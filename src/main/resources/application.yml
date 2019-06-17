@@ -1,0 +1,85 @@
+spring:
+  application:
+    name: @name@
+    description: @description@
+---
+info:
+  version: @version@
+  responsible: @project.maintainer@
+  stage: @stage@
+---
+management:
+  metrics:
+    export:
+      statsd:
+        flavor: etsy
+---
+server:
+  port: @server.port@
+---
+kafka:
+  bootstrap:
+    servers: kenny-kafka1.bst1.rbkmoney.net:9092
+  invoice:
+    topic: mg-invoice-100-2-v4
+  concurrency: 1
+  ssl:
+    enable: true
+    keystore-location: /tmp/p.popov.p12
+    keystore-password: ""
+    key-password: ""
+    server-password: ""
+    server-keystore-location: /tmp/truststore.p12
+---
+spring:
+  flyway:
+    validate-on-migrate: true
+    schemas: cashreg
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    properties:
+      hibernate:
+        default_schema: cashreg
+        temp:
+          use_jdbc_metadata_defaults: false
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: false
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5432/cashreg
+    username: test
+    password: test
+    hikari:
+      maximum-pool-size: 3
+      idle-timeout: 30000
+      leak-detection-threshold: 60000
+      schema: cashreg
+---
+cron:
+  expression:
+    debit: 60000
+    refund_debit: 60000
+    status: 60000
+query:
+  limit:
+    debit: 30
+    refund_debit: 30
+    status: 30
+polling:
+  limit:
+    timeout: 60
+caffeine:
+  expire_after_write: 90
+  maximum_size: 1000
+---
+restTemplate:
+  connectTimeout: 3000
+  connectionRequestTimeout: 60000
+  readTimeout: 60000
+---
+retry-policy:
+  maxAttempts: -1
+
