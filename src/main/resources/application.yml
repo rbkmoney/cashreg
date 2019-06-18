@@ -75,11 +75,6 @@ caffeine:
   expire_after_write: 90
   maximum_size: 1000
 ---
-restTemplate:
-  connectTimeout: 3000
-  connectionRequestTimeout: 60000
-  readTimeout: 60000
----
 retry-policy:
   maxAttempts: -1
 

@@ -48,6 +48,9 @@ public class Payment {
     @Column(name = "partial_amount")
     private Long partialAmount;
 
+    @Column(name = "currency")
+    private String currency;
+
     @ManyToOne
     @JoinColumn(name = "payer_info_id")
     private PayerInfo payerInfo;

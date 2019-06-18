@@ -8,11 +8,12 @@ import com.rbkmoney.cashreg.service.CashRegDeliveryService;
 import com.rbkmoney.cashreg.utils.CashRegUtils;
 import com.rbkmoney.cashreg.utils.Converter;
 import com.rbkmoney.cashreg.utils.PageUtils;
+import com.rbkmoney.cashreg.utils.constant.CartState;
 import com.rbkmoney.cashreg.utils.constant.CashRegStatus;
 import com.rbkmoney.cashreg.utils.constant.CashRegTypeOperation;
 import com.rbkmoney.file.storage.base.Cash;
 import com.rbkmoney.file.storage.base.ContactInfo;
-import com.rbkmoney.file.storage.base.Currency;
+import com.rbkmoney.file.storage.base.CurrencyRef;
 import com.rbkmoney.kkt.provider.*;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -90,7 +91,6 @@ public class CashregScheduled {
                         String url = delivery.getInvoiceId().getAccount().getCashbox().getUrl();
                         KktProviderSrv.Iface kktProvider = kktProviderSrv(url, kktNetworkTimeout);
 
-                        // TODO: full or partial cart, add check
                         KktContext context = new KktContext();
                         Settings settings = extractSettings(delivery.getInvoiceId().getAccount().getCashbox().getSettings());
 
@@ -98,11 +98,26 @@ public class CashregScheduled {
 
                         context.setOptions(settings.prepareMap());
 
-
                         PaymentInfo paymentInfo = new PaymentInfo();
-                        paymentInfo.setCart(Converter.getInvoiceLines(delivery.getInvoiceId().getExchangeCart()));
 
-                        // TODO add currency
+                        /**
+                         * if full cart, do full refund debit from invoice cart
+                         * if partial cart, do partial refund debit from refund cart
+                         */
+                        if (delivery.getCartState().equalsIgnoreCase(CartState.FULL)) {
+                            paymentInfo.setCart(Converter.getInvoiceLines(
+                                    delivery.getInvoiceId().getCart(),
+                                    delivery.getInvoiceId().getCurrency()
+                                    )
+                            );
+                        } else {
+                            paymentInfo.setCart(Converter.getInvoiceLines(
+                                    delivery.getRefundId().getPreviousCart(),
+                                    delivery.getInvoiceId().getCurrency()
+                                    )
+                            );
+                        }
+
                         Cash cash = prepareCash(delivery);
                         paymentInfo.setCash(cash);
 
@@ -167,20 +182,46 @@ public class CashregScheduled {
                         String url = delivery.getInvoiceId().getAccount().getCashbox().getUrl();
                         KktProviderSrv.Iface kktProvider = kktProviderSrv(url, kktNetworkTimeout);
 
-                        // TODO: full or partial cart, add check
+                        // if no refund cart and amount not equals - throw exception
+                        if (delivery.getRefundId() != null &&
+                                !delivery.getInvoiceId().getAmount().equals(delivery.getRefundId().getAmount())
+                                && delivery.getRefundId().getCart() != null
+                        ) {
+                            String message = String.format(CashRegTypeOperation.REFUND_DEBIT + " invoice %s amount != refund %s amount",
+                                    delivery.getInvoiceId(), delivery.getRefundId()
+                            );
+                            log.error(message);
+                            throw new RuntimeException(message);
+                        }
+
+
                         KktContext context = new KktContext();
                         Settings settings = extractSettings(delivery.getInvoiceId().getAccount().getCashbox().getSettings());
 
                         context.setAccountInfo(prepareAccountInfo(settings));
-
                         context.setOptions(settings.prepareMap());
 
 
                         PaymentInfo paymentInfo = new PaymentInfo();
-                        paymentInfo.setCart(Converter.getInvoiceLines(delivery.getInvoiceId().getExchangeCart()));
 
+                        /**
+                         * if full cart, do full refund debit from invoice cart
+                         * if partial cart, do partial refund debit from refund cart
+                         */
+                        if (delivery.getCartState().equalsIgnoreCase(CartState.FULL)) {
+                            paymentInfo.setCart(Converter.getInvoiceLines(
+                                    delivery.getInvoiceId().getCart(),
+                                    delivery.getInvoiceId().getCurrency()
+                                    )
+                            );
+                        } else {
+                            paymentInfo.setCart(Converter.getInvoiceLines(
+                                    delivery.getRefundId().getPreviousCart(),
+                                    delivery.getInvoiceId().getCurrency()
+                                    )
+                            );
+                        }
 
-                        // TODO add currency
                         Cash cash = prepareCash(delivery);
                         paymentInfo.setCash(cash);
 
@@ -244,7 +285,6 @@ public class CashregScheduled {
                     String url = delivery.getInvoiceId().getAccount().getCashbox().getUrl();
                     KktProviderSrv.Iface kktProvider = kktProviderSrv(url, kktNetworkTimeout);
 
-                    // TODO: full or partial cart, add check
                     KktContext context = new KktContext();
                     Settings settings = extractSettings(delivery.getInvoiceId().getAccount().getCashbox().getSettings());
 
@@ -254,10 +294,11 @@ public class CashregScheduled {
                     context.setRequestId(delivery.getCashregUuid());
 
                     PaymentInfo paymentInfo = new PaymentInfo();
-                    paymentInfo.setCart(Converter.getInvoiceLines(delivery.getInvoiceId().getExchangeCart()));
+                    paymentInfo.setCart(Converter.getInvoiceLines(
+                            delivery.getInvoiceId().getExchangeCart(),
+                            delivery.getInvoiceId().getCurrency())
+                    );
 
-
-                    // TODO add currency
                     Cash cash = prepareCash(delivery);
                     paymentInfo.setCash(cash);
 
@@ -308,16 +349,12 @@ public class CashregScheduled {
     }
 
     private Cash prepareCash(CashRegDelivery delivery) {
+        CurrencyRef currencyRef = new CurrencyRef();
+        currencyRef.setSymbolicCode(delivery.getInvoiceId().getCurrency());
+
         Cash cash = new Cash();
         cash.setAmount(delivery.getInvoiceId().getAmount());
-
-        Currency currency = new Currency();
-        currency.setExponent((short) 2);
-        currency.setName("Rubles");
-        currency.setNumericCode((short) 643);
-        currency.setSymbolicCode("RUB");
-
-        cash.setCurrency(currency);
+        cash.setCurrency(currencyRef);
         return cash;
     }
 

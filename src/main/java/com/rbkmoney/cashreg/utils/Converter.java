@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.cashreg.model.InvoiceLine;
 import com.rbkmoney.cashreg.model.Settings;
 import com.rbkmoney.file.storage.base.Cash;
-import com.rbkmoney.file.storage.base.Currency;
+import com.rbkmoney.file.storage.base.CurrencyRef;
 import com.rbkmoney.kkt.provider.Cart;
 import com.rbkmoney.kkt.provider.ItemsLine;
 
@@ -31,12 +31,11 @@ public class Converter {
         }
     }
 
-    public static Cart getInvoiceLines(String cart) {
-        try
-        {
+    public static Cart getInvoiceLines(String cart, String currencyRef) {
+        try {
             List<InvoiceLine> lineList = (cart == null)
-                ? Collections.emptyList()
-                : objectMapper.readValue(cart, objectMapper.getTypeFactory().constructCollectionType(List.class, InvoiceLine.class));
+                    ? Collections.emptyList()
+                    : objectMapper.readValue(cart, objectMapper.getTypeFactory().constructCollectionType(List.class, InvoiceLine.class));
 
             Cart prepareCart = new Cart();
             List<ItemsLine> itemsLines = new ArrayList<>();
@@ -47,11 +46,8 @@ public class Converter {
                 Cash cash = new Cash();
                 cash.setAmount(invoiceLine.getPrice().longValue());
 
-                Currency currency = new Currency();
-                currency.setExponent((short) 2);
-                currency.setName("Rubles");
-                currency.setNumericCode((short) 643);
-                currency.setSymbolicCode("RUB");
+                CurrencyRef currency = new CurrencyRef();
+                currency.setSymbolicCode(currencyRef);
 
                 cash.setCurrency(currency);
 
@@ -64,7 +60,7 @@ public class Converter {
 
             prepareCart.setLines(itemsLines);
             return prepareCart;
-        }catch (Exception ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }

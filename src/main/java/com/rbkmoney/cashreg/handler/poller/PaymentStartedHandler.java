@@ -100,6 +100,8 @@ public class PaymentStartedHandler implements PollingEventHandler {
             payment.setPayerInfo(payerInfo);
             payment.setStatus(PaymentStatus.STARTED);
 
+            payment.setCurrency(invoicePayment.getCost().getCurrency().getSymbolicCode());
+
             String currentPaymentType;
             if (payer.isSetPaymentResource()) {
                 currentPaymentType = payer.getPaymentResource().getResource().getPaymentTool().getSetField().getFieldName();

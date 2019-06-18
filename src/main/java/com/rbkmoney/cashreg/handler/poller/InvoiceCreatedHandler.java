@@ -50,6 +50,8 @@ public class InvoiceCreatedHandler implements PollingEventHandler {
         invoicePayer.setAccount(account);
         invoicePayer.setInvoiceId(invoiceId);
 
+        invoicePayer.setCurrency(invoice.getCost().getCurrency().getSymbolicCode());
+
         String context = new String(invoice.getContext().getData(), Charset.forName("UTF-8"));
         invoicePayer.setMetadata(context);
         invoicePayer.setAmount(invoice.getCost().getAmount());

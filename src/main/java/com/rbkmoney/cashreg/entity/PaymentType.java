@@ -18,6 +18,7 @@ public class PaymentType {
     public static final String BANK_CARD = "bank_card";
     public static final String PAYMENT_TERMINAL = "payment_terminal";
     public static final String DIGITAL_WALLET = "digital_wallet";
+    public static final String CRYPTO_WALLET = "crypto_wallet";
 
 
     @Id

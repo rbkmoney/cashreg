@@ -61,6 +61,8 @@ public class InvoicePaymentRefundChangedSuccessHandler implements PollingEventHa
         Refund refund = invoicePayer.getPayment().getRefund();
         refund.setStatus(RefundStatus.SUCCEEDED);
         refund.setPreviousCart(invoicePayer.getExchangeCart());
+        refund.setCart(refund.getCart());
+        invoicePayer.setExchangeCart(refund.getCart());
 
         Refund refundDB = refundService.save(refund);
 

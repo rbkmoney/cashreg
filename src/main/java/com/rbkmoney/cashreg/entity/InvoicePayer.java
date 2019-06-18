@@ -42,6 +42,10 @@ public class InvoicePayer {
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
+    @ManyToOne
+    @JoinColumn(name = "currency")
+    private String currency;
+
     /**
      * Amount
      * e.g. 10000 (minor units)
