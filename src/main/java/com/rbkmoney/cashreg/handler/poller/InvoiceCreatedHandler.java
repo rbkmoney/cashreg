@@ -11,7 +11,6 @@ import com.rbkmoney.cashreg.service.InvoicePayerService;
 import com.rbkmoney.damsel.domain.Invoice;
 import com.rbkmoney.damsel.domain.InvoiceLine;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
-import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -33,14 +32,17 @@ public class InvoiceCreatedHandler implements PollingEventHandler {
     private final ObjectMapper objectMapper;
 
 
-    public void handle(InvoiceChange ic, MachineEvent event, String sourceId) {
+    public void handle(InvoiceChange ic, String sourceId) {
         Invoice invoice = ic.getInvoiceCreated().getInvoice();
         String invoiceId = invoice.getId();
         log.info("Start {}: invoice_id {}", handlerEvent, invoiceId);
 
-        String partyId = invoice.getOwnerId();
-        String shopId = invoice.getShopId();
-        Account account = accountService.findByMerchantIdAndShopId(partyId, shopId);
+        if (invoicePayerService.findByInvoiceId(invoiceId) != null) {
+            log.info("Duplicate found, invoice: {}", invoiceId);
+            return;
+        }
+
+        Account account = accountService.findByMerchantIdAndShopId(invoice.getOwnerId(), invoice.getShopId());
         if (account == null) {
             log.debug("{}: Account is missing", handlerEvent);
             return;
@@ -70,10 +72,7 @@ public class InvoiceCreatedHandler implements PollingEventHandler {
             }
         }
 
-        invoicePayer = invoicePayerService.save(invoicePayer);
-        if (invoicePayer == null) {
-            log.debug("{}: InvoicePayer not save", handlerEvent);
-        }
+        invoicePayerService.save(invoicePayer);
 
         log.info("End {}: invoice_id {}", handlerEvent, invoice.getId());
     }

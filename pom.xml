@@ -26,7 +26,7 @@
         <exposed.ports>${server.port}</exposed.ports>
         <project.maintainer>Anatoly Cherkasov &lt;a.cherkasov@rbkmoney.com&gt;</project.maintainer>
         <dockerfile.Template>GENERATED DOCKER FILE</dockerfile.Template>
-        <dockerfile.base.service.tag>bc95d0d6dc13c693acd2b274531a7d604b877bf3</dockerfile.base.service.tag>
+        <dockerfile.base.service.tag>c0d0900ec19c907d866f8360031a836049985110</dockerfile.base.service.tag>
         <dockerfile.registry>dr2.rbkmoney.com</dockerfile.registry>
         <shared.resources.version>0.3.6</shared.resources.version>
         <logstash-logback-encoder.version>5.2</logstash-logback-encoder.version>
@@ -41,7 +41,7 @@
         <hikaricp.version>3.3.1</hikaricp.version>
 
         <testcontainers.version>1.10.2</testcontainers.version>
-        <kafka.common.lib.version>0.0.3</kafka.common.lib.version>
+        <kafka.common.lib.version>0.0.9</kafka.common.lib.version>
         <damsel.version>1.303-d99319c</damsel.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -50,7 +50,7 @@
     <dependencies>
         <dependency>
             <groupId>com.rbkmoney</groupId>
-            <artifactId>kkt-proto</artifactId>
+            <artifactId>cashreg-proto</artifactId>
             <version>SNAPSHOT</version>
         </dependency>
         <!--Thrirdparty libs-->
@@ -125,6 +125,11 @@
             <version>${custom.flyway.version}</version>
         </dependency>
         <!--RBK libs-->
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>sink-common-lib</artifactId>
+            <version>0.0.3</version>
+        </dependency>
         <dependency>
             <groupId>com.rbkmoney.geck</groupId>
             <artifactId>common</artifactId>

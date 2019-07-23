@@ -11,7 +11,6 @@ import com.rbkmoney.cashreg.utils.constant.CashRegStatus;
 import com.rbkmoney.cashreg.utils.constant.CashRegTypeOperation;
 import com.rbkmoney.cashreg.utils.constant.PaymentStatus;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
-import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -27,49 +26,41 @@ public class InvoicePaymentStatusChangedFailedHandler implements PollingEventHan
     private final PaymentService paymentService;
     private final CashRegDeliveryService cashRegDeliveryService;
 
-    public void handle(InvoiceChange ic, MachineEvent event, String invoiceId) {
+    public void handle(InvoiceChange ic, String invoiceId) {
         String paymentId = ic.getInvoicePaymentChange().getId();
+        log.info("Start {} with paymentId {}.{}", handlerEvent, invoiceId, paymentId);
 
-        log.info("Start {} with invoice_id {}, paymentId {}", handlerEvent, invoiceId, paymentId);
 
         InvoicePayer invoicePayer = invoicePayerService.findByInvoiceIdAndPaymentId(invoiceId, paymentId);
         if (invoicePayer == null) {
-            log.debug("PaymentPayer is missing, invoiceId {}", invoiceId);
+            log.info("InvoicePayer is missing, payment {}.{}", invoiceId, paymentId);
             return;
         }
 
         Payment payment = invoicePayer.getPayment();
+
+        if (!PaymentStatus.STARTED.equals(payment.getStatus())) {
+            log.info("Duplicate found, payment: {}.{}", invoiceId, paymentId);
+            return;
+        }
+
         payment.setStatus(PaymentStatus.FAILED);
 
         Payment paymentDB = paymentService.save(payment);
-        if (paymentDB == null) {
-            log.debug("{}: couldn't save Payment. payment {}.{}", handlerEvent, invoiceId, paymentId);
-            return;
-        } else {
-            log.debug("{}: saved Payment. payment {}.{}", handlerEvent, invoiceId, paymentId);
-        }
+
 
         CashRegDelivery cashRegDeliveryCheck = cashRegDeliveryService.findByTypeOperationAndCashregStatus(
                 invoicePayer, paymentDB, CashRegTypeOperation.DEBIT
         );
 
         if(cashRegDeliveryCheck != null) {
-            CashRegDelivery cashRegDelivery = new CashRegDelivery();
-            cashRegDelivery.setInvoiceId(invoicePayer);
-            cashRegDelivery.setPaymentId(paymentDB);
-            cashRegDelivery.setTypeOperation(CashRegTypeOperation.REFUND_DEBIT);
-            cashRegDelivery.setCashregStatus(CashRegStatus.READY);
-
-            CashRegDelivery cashRegDeliveryDB = cashRegDeliveryService.save(cashRegDelivery);
-            if (cashRegDeliveryDB == null) {
-                log.debug("{}: couldn't save CashRegDelivery. payment {}.{}", handlerEvent, invoiceId, paymentId);
-                return;
-            } else {
-                log.debug("{}: saved CashRegDelivery. payment {}.{}", handlerEvent, invoiceId, paymentId);
-            }
+            cashRegDeliveryService.save(new CashRegDelivery(invoicePayer,
+                    paymentDB,
+                    CashRegTypeOperation.REFUND_DEBIT,
+                    CashRegStatus.READY));
         }
 
-        log.info("End {} with invoice_id {}, paymentId {}",
+        log.info("End {} with paymentId {}.{}",
                 handlerEvent, invoiceId, paymentId
         );
     }

@@ -4,6 +4,10 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.rbkmoney.cashreg.entity.*;
 import com.rbkmoney.cashreg.model.Settings;
 import com.rbkmoney.cashreg.model.StatusPolling;
+import com.rbkmoney.cashreg.proto.base.Cash;
+import com.rbkmoney.cashreg.proto.base.ContactInfo;
+import com.rbkmoney.cashreg.proto.base.CurrencyRef;
+import com.rbkmoney.cashreg.proto.provider.*;
 import com.rbkmoney.cashreg.service.CashRegDeliveryService;
 import com.rbkmoney.cashreg.utils.CashRegUtils;
 import com.rbkmoney.cashreg.utils.Converter;
@@ -11,15 +15,10 @@ import com.rbkmoney.cashreg.utils.PageUtils;
 import com.rbkmoney.cashreg.utils.constant.CartState;
 import com.rbkmoney.cashreg.utils.constant.CashRegStatus;
 import com.rbkmoney.cashreg.utils.constant.CashRegTypeOperation;
-import com.rbkmoney.file.storage.base.Cash;
-import com.rbkmoney.file.storage.base.ContactInfo;
-import com.rbkmoney.file.storage.base.CurrencyRef;
-import com.rbkmoney.kkt.provider.*;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -46,7 +45,7 @@ public class CashregScheduled {
     private final int queryLimitStatus;
 
     private final long pollingLimitTimeout;
-    private final int kktNetworkTimeout;
+    private final int cashRegNetworkTimeout;
 
     private final Cache<String, StatusPolling> cache;
 
@@ -57,7 +56,7 @@ public class CashregScheduled {
             @Value("${query.limit.refund_debit:30}") int queryLimitRefundDebit,
             @Value("${query.limit.status:30}") int queryLimitStatus,
             @Value("${polling.limit.timeout:60}") long pollingLimitTimeout,
-            @Value("${kkt.networkTimeout:60}") int kktNetworkTimeout,
+            @Value("${cashreg.networkTimeout:60}") int cashRegNetworkTimeout,
             Cache<String, StatusPolling> cache
     ) {
         Assert.notNull(deliveryService, "deliveryService must not be null");
@@ -69,12 +68,11 @@ public class CashregScheduled {
         this.queryLimitStatus = queryLimitStatus;
 
         this.pollingLimitTimeout = pollingLimitTimeout;
-        this.kktNetworkTimeout = kktNetworkTimeout;
+        this.cashRegNetworkTimeout = cashRegNetworkTimeout;
 
         this.cache = cache;
     }
 
-    @ConditionalOnProperty(prefix = "cron.expression.", name = "debit", matchIfMissing = true)
     @Scheduled(fixedRateString = "${cron.expression.debit}")
     public void debit() {
 
@@ -89,9 +87,9 @@ public class CashregScheduled {
 
                     try {
                         String url = delivery.getInvoiceId().getAccount().getCashbox().getUrl();
-                        KktProviderSrv.Iface kktProvider = kktProviderSrv(url, kktNetworkTimeout);
+                        CashRegProviderSrv.Iface cashRegProvider = cashRegProviderSrv(url, cashRegNetworkTimeout);
 
-                        KktContext context = new KktContext();
+                        CashRegContext context = new CashRegContext();
                         Settings settings = extractSettings(delivery.getInvoiceId().getAccount().getCashbox().getSettings());
 
                         context.setAccountInfo(prepareAccountInfo(settings));
@@ -112,7 +110,7 @@ public class CashregScheduled {
                             );
                         } else {
                             paymentInfo.setCart(Converter.getInvoiceLines(
-                                    delivery.getRefundId().getPreviousCart(),
+                                    delivery.getRefundId().getCart(),
                                     delivery.getInvoiceId().getCurrency()
                                     )
                             );
@@ -135,7 +133,7 @@ public class CashregScheduled {
 
                         context.setRequestId(requestId);
 
-                        KktResult result = kktProvider.debit(context);
+                        CashRegResult result = cashRegProvider.debit(context);
                         delivery.setCashregStatus(CashRegStatus.ERROR);
 
                         if (result.getIntent().getFinish().getStatus().isSetSuccess()) {
@@ -165,7 +163,6 @@ public class CashregScheduled {
 
     }
 
-    @ConditionalOnProperty(prefix = "cron.expression.", name = "refund_debit", matchIfMissing = true)
     @Scheduled(fixedRateString = "${cron.expression.refund_debit}")
     public void refundDebit() {
 
@@ -180,7 +177,7 @@ public class CashregScheduled {
 
                     try {
                         String url = delivery.getInvoiceId().getAccount().getCashbox().getUrl();
-                        KktProviderSrv.Iface kktProvider = kktProviderSrv(url, kktNetworkTimeout);
+                        CashRegProviderSrv.Iface cashRegProvider = cashRegProviderSrv(url, cashRegNetworkTimeout);
 
                         // if no refund cart and amount not equals - throw exception
                         if (delivery.getRefundId() != null &&
@@ -195,7 +192,7 @@ public class CashregScheduled {
                         }
 
 
-                        KktContext context = new KktContext();
+                        CashRegContext context = new CashRegContext();
                         Settings settings = extractSettings(delivery.getInvoiceId().getAccount().getCashbox().getSettings());
 
                         context.setAccountInfo(prepareAccountInfo(settings));
@@ -239,7 +236,7 @@ public class CashregScheduled {
 
                         context.setRequestId(requestId);
 
-                        KktResult result = kktProvider.refundDebit(context);
+                        CashRegResult result = cashRegProvider.refundDebit(context);
 
                         delivery.setCashregStatus(CashRegStatus.ERROR);
 
@@ -267,11 +264,9 @@ public class CashregScheduled {
 
                 }
         );
-
     }
 
 
-    @ConditionalOnProperty(prefix = "cron.expression.", name = "status", matchIfMissing = true)
     @Scheduled(fixedRateString = "${cron.expression.status}")
     public void status() {
 
@@ -283,9 +278,9 @@ public class CashregScheduled {
         deliveryList.forEach((delivery) -> {
 
                     String url = delivery.getInvoiceId().getAccount().getCashbox().getUrl();
-                    KktProviderSrv.Iface kktProvider = kktProviderSrv(url, kktNetworkTimeout);
+                    CashRegProviderSrv.Iface kktProvider = cashRegProviderSrv(url, cashRegNetworkTimeout);
 
-                    KktContext context = new KktContext();
+                    CashRegContext context = new CashRegContext();
                     Settings settings = extractSettings(delivery.getInvoiceId().getAccount().getCashbox().getSettings());
 
                     context.setAccountInfo(prepareAccountInfo(settings));
@@ -308,7 +303,7 @@ public class CashregScheduled {
                     context.setPaymentInfo(paymentInfo);
 
                     try {
-                        KktResult result = kktProvider.getStatus(context);
+                        CashRegResult result = kktProvider.getStatus(context);
                         checkTimeoutPolling(delivery, cache, pollingLimitTimeout);
 
                         if (result.getIntent().getFinish().getStatus().isSetSuccess()) {
@@ -419,12 +414,12 @@ public class CashregScheduled {
         return TaxMode.valueOf(taxMode);
     }
 
-    public KktProviderSrv.Iface kktProviderSrv(String url, Integer networkTimeout) {
+    public CashRegProviderSrv.Iface cashRegProviderSrv(String url, Integer networkTimeout) {
         try {
             return new THSpawnClientBuilder()
                     .withAddress(new URI(url))
                     .withNetworkTimeout(networkTimeout)
-                    .build(KktProviderSrv.Iface.class);
+                    .build(CashRegProviderSrv.Iface.class);
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }

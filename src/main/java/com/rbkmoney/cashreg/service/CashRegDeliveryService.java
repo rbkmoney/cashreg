@@ -15,6 +15,9 @@ import org.springframework.util.Assert;
 
 import java.util.List;
 
+import static com.rbkmoney.cashreg.utils.constant.CashRegStatus.READY;
+import static com.rbkmoney.cashreg.utils.constant.CashRegTypeOperation.REFUND_DEBIT;
+
 @Slf4j
 @Service
 public class CashRegDeliveryService {
@@ -71,6 +74,17 @@ public class CashRegDeliveryService {
     }
     private Pageable createPageRequest(int page, int size) {
         return new PageRequest(page, size, Sort.Direction.ASC, "id");
+    }
+
+    public void createRefundCashRegIfExists(InvoicePayer invoicePayer, Payment paymentDB, String typeOperation) {
+        CashRegDelivery cashRegDeliveryCheck = findByTypeOperationAndCashregStatus(invoicePayer, paymentDB, typeOperation);
+
+        if (cashRegDeliveryCheck != null) {
+            save(new CashRegDelivery(invoicePayer, paymentDB, REFUND_DEBIT, READY));
+        } else {
+            log.warn("Cashreg for invoicePayer {}, payment {} wasn't found", invoicePayer, paymentDB);
+        }
+
     }
 
 }

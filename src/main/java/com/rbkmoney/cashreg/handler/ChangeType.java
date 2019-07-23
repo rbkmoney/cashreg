@@ -8,22 +8,22 @@ import com.rbkmoney.geck.filter.rule.PathConditionRule;
 
 public enum ChangeType {
 
-    INVOICE_CREATED("invoice_created", new IsNullCondition().not()),
-    INVOICE_STATUS_CHANGED("invoice_status_changed", new IsNullCondition().not()),
-    INVOICE_STATUS_CHANGED_PAID("invoice_status_changed.status.paid", new IsNullCondition().not()),
+    INVOICE_CREATED("invoice_created", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
+    INVOICE_STATUS_CHANGED("invoice_status_changed", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
+    INVOICE_STATUS_CHANGED_PAID("invoice_status_changed.status.paid", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
 
-    INVOICE_PAYMENT_STARTED("invoice_payment_change.payload.invoice_payment_started", new IsNullCondition().not()),
-    INVOICE_PAYMENT_STATUS_CHANGED("invoice_payment_change.payload.invoice_payment_status_changed", new IsNullCondition().not()),
-    INVOICE_PAYMENT_STATUS_CHANGED_PENDING("invoice_payment_change.payload.invoice_payment_status_changed.status.pending", new IsNullCondition().not()),
-    INVOICE_PAYMENT_STATUS_CHANGED_PROCESSED("invoice_payment_change.payload.invoice_payment_status_changed.status.processed", new IsNullCondition().not()),
-    INVOICE_PAYMENT_STATUS_CHANGED_CAPTURED("invoice_payment_change.payload.invoice_payment_status_changed.status.captured", new IsNullCondition().not()),
-    INVOICE_PAYMENT_STATUS_CHANGED_CANCELLED("invoice_payment_change.payload.invoice_payment_status_changed.status.cancelled", new IsNullCondition().not()),
-    INVOICE_PAYMENT_STATUS_CHANGED_REFUNDED("invoice_payment_change.payload.invoice_payment_status_changed.status.refunded", new IsNullCondition().not()),
-    INVOICE_PAYMENT_STATUS_CHANGED_FAILED("invoice_payment_change.payload.invoice_payment_status_changed.status.failed", new IsNullCondition().not()),
+    INVOICE_PAYMENT_STARTED("invoice_payment_change.payload.invoice_payment_started", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
+    INVOICE_PAYMENT_STATUS_CHANGED("invoice_payment_change.payload.invoice_payment_status_changed", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
+    INVOICE_PAYMENT_STATUS_CHANGED_PENDING("invoice_payment_change.payload.invoice_payment_status_changed.status.pending", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
+    INVOICE_PAYMENT_STATUS_CHANGED_PROCESSED("invoice_payment_change.payload.invoice_payment_status_changed.status.processed", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
+    INVOICE_PAYMENT_STATUS_CHANGED_CAPTURED("invoice_payment_change.payload.invoice_payment_status_changed.status.captured", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
+    INVOICE_PAYMENT_STATUS_CHANGED_CANCELLED("invoice_payment_change.payload.invoice_payment_status_changed.status.cancelled", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
+    INVOICE_PAYMENT_STATUS_CHANGED_REFUNDED("invoice_payment_change.payload.invoice_payment_status_changed.status.refunded", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
+    INVOICE_PAYMENT_STATUS_CHANGED_FAILED("invoice_payment_change.payload.invoice_payment_status_changed.status.failed", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
 
-    INVOICE_PAYMENT_REFUND_CREATED("invoice_payment_change.payload.invoice_payment_refund_change.payload.invoice_payment_refund_created", new IsNullCondition().not()),
-    INVOICE_PAYMENT_REFUND_STATUS_CHANGED("invoice_payment_change.payload.invoice_payment_refund_change.payload.invoice_payment_refund_status_changed", new IsNullCondition().not()),
-    INVOICE_PAYMENT_REFUND_CHANGED_SUCCEEDED("invoice_payment_change.payload.invoice_payment_refund_change.payload.invoice_payment_refund_status_changed.status.succeeded", new IsNullCondition().not());
+    INVOICE_PAYMENT_REFUND_CREATED("invoice_payment_change.payload.invoice_payment_refund_change.payload.invoice_payment_refund_created", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
+    INVOICE_PAYMENT_REFUND_STATUS_CHANGED("invoice_payment_change.payload.invoice_payment_refund_change.payload.invoice_payment_refund_status_changed", ChangeTypeCondition.IS_NOT_NULL_CONDITION),
+    INVOICE_PAYMENT_REFUND_CHANGED_SUCCEEDED("invoice_payment_change.payload.invoice_payment_refund_change.payload.invoice_payment_refund_status_changed.status.succeeded", ChangeTypeCondition.IS_NOT_NULL_CONDITION);
 
     Filter filter;
 
@@ -33,6 +33,10 @@ public enum ChangeType {
 
     public Filter getFilter() {
         return filter;
+    }
+
+    private static class ChangeTypeCondition {
+        public static final Condition IS_NOT_NULL_CONDITION = new IsNullCondition().not();
     }
 
 }

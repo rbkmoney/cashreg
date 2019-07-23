@@ -2,18 +2,19 @@ package com.rbkmoney.cashreg.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-@ToString
+
 @Getter
 @Setter
+@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Settings implements Serializable {
 
@@ -65,17 +66,13 @@ public class Settings implements Serializable {
     @JsonProperty(value = "payment_object")
     private String paymentObject;
 
+    @SuppressWarnings("unchecked")
     public Map<String, String> prepareMap() {
-        Map<String, String> map = new HashMap<>();
-        for (Field field : Settings.class.getDeclaredFields()) {
-            // Skip this if you intend to access to public fields only
-            if (!field.canAccess(field)) {
-                field.setAccessible(true);
-            }
-            map.put(field.getName(), field.toString());
-        }
-
-        return map;
+        Map<String, String> map = new ObjectMapper().convertValue(this, Map.class);
+        return map.entrySet()
+                .stream()
+                .filter(e -> e.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 }

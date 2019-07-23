@@ -1,18 +1,15 @@
 package com.rbkmoney.cashreg.handler.poller;
 
 
-import com.rbkmoney.cashreg.entity.CashRegDelivery;
 import com.rbkmoney.cashreg.entity.InvoicePayer;
 import com.rbkmoney.cashreg.entity.Payment;
 import com.rbkmoney.cashreg.handler.ChangeType;
 import com.rbkmoney.cashreg.service.CashRegDeliveryService;
 import com.rbkmoney.cashreg.service.InvoicePayerService;
 import com.rbkmoney.cashreg.service.PaymentService;
-import com.rbkmoney.cashreg.utils.constant.CashRegStatus;
 import com.rbkmoney.cashreg.utils.constant.CashRegTypeOperation;
 import com.rbkmoney.cashreg.utils.constant.PaymentStatus;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
-import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -29,48 +26,31 @@ public class InvoicePaymentStatusChangedCancelled implements PollingEventHandler
     private final CashRegDeliveryService cashRegDeliveryService;
 
     @Override
-    public void handle(InvoiceChange ic, MachineEvent event, String invoiceId) {
+    public void handle(InvoiceChange ic, String invoiceId) {
         String paymentId = ic.getInvoicePaymentChange().getId();
         log.info("Start {} with payment {}.{}", handlerEvent, invoiceId, paymentId);
 
         InvoicePayer invoicePayer = invoicePayerService.findByInvoiceIdAndPaymentId(invoiceId, paymentId);
         if (invoicePayer == null) {
-            log.debug("{}: InvoicePayer is missing, invoiceId {}", handlerEvent, invoiceId);
+            log.info("InvoicePayer is missing, payment {}.{}", invoiceId, paymentId);
             return;
         }
 
         Payment payment = invoicePayer.getPayment();
+
+        if (!PaymentStatus.PROCESSED.equals(payment.getStatus())) {
+            log.info("Duplicate found, payment: {}.{}", invoiceId, paymentId);
+            return;
+        }
+
         payment.setStatus(PaymentStatus.CANCELLED);
 
         Payment paymentDB = paymentService.save(payment);
-        if (paymentDB == null) {
-            log.debug("{}: couldn't save Payment. payment {}.{}", handlerEvent, invoiceId, paymentId);
-            return;
-        } else {
-            log.debug("{}: saved Payment. payment {}.{}", handlerEvent, invoiceId, paymentId);
-        }
 
-        CashRegDelivery cashRegDeliveryCheck = cashRegDeliveryService.findByTypeOperationAndCashregStatus(
-                invoicePayer, paymentDB, CashRegTypeOperation.DEBIT
-        );
+        cashRegDeliveryService.createRefundCashRegIfExists(invoicePayer, paymentDB, CashRegTypeOperation.DEBIT);
 
-        if(cashRegDeliveryCheck != null) {
-            CashRegDelivery cashRegDelivery = new CashRegDelivery();
-            cashRegDelivery.setInvoiceId(invoicePayer);
-            cashRegDelivery.setPaymentId(paymentDB);
-            cashRegDelivery.setTypeOperation(CashRegTypeOperation.REFUND_DEBIT);
-            cashRegDelivery.setCashregStatus(CashRegStatus.READY);
-
-            CashRegDelivery cashRegDeliveryDB = cashRegDeliveryService.save(cashRegDelivery);
-            if (cashRegDeliveryDB == null) {
-                log.debug("{}: couldn't save CashRegDelivery. payment {}.{}", handlerEvent, invoiceId, paymentId);
-                return;
-            } else {
-                log.debug("{}: saved CashRegDelivery. payment {}.{}", handlerEvent, invoiceId, paymentId);
-            }
-        }
-
-        log.info("End {} with invoice_id {}, paymentId {}", handlerEvent, invoiceId, paymentId);
+        log.info("End {} with paymentId {}.{}",
+                handlerEvent, invoiceId, paymentId);
     }
 
     @Override

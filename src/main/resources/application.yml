@@ -18,18 +18,28 @@ server:
   port: @server.port@
 ---
 kafka:
-  bootstrap:
-    servers: kenny-kafka1.bst1.rbkmoney.net:9092
-  invoice:
-    topic: mg-invoice-100-2-v4
-  concurrency: 1
+  exception.sleep: 1000
+  bootstrap-servers: kenny-kafka1.bst1.rbkmoney.net:9092
+  client-id: starrys
   ssl:
-    enable: true
-    keystore-location: /tmp/p.popov.p12
-    keystore-password: ""
-    key-password: ""
-    server-password: ""
-    server-keystore-location: /tmp/truststore.p12
+    enabled: false
+  #    trust-store-location: "test"
+  #    trust-store-password: "test"
+  #    key-store-location: "test"
+  #    key-store-password: "test"
+  #    key-password: "test"
+  #    key-store-type: PKCS12
+  #    trust-store-type: PKCS12
+  consumer:
+    concurrency: 8
+    group-id: "StarrysListener"
+    enable-auto-commit: false
+    auto-offset-reset: latest
+    max-poll-records: 20
+  topics:
+    invoice:
+      id: mg-invoice-100-2
+      enabled: false
 ---
 spring:
   flyway:
@@ -77,4 +87,6 @@ caffeine:
 ---
 retry-policy:
   maxAttempts: -1
-
+---
+cashreg:
+  networkTimeout: 60

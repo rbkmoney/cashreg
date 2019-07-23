@@ -10,9 +10,10 @@ import lombok.ToString;
 import java.math.BigInteger;
 import java.util.Map;
 
-@ToString
+
 @Getter
 @Setter
+@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InvoiceLine {

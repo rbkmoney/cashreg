@@ -9,9 +9,10 @@ import lombok.ToString;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-@ToString
+
 @Getter
 @Setter
+@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Items {
 

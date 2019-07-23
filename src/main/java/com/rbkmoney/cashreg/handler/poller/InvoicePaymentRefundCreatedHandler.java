@@ -10,10 +10,8 @@ import com.rbkmoney.cashreg.service.InvoicePayerService;
 import com.rbkmoney.cashreg.service.PaymentService;
 import com.rbkmoney.cashreg.service.RefundService;
 import com.rbkmoney.cashreg.utils.constant.RefundStatus;
-import com.rbkmoney.damsel.domain.Invoice;
 import com.rbkmoney.damsel.domain.InvoiceLine;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
-import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -35,20 +33,24 @@ public class InvoicePaymentRefundCreatedHandler implements PollingEventHandler {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void handle(InvoiceChange ic, MachineEvent event, String sourceId) {
-        Invoice invoice = ic.getInvoiceCreated().getInvoice();
-        String invoiceId = invoice.getId();
+    public void handle(InvoiceChange ic, String sourceId) {
         String paymentId = ic.getInvoicePaymentChange().getId();
         String refundId = ic.getInvoicePaymentChange().getPayload().getInvoicePaymentRefundChange().getId();
-        log.info("Start {} with invoice_id {}, paymentId {}, refundId {}", handlerEvent, invoiceId, paymentId, refundId);
+        log.info("Start {} with refundId {}.{}.{}", handlerEvent, sourceId, paymentId, refundId);
 
-        InvoicePayer invoicePayer = invoicePayerService.findByInvoiceIdAndPaymentId(invoiceId, paymentId);
+        InvoicePayer invoicePayer = invoicePayerService.findByInvoiceIdAndPaymentId(sourceId, paymentId);
         if (invoicePayer == null) {
-            log.debug("InvoicePayer is missing, invoiceId {}", invoiceId);
+            log.debug("InvoicePayer is missing, refundId {}.{}.{}", sourceId, paymentId, refundId);
             return;
         }
 
-        Long amount = ic.getInvoicePaymentChange().getPayload().getInvoicePaymentRefundChange().getPayload().getInvoicePaymentRefundCreated().getRefund().getCash().getAmount();
+        if (invoicePayer.getPayment().getRefund() != null) {
+            log.info("Duplicate found, refund: {}.{}.{}", sourceId, paymentId, refundId);
+            return;
+        }
+
+        Long amount = ic.getInvoicePaymentChange().getPayload().getInvoicePaymentRefundChange().getPayload()
+                .getInvoicePaymentRefundCreated().getRefund().getCash().getAmount();
 
         Refund refund = new Refund();
         refund.setAmount(amount);
@@ -68,38 +70,18 @@ public class InvoicePaymentRefundCreatedHandler implements PollingEventHandler {
 
         Refund refundDB = refundService.save(refund);
 
-        if (refundDB == null) {
-            log.debug("Couldn't save Refund. payment {}.{}", invoiceId, paymentId);
-            return;
-        } else {
-            log.debug("Saved Refund. payment {}.{}", invoiceId, paymentId);
-        }
-
         Payment payment = invoicePayer.getPayment();
         payment.setRefund(refundDB);
 
-        Payment paymentDB = paymentService.save(payment);
-        if (paymentDB == null) {
-            log.debug("Couldn't save Payment. payment {}.{}", invoiceId, paymentId);
-            return;
-        } else {
-            log.debug("Saved Payment. payment {}.{}", invoiceId, paymentId);
-        }
+        paymentService.save(payment);
 
         // Если есть корзина, то обновляем обменную корзину
-        if(refundDB.getCart() != null) {
+        if (refundDB.getCart() != null) {
             invoicePayer.setExchangeCart(refundDB.getCart());
         }
-        InvoicePayer invoicePayerUpdate = invoicePayerService.save(invoicePayer);
-        if (invoicePayerUpdate == null) {
-            log.debug("{}: InvoicePayer not save", handlerEvent);
-        } else {
-            log.debug("Saved InvoicePayer. payment {}.{}", invoiceId, paymentId);
-        }
+        invoicePayerService.save(invoicePayer);
 
-        log.info("End {} with invoice_id {}, paymentId {}, refundId {}",
-                handlerEvent, invoiceId, paymentId, refundId
-        );
+        log.info("End {} with paymentId {}.{}.{}", handlerEvent, sourceId, paymentId, refundId);
     }
 
     @Override

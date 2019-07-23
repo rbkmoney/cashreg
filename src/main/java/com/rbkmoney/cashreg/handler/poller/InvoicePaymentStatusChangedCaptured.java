@@ -17,7 +17,6 @@ import com.rbkmoney.cashreg.utils.constant.PaymentStatus;
 import com.rbkmoney.damsel.domain.InvoiceLine;
 import com.rbkmoney.damsel.domain.InvoicePaymentCaptured;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
-import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import static com.rbkmoney.cashreg.utils.cart.CartUtils.prepareCartInvoiceLine;
-import static com.rbkmoney.cashreg.utils.cart.CartUtils.prepareCashRegDelivery;
 
 @Slf4j
 @Component
@@ -40,22 +38,26 @@ public class InvoicePaymentStatusChangedCaptured implements PollingEventHandler 
     private final ObjectMapper objectMapper;
 
     @Override
-    public void handle(InvoiceChange ic, MachineEvent event, String invoiceId) {
+    public void handle(InvoiceChange ic, String invoiceId) {
         String paymentId = ic.getInvoicePaymentChange().getId();
         log.info("Start {} with payment {}.{}", handlerEvent, invoiceId, paymentId);
 
         InvoicePayer invoicePayer = invoicePayerService.findByInvoiceIdAndPaymentId(invoiceId, paymentId);
         if (invoicePayer == null) {
-            log.debug("{}: InvoicePayer is missing, invoiceId {}", handlerEvent, invoiceId);
+            log.info("InvoicePayer is missing, payment {}.{}", invoiceId, paymentId);
             return;
         }
 
         InvoicePaymentCaptured invocePaymentCaptured = ic.getInvoicePaymentChange().getPayload().getInvoicePaymentStatusChanged().getStatus().getCaptured();
-
         Payment payment = invoicePayer.getPayment();
+
+        if (!PaymentStatus.STARTED.equals(payment.getStatus())) {
+            log.info("Duplicate found, payment: {}.{}", invoiceId, paymentId);
+            return;
+        }
+
         payment.setStatus(PaymentStatus.CAPTURED);
-        Long partialAmount = invocePaymentCaptured.getCost().getAmount();
-        payment.setPartialAmount(partialAmount);
+        payment.setPartialAmount(invocePaymentCaptured.getCost().getAmount());
 
         // Если корзины нет, то ничего не делаем
         if (!invocePaymentCaptured.isSetCart()) {
@@ -74,12 +76,6 @@ public class InvoicePaymentStatusChangedCaptured implements PollingEventHandler 
 
 
         Payment paymentDB = paymentService.save(payment);
-        if (paymentDB == null) {
-            log.debug("{}: couldn't save Payment. payment {}.{}", handlerEvent, invoiceId, paymentId);
-            return;
-        } else {
-            log.debug("{}: saved Payment. payment {}.{}", handlerEvent, invoiceId, paymentId);
-        }
 
         // отправляем чек возврата-прихода c корзиной инвойса
         CashRegDelivery cashRegDeliveryCheck = cashRegDeliveryService.findByTypeOperationAndCashregStatus(
@@ -87,20 +83,10 @@ public class InvoicePaymentStatusChangedCaptured implements PollingEventHandler 
         );
 
         if (cashRegDeliveryCheck != null) {
-            CashRegDelivery cashRegDelivery = prepareCashRegDelivery(
-                    invoicePayer, paymentDB, null,
-                    CashRegTypeOperation.REFUND_DEBIT,
-                    CashRegStatus.READY,
-                    CartState.FULL
+            cashRegDeliveryService.save(CashRegDelivery.builder().invoiceId(invoicePayer)
+                    .paymentId(paymentDB).typeOperation(CashRegTypeOperation.REFUND_DEBIT)
+                    .cashregStatus(CashRegStatus.READY).cartState(CartState.FULL).build()
             );
-
-            CashRegDelivery cashRegDeliveryDB = cashRegDeliveryService.save(cashRegDelivery);
-            if (cashRegDeliveryDB == null) {
-                log.debug("{}: couldn't save CashRegDelivery. payment {}.{}", handlerEvent, invoiceId, paymentId);
-                return;
-            } else {
-                log.debug("{}: saved CashRegDelivery. payment {}.{}", handlerEvent, invoiceId, paymentId);
-            }
         }
 
         // отправляем чек прихода с корзиной payment captured
@@ -109,20 +95,10 @@ public class InvoicePaymentStatusChangedCaptured implements PollingEventHandler 
         );
 
         if (cashRegDeliveryCheck != null) {
-            CashRegDelivery cashRegDelivery = prepareCashRegDelivery(
-                    invoicePayer, paymentDB, null,
-                    CashRegTypeOperation.DEBIT,
-                    CashRegStatus.READY,
-                    CartState.PARTIAL
+            cashRegDeliveryService.save(CashRegDelivery.builder().invoiceId(invoicePayer)
+                    .paymentId(paymentDB).typeOperation(CashRegTypeOperation.DEBIT)
+                    .cashregStatus(CashRegStatus.READY).cartState(CartState.PARTIAL).build()
             );
-
-            CashRegDelivery cashRegDeliveryDB = cashRegDeliveryService.save(cashRegDelivery);
-            if (cashRegDeliveryDB == null) {
-                log.debug("{}: couldn't save CashRegDelivery. payment {}.{}", handlerEvent, invoiceId, paymentId);
-                return;
-            } else {
-                log.debug("{}: saved CashRegDelivery. payment {}.{}", handlerEvent, invoiceId, paymentId);
-            }
         }
 
         log.info("End {} with invoice_id {}, paymentId {}", handlerEvent, invoiceId, paymentId);

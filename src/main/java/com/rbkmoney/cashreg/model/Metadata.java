@@ -8,9 +8,10 @@ import lombok.ToString;
 
 import java.util.List;
 
-@ToString
+
 @Getter
 @Setter
+@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Metadata {
 

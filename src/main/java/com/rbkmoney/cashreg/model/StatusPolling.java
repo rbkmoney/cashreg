@@ -8,9 +8,10 @@ import lombok.ToString;
 
 import java.time.Instant;
 
-@ToString
+
 @Getter
 @Setter
+@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StatusPolling {
 

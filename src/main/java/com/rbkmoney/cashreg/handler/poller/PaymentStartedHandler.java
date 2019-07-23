@@ -7,11 +7,11 @@ import com.rbkmoney.cashreg.utils.constant.PaymentStatus;
 import com.rbkmoney.damsel.domain.InvoicePayment;
 import com.rbkmoney.damsel.domain.Payer;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;
-import com.rbkmoney.machinegun.eventsink.MachineEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 
 @Slf4j
@@ -27,80 +27,38 @@ public class PaymentStartedHandler implements PollingEventHandler {
     private final ContactTypeService contactTypeService;
     private final PaymentTypeService paymentTypeService;
 
-    @Override
+
     @Transactional
-    public void handle(InvoiceChange ic, MachineEvent event, String invoiceId) {
+    public void handle(InvoiceChange ic, String invoiceId) {
         String paymentId = ic.getInvoicePaymentChange().getId();
         log.info("Start {}: payment {}.{}", handlerEvent, invoiceId, paymentId);
 
         InvoicePayment invoicePayment = ic.getInvoicePaymentChange().getPayload().getInvoicePaymentStarted().getPayment();
         Payer payer = invoicePayment.getPayer();
 
-        boolean isContactInfo;
-        boolean isEmail = false;
-        if (payer.isSetPaymentResource()) {
-            isContactInfo = payer.getPaymentResource().isSetContactInfo();
-            if (isContactInfo) {
-                isEmail = payer.getPaymentResource().getContactInfo().isSetEmail();
-            }
-        } else if (payer.isSetCustomer()) {
-            isContactInfo = payer.getCustomer().isSetContactInfo();
-            if (isContactInfo) {
-                isEmail = payer.getCustomer().getContactInfo().isSetEmail();
-            }
-        } else {
-            isContactInfo = payer.getRecurrent().isSetContactInfo();
-            if (isContactInfo) {
-                isEmail = payer.getRecurrent().getContactInfo().isSetEmail();
-            }
-        }
-
-        if (isContactInfo && isEmail) {
+        String email = getEmail(payer);
+        if (!StringUtils.isEmpty(email)) {
             InvoicePayer invoicePayer = invoicePayerService.findByInvoiceId(invoiceId);
+
             if (invoicePayer == null) {
-                log.debug("{}: couldn't find invoicePayer. payment {}.{}",
-                        handlerEvent, invoiceId, paymentId
-                );
+                log.info("InvoicePayer is missing, payment {}.{}", invoiceId, paymentId);
                 return;
             }
 
+            if (invoicePayer.getPayment() != null) {
+                log.info("Duplicate found, payment: {}.{}", invoiceId, paymentId);
+                return;
+            }
 
             ContactType contactType = contactTypeService.findByContactType(ContactType.EMAIL);
-            if (contactType == null) {
-
-                contactType = contactTypeService.save(new ContactType(ContactType.EMAIL));
-                if (contactType == null) {
-                    log.debug("{}: couldn't save contactType.  payment {}.{}",
-                            handlerEvent, invoiceId, paymentId
-                    );
-                    return;
-                } else {
-                    log.debug("{}: saved contactType.  payment {}.{}", handlerEvent, invoiceId, paymentId);
-                }
-            }
 
             // Now it's work only for email
             String contactInfo = extractContactInfo(payer);
             PayerInfo payerInfo = payerInfoService.findByContact(contactInfo);
-
             if (payerInfo == null) {
                 payerInfo = payerInfoService.save(new PayerInfo(contactInfo, contactType));
-                if (payerInfo == null) {
-                    log.debug("{}: couldn't save payerInfo. payment {}.{}", handlerEvent, invoiceId, paymentId);
-                    return;
-                } else {
-                    log.debug("{}: saved payerInfo.  payment {}.{}", handlerEvent, invoiceId, paymentId);
-                }
-
             }
 
-            Payment payment = new Payment();
-            payment.setPaymentId(paymentId);
-            payment.setAmountOrig(invoicePayment.getCost().getAmount());
-            payment.setPayerInfo(payerInfo);
-            payment.setStatus(PaymentStatus.STARTED);
-
-            payment.setCurrency(invoicePayment.getCost().getCurrency().getSymbolicCode());
 
             String currentPaymentType;
             if (payer.isSetPaymentResource()) {
@@ -121,29 +79,19 @@ public class PaymentStartedHandler implements PollingEventHandler {
 
             }
 
-            payment.setPaymentType(paymentType);
-            Payment paymentDB = paymentService.save(payment);
-
-            if (paymentDB == null) {
-                log.debug("{}: couldn't save Payment. payment {}.{}", handlerEvent, invoiceId, paymentId);
-                return;
-            } else {
-                log.debug("{}: saved Payment. payment {}.{}", handlerEvent, invoiceId, paymentId);
-            }
+            Payment paymentDB = paymentService.save(Payment.builder().paymentId(paymentId)
+                    .amountOrig(invoicePayment.getCost().getAmount())
+                    .payerInfo(payerInfo)
+                    .status(PaymentStatus.STARTED)
+                    .currency(invoicePayment.getCost().getCurrency().getSymbolicCode())
+                    .paymentType(paymentType).build());
 
 
             invoicePayer.setPayment(paymentDB);
-            InvoicePayer invoicePayerDB = invoicePayerService.save(invoicePayer);
-            if (invoicePayerDB == null) {
-                log.debug("{}: couldn't save invoicePayer. payment {}.{}",
-                        handlerEvent, invoiceId, paymentId
-                );
-                return;
-            } else {
-                log.debug("{}: saved invoicePayer. payment {}.{}",
-                        handlerEvent, invoiceId, paymentId
-                );
-            }
+            invoicePayerService.save(invoicePayer);
+
+        } else {
+            log.info("Received payment with empty email, payment: {}.{}", invoiceId, paymentId);
         }
 
         log.info("End {}: payment {}.{}", handlerEvent, invoiceId, paymentId);
@@ -164,6 +112,24 @@ public class PaymentStartedHandler implements PollingEventHandler {
             email = payer.getRecurrent().getContactInfo().getEmail();
         }
         return email;
+    }
+
+    private String getEmail(Payer payer) {
+        if (payer.isSetPaymentResource()
+                && payer.getPaymentResource().isSetContactInfo()
+                && payer.getPaymentResource().getContactInfo().isSetEmail()) {
+            return payer.getPaymentResource().getContactInfo().getEmail();
+
+        } else if (payer.isSetCustomer()
+                && payer.getCustomer().isSetContactInfo()
+                && payer.getCustomer().getContactInfo().isSetEmail()) {
+            return payer.getCustomer().getContactInfo().getEmail();
+        } else if (payer.isSetRecurrent()
+                && payer.getRecurrent().isSetContactInfo()
+                && payer.getRecurrent().getContactInfo().isSetEmail()) {
+            return payer.getRecurrent().getContactInfo().getEmail();
+        }
+        return null;
     }
 
 }

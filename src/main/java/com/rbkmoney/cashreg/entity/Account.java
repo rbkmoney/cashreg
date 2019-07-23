@@ -1,6 +1,7 @@
 package com.rbkmoney.cashreg.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 @Entity(name = "account")
 @Table(name = "account")
 public class Account {
@@ -48,37 +50,5 @@ public class Account {
      */
     @Column(name = "is_active")
     private Boolean isActive = Boolean.TRUE;
-
-    public Account() {
-        // Constructs default a new {@link Account Account} instance.
-    }
-
-    public Account(Long id) {
-        this.id = id;
-    }
-
-    public Account(String merchantId, String shopId) {
-        this.merchantId = merchantId;
-        this.shopId = shopId;
-    }
-
-    public Account(Long id, String merchantId, String shopId) {
-        this.id = id;
-        this.merchantId = merchantId;
-        this.shopId = shopId;
-    }
-
-    public Account(Long id, String merchantId, String shopId, Boolean isActive) {
-        this.id = id;
-        this.merchantId = merchantId;
-        this.shopId = shopId;
-        this.isActive = isActive;
-    }
-
-    public Account(String merchantId, String shopId, Boolean isActive) {
-        this.merchantId = merchantId;
-        this.shopId = shopId;
-        this.isActive = isActive;
-    }
 
 }

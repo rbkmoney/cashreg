@@ -1,16 +1,15 @@
 package com.rbkmoney.cashreg.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Getter
 @Setter
+@Builder
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "cashreg_delivery")
 @Table(name = "cashreg_delivery")
 public class CashRegDelivery {
@@ -65,6 +64,16 @@ public class CashRegDelivery {
 
     public CashRegDelivery(Long id) {
         this.id = id;
+    }
+
+    public CashRegDelivery(InvoicePayer invoicePayer,
+                           Payment payment,
+                           String typeOperation,
+                           String status) {
+        this.invoiceId = invoicePayer;
+        this.paymentId = payment;
+        this.typeOperation = typeOperation;
+        this.cashregStatus = status;
     }
 
 }

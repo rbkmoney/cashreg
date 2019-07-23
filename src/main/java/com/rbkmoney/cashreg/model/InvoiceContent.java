@@ -5,22 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-@ToString
 @Getter
 @Setter
+@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class InvoiceContent {
 
-    /**
-     * Type
-     */
     private String type;
-
-    /**
-     * Data
-     */
     private byte[] data;
-
 
     public InvoiceContent(InvoiceContent other) {
         this.type = other.type;

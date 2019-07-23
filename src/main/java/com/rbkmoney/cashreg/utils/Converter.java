@@ -4,15 +4,17 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.cashreg.model.InvoiceLine;
 import com.rbkmoney.cashreg.model.Settings;
-import com.rbkmoney.file.storage.base.Cash;
-import com.rbkmoney.file.storage.base.CurrencyRef;
-import com.rbkmoney.kkt.provider.Cart;
-import com.rbkmoney.kkt.provider.ItemsLine;
+import com.rbkmoney.cashreg.proto.base.Cash;
+import com.rbkmoney.cashreg.proto.base.CurrencyRef;
+import com.rbkmoney.cashreg.proto.provider.Cart;
+import com.rbkmoney.cashreg.proto.provider.ItemsLine;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static com.rbkmoney.cashreg.utils.constant.Tax.TAX_MODE;
 
 public class Converter {
 
@@ -54,7 +56,7 @@ public class Converter {
                 itemLine.setPrice(cash);
                 itemLine.setProduct(invoiceLine.getProduct());
                 itemLine.setQuantity(invoiceLine.getQuantity());
-                itemLine.setTax(invoiceLine.getMetadata().get("TaxMode"));
+                itemLine.setTax(invoiceLine.getMetadata().get(TAX_MODE));
                 itemsLines.add(itemLine);
             });
 
