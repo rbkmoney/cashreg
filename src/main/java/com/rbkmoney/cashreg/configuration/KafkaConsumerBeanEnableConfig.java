@@ -15,8 +15,10 @@ public class KafkaConsumerBeanEnableConfig {
 
     @Bean
     @ConditionalOnProperty(value = "kafka.topics.invoice.enabled", havingValue = "true")
-    public InvoicingKafkaListener paymentEventsKafkaListener(HandlerManager handlerManager,
-                                                             MachineEventParser<EventPayload> parser) {
+    public InvoicingKafkaListener invoicingEventsKafkaListener(
+            HandlerManager handlerManager,
+            MachineEventParser<EventPayload> parser
+    ) {
         return new InvoicingKafkaListener(handlerManager, parser);
     }
 }

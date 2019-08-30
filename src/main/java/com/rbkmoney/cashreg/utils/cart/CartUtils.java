@@ -45,14 +45,13 @@ public class CartUtils {
     }
 
     public static CashRegDelivery prepareCashRegDelivery(InvoicePayer invoicePayer, Payment paymentDB, Refund refundId, String typeOperation, String cashRegStatus, String cartState) {
-        CashRegDelivery cashRegDelivery = new CashRegDelivery();
-        cashRegDelivery.setInvoiceId(invoicePayer);
-        cashRegDelivery.setPaymentId(paymentDB);
-        cashRegDelivery.setRefundId(refundId);
-        cashRegDelivery.setTypeOperation(typeOperation);
-        cashRegDelivery.setCashregStatus(cashRegStatus);
-        cashRegDelivery.setCartState(cartState);
-        return cashRegDelivery;
+        return CashRegDelivery.builder()
+                .invoiceId(invoicePayer)
+                .paymentId(paymentDB)
+                .refundId(refundId)
+                .typeOperation(typeOperation)
+                .cashregStatus(cashRegStatus)
+                .cartState(cartState).build();
     }
 
 }

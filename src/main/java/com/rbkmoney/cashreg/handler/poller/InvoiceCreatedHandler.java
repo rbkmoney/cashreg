@@ -48,32 +48,28 @@ public class InvoiceCreatedHandler implements PollingEventHandler {
             return;
         }
 
-        InvoicePayer invoicePayer = new InvoicePayer();
-        invoicePayer.setAccount(account);
-        invoicePayer.setInvoiceId(invoiceId);
-
-        invoicePayer.setCurrency(invoice.getCost().getCurrency().getSymbolicCode());
-
         String context = new String(invoice.getContext().getData(), Charset.forName("UTF-8"));
-        invoicePayer.setMetadata(context);
-        invoicePayer.setAmount(invoice.getCost().getAmount());
-
+        InvoicePayer.InvoicePayerBuilder invoicePayer = InvoicePayer.builder()
+                .account(account)
+                .invoiceId(invoiceId)
+                .currency(invoice.getCost().getCurrency().getSymbolicCode())
+                .metadata(context)
+                .amount(invoice.getCost().getAmount());
 
         if (invoice.getDetails().isSetCart()) {
             List<InvoiceLine> lineList = invoice.getDetails().getCart().getLines();
             if (!lineList.isEmpty()) {
                 try {
                     String lines = prepareCartInvoiceLine(objectMapper, lineList);
-                    invoicePayer.setCart(lines);
-                    invoicePayer.setExchangeCart(lines);
+                    invoicePayer.cart(lines);
+                    invoicePayer.exchangeCart(lines);
                 } catch (JsonProcessingException e) {
                     log.debug("{}: InvoicePayer cart lines is empty", handlerEvent);
                 }
             }
         }
 
-        invoicePayerService.save(invoicePayer);
-
+        invoicePayerService.save(invoicePayer.build());
         log.info("End {}: invoice_id {}", handlerEvent, invoice.getId());
     }
 

@@ -6,7 +6,6 @@ import com.rbkmoney.cashreg.repository.InvoicePayerRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 @Slf4j
 @Service
@@ -16,8 +15,6 @@ public class InvoicePayerService {
 
     @Autowired
     public InvoicePayerService(InvoicePayerRepository invoicePayerRepository) {
-        Assert.notNull(invoicePayerRepository, "InvoicePayerRepository must not be null");
-
         this.invoicePayerRepository = invoicePayerRepository;
     }
 

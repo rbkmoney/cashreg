@@ -11,7 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import java.util.List;
 
@@ -26,8 +25,6 @@ public class CashRegDeliveryService {
 
     @Autowired
     public CashRegDeliveryService(CashRegDeliveryRepository cashRegDeliveryRepository) {
-        Assert.notNull(cashRegDeliveryRepository, "CashRegDeliveryRepository must not be null");
-
         this.cashRegDeliveryRepository = cashRegDeliveryRepository;
     }
 
@@ -80,7 +77,7 @@ public class CashRegDeliveryService {
         CashRegDelivery cashRegDeliveryCheck = findByTypeOperationAndCashregStatus(invoicePayer, paymentDB, typeOperation);
 
         if (cashRegDeliveryCheck != null) {
-            save(new CashRegDelivery(invoicePayer, paymentDB, REFUND_DEBIT, READY));
+            save(CashRegDelivery.builder().invoiceId(invoicePayer).paymentId(paymentDB).typeOperation(REFUND_DEBIT).cashregStatus(READY).build());
         } else {
             log.warn("Cashreg for invoicePayer {}, payment {} wasn't found", invoicePayer, paymentDB);
         }

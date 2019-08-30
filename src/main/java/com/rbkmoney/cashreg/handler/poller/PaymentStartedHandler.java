@@ -24,8 +24,6 @@ public class PaymentStartedHandler implements PollingEventHandler {
     private final InvoicePayerService invoicePayerService;
     private final PaymentService paymentService;
     private final PayerInfoService payerInfoService;
-    private final ContactTypeService contactTypeService;
-    private final PaymentTypeService paymentTypeService;
 
 
     @Transactional
@@ -45,56 +43,54 @@ public class PaymentStartedHandler implements PollingEventHandler {
                 return;
             }
 
-            if (invoicePayer.getPayment() != null) {
+            if (invoicePayer.getPayment() != null
+                    && (invoicePayer.getPayment().getPaymentId().equals(paymentId)
+                    || Integer.parseInt(paymentId) < Integer.parseInt(invoicePayer.getPayment().getPaymentId()))) {
                 log.info("Duplicate found, payment: {}.{}", invoiceId, paymentId);
                 return;
             }
 
-            ContactType contactType = contactTypeService.findByContactType(ContactType.EMAIL);
+            ContactType contactType = ContactType.findByType(ContactType.EMAIL.getType());
 
             // Now it's work only for email
             String contactInfo = extractContactInfo(payer);
             PayerInfo payerInfo = payerInfoService.findByContact(contactInfo);
             if (payerInfo == null) {
-                payerInfo = payerInfoService.save(new PayerInfo(contactInfo, contactType));
+                payerInfo = payerInfoService.save(PayerInfo.builder()
+                        .contact(contactInfo)
+                        .contactType(contactType.getType())
+                        .build()
+                );
             }
 
-
-            String currentPaymentType;
-            if (payer.isSetPaymentResource()) {
-                currentPaymentType = payer.getPaymentResource().getResource().getPaymentTool().getSetField().getFieldName();
-            } else {
-                currentPaymentType = payer.getCustomer().getPaymentTool().getSetField().getFieldName();
-            }
-
-            PaymentType paymentType = paymentTypeService.findByType(currentPaymentType);
-            if (paymentType == null) {
-                paymentType = paymentTypeService.save(new PaymentType(currentPaymentType));
-                if (paymentType == null) {
-                    log.debug("{}: couldn't save paymentType. payment {}.{}", handlerEvent, invoiceId, paymentId);
-                    return;
-                } else {
-                    log.debug("{}: saved paymentType. payment {}.{}", handlerEvent, invoiceId, paymentId);
-                }
-
-            }
-
+            PaymentType paymentType = PaymentType.findByType(extractPaymentType(payer));
             Payment paymentDB = paymentService.save(Payment.builder().paymentId(paymentId)
                     .amountOrig(invoicePayment.getCost().getAmount())
                     .payerInfo(payerInfo)
                     .status(PaymentStatus.STARTED)
                     .currency(invoicePayment.getCost().getCurrency().getSymbolicCode())
-                    .paymentType(paymentType).build());
+                    .paymentType(paymentType.getType()).build());
 
 
             invoicePayer.setPayment(paymentDB);
             invoicePayerService.save(invoicePayer);
-
         } else {
             log.info("Received payment with empty email, payment: {}.{}", invoiceId, paymentId);
         }
 
         log.info("End {}: payment {}.{}", handlerEvent, invoiceId, paymentId);
+    }
+
+    private String extractPaymentType(Payer payer) {
+        String currentPaymentType;
+        if (payer.isSetPaymentResource()) {
+            currentPaymentType = payer.getPaymentResource().getResource().getPaymentTool().getSetField().getFieldName();
+        } else if (payer.isSetCustomer()) {
+            currentPaymentType = payer.getCustomer().getPaymentTool().getSetField().getFieldName();
+        } else {
+            currentPaymentType = payer.getRecurrent().getPaymentTool().getSetField().getFieldName();
+        }
+        return currentPaymentType;
     }
 
     @Override

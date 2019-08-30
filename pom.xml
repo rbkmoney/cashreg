@@ -45,13 +45,20 @@
         <damsel.version>1.303-d99319c</damsel.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <machinarium.version>0.2.5</machinarium.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>cashreg-proto</artifactId>
-            <version>SNAPSHOT</version>
+            <version>1.2-a20e551</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rbkmoney</groupId>
+            <artifactId>machinarium</artifactId>
+            <version>${machinarium.version}</version>
         </dependency>
         <!--Thrirdparty libs-->
         <dependency>
@@ -101,11 +108,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.rbkmoney</groupId>
-            <artifactId>machinegun-proto</artifactId>
-            <version>1.12-ebae56f</version>
         </dependency>
         <!--DB libs-->
         <dependency>

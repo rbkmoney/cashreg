@@ -37,21 +37,21 @@ public class InvoicePaymentStatusChangedProcessedHandler implements PollingEvent
         }
 
         Payment payment = invoicePayer.getPayment();
-
         if (!PaymentStatus.STARTED.equals(payment.getStatus())) {
             log.info("Duplicate found, payment: {}.{}", invoiceId, paymentId);
             return;
         }
 
         payment.setStatus(PaymentStatus.PROCESSED);
-
         Payment paymentDB = paymentService.save(payment);
 
-        cashRegDeliveryService.save(new CashRegDelivery(invoicePayer,
-                paymentDB,
-                CashRegTypeOperation.DEBIT,
-                CashRegStatus.READY));
-
+        cashRegDeliveryService.save(CashRegDelivery.builder()
+                .invoiceId(invoicePayer)
+                .paymentId(paymentDB)
+                .typeOperation(CashRegTypeOperation.DEBIT)
+                .cashregStatus(CashRegStatus.READY)
+                .build()
+        );
 
         log.info("End {} with invoice_id {}, paymentId {}",
                 handlerEvent, invoiceId, paymentId

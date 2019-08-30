@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
+@Data
 @Getter
 @Setter
 @Builder
@@ -64,16 +65,6 @@ public class CashRegDelivery {
 
     public CashRegDelivery(Long id) {
         this.id = id;
-    }
-
-    public CashRegDelivery(InvoicePayer invoicePayer,
-                           Payment payment,
-                           String typeOperation,
-                           String status) {
-        this.invoiceId = invoicePayer;
-        this.paymentId = payment;
-        this.typeOperation = typeOperation;
-        this.cashregStatus = status;
     }
 
 }

@@ -37,18 +37,14 @@ public class InvoicePaymentStatusChangedCancelled implements PollingEventHandler
         }
 
         Payment payment = invoicePayer.getPayment();
-
         if (!PaymentStatus.PROCESSED.equals(payment.getStatus())) {
             log.info("Duplicate found, payment: {}.{}", invoiceId, paymentId);
             return;
         }
-
         payment.setStatus(PaymentStatus.CANCELLED);
-
         Payment paymentDB = paymentService.save(payment);
 
         cashRegDeliveryService.createRefundCashRegIfExists(invoicePayer, paymentDB, CashRegTypeOperation.DEBIT);
-
         log.info("End {} with paymentId {}.{}",
                 handlerEvent, invoiceId, paymentId);
     }

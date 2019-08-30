@@ -38,26 +38,27 @@ public class InvoicePaymentStatusChangedFailedHandler implements PollingEventHan
         }
 
         Payment payment = invoicePayer.getPayment();
-
         if (!PaymentStatus.STARTED.equals(payment.getStatus())) {
             log.info("Duplicate found, payment: {}.{}", invoiceId, paymentId);
             return;
         }
 
         payment.setStatus(PaymentStatus.FAILED);
-
         Payment paymentDB = paymentService.save(payment);
-
 
         CashRegDelivery cashRegDeliveryCheck = cashRegDeliveryService.findByTypeOperationAndCashregStatus(
                 invoicePayer, paymentDB, CashRegTypeOperation.DEBIT
         );
 
-        if(cashRegDeliveryCheck != null) {
-            cashRegDeliveryService.save(new CashRegDelivery(invoicePayer,
-                    paymentDB,
-                    CashRegTypeOperation.REFUND_DEBIT,
-                    CashRegStatus.READY));
+        if (cashRegDeliveryCheck != null) {
+            cashRegDeliveryService.save(
+                    CashRegDelivery.builder()
+                            .invoiceId(invoicePayer)
+                            .paymentId(paymentDB)
+                            .typeOperation(CashRegTypeOperation.REFUND_DEBIT)
+                            .cashregStatus(CashRegStatus.READY)
+                            .build()
+            );
         }
 
         log.info("End {} with paymentId {}.{}",

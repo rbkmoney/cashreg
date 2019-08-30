@@ -1,0 +1,21 @@
+server:
+  port: @server.port@
+spring:
+  application:
+    name: @project.name@
+---
+management:
+  metrics:
+    export:
+      statsd:
+        flavor: etsy
+---
+service:
+  mg:
+    automaton:
+      url: http://machinegun:8022/v1/automaton
+      namespace: cashreg
+    eventSink:
+      url: http://localhost:8022/v1/event_sink
+      sinkId: cashreg
+    networkTimeout: 5000

@@ -6,7 +6,6 @@ import com.rbkmoney.cashreg.repository.AccountRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 @Slf4j
 @Service
@@ -16,8 +15,6 @@ public class AccountService {
 
     @Autowired
     public AccountService(AccountRepository accountRepository) {
-        Assert.notNull(accountRepository, "AccountRepository must not be null");
-
         this.accountRepository = accountRepository;
     }
 

@@ -6,8 +6,8 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@ToString
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "payment")
@@ -58,13 +58,8 @@ public class Payment {
     @JoinColumn(name = "refund_id")
     private Refund refund;
 
-    /**
-     * Payment type:
-     * card, wallet, phone, terminal and etc
-     */
-    @ManyToOne
-    @JoinColumn(name = "payment_type_id")
-    private PaymentType paymentType;
+    @Column(name = "payment_type")
+    private String paymentType;
 
     /**
      * Status

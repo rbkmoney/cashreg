@@ -33,53 +33,13 @@ CREATE SEQUENCE cashreg.seq_payer_info_id
 
 CREATE TABLE IF NOT EXISTS cashreg.payer_info
 (
-  id              BIGINT       NOT NULL DEFAULT nextval('cashreg.seq_payer_info_id' :: REGCLASS),
-  contact         VARCHAR(255) NOT NULL,
-  contact_type_id BIGINT       NOT NULL REFERENCES cashreg.contact_type (id),
+  id           BIGINT       NOT NULL DEFAULT nextval('cashreg.seq_payer_info_id' :: REGCLASS),
+  contact      VARCHAR(255) NOT NULL,
+  contact_type VARCHAR(255) NOT NULL,
   CONSTRAINT payer_info_pkey PRIMARY KEY (id)
 );
 CREATE INDEX IF NOT EXISTS payer_info_contact
   ON cashreg.payer_info (contact);
-
-
----------------   CONTACT TYPE    ---------------
-
-CREATE SEQUENCE cashreg.seq_contact_type_id
-  START WITH 1
-  INCREMENT BY 1
-  MINVALUE 1
-  MAXVALUE 9223372036854775807
-  CACHE 1;
-
-CREATE TABLE IF NOT EXISTS cashreg.contact_type
-(
-  id   BIGINT       NOT NULL DEFAULT nextval('cashreg.seq_contact_type_id' :: REGCLASS),
-  type VARCHAR(255) NOT NULL,
-  CONSTRAINT contact_type_pkey PRIMARY KEY (id)
-);
-
-CREATE INDEX IF NOT EXISTS contact_type_type
-  ON cashreg.contact_type (type);
-
-
----------------   PAYMENT_TYPE    ---------------
-
-CREATE SEQUENCE cashreg.seq_payment_type_id
-  START WITH 1
-  INCREMENT BY 1
-  MINVALUE 1
-  MAXVALUE 9223372036854775807
-  CACHE 1;
-
-CREATE TABLE IF NOT EXISTS cashreg.payment_type
-(
-  id   BIGINT       NOT NULL DEFAULT nextval('cashreg.seq_payment_type_id' :: REGCLASS),
-  type VARCHAR(255) NOT NULL,
-  CONSTRAINT payment_type_pkey PRIMARY KEY (id)
-);
-
-CREATE INDEX IF NOT EXISTS payment_type_type
-  ON cashreg.payment_type (type);
 
 
 ---------------   PAYMENT   ---------------
@@ -93,16 +53,16 @@ CREATE SEQUENCE cashreg.seq_payment_id
 
 CREATE TABLE IF NOT EXISTS cashreg.payment
 (
-  id              BIGINT       NOT NULL DEFAULT nextval('cashreg.seq_payment_id' :: REGCLASS),
-  amount          NUMERIC      NOT NULL,
-  partial_amount  NUMERIC      NULL,
-  currency        VARCHAR(3)   NOT NULL,
-  payment_id      VARCHAR(255) NOT NULL,
-  payer_info_id   BIGINT       NOT NULL REFERENCES cashreg.payer_info (id),
-  refund_id       BIGINT       NULL REFERENCES cashreg.refund (id),
-  payment_type_id BIGINT       NOT NULL REFERENCES cashreg.payment_type (id),
-  capture_cart    TEXT                  DEFAULT '{}',
-  status          VARCHAR(12)           DEFAULT 'none',
+  id             BIGINT       NOT NULL DEFAULT nextval('cashreg.seq_payment_id' :: REGCLASS),
+  amount         NUMERIC      NOT NULL,
+  partial_amount NUMERIC      NULL,
+  currency       VARCHAR(3)   NOT NULL,
+  payment_id     VARCHAR(255) NOT NULL,
+  payer_info_id  BIGINT       NOT NULL REFERENCES cashreg.payer_info (id),
+  refund_id      BIGINT       NULL REFERENCES cashreg.refund (id),
+  payment_type   VARCHAR(255) NOT NULL,
+  capture_cart   TEXT                  DEFAULT '{}',
+  status         VARCHAR(12)           DEFAULT 'none',
   CONSTRAINT payment_pkey PRIMARY KEY (id)
 );
 

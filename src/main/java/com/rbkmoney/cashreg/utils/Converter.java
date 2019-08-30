@@ -4,10 +4,11 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rbkmoney.cashreg.model.InvoiceLine;
 import com.rbkmoney.cashreg.model.Settings;
-import com.rbkmoney.cashreg.proto.base.Cash;
-import com.rbkmoney.cashreg.proto.base.CurrencyRef;
-import com.rbkmoney.cashreg.proto.provider.Cart;
-import com.rbkmoney.cashreg.proto.provider.ItemsLine;
+import com.rbkmoney.damsel.cashreg.provider.Cart;
+import com.rbkmoney.damsel.cashreg.provider.ItemsLine;
+import com.rbkmoney.damsel.domain.Cash;
+import com.rbkmoney.damsel.domain.CurrencyRef;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import static com.rbkmoney.cashreg.utils.constant.Tax.TAX_MODE;
 
+@Component
 public class Converter {
 
     private static ObjectMapper objectMapper;

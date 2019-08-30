@@ -90,3 +90,20 @@ retry-policy:
 ---
 cashreg:
   networkTimeout: 60
+service:
+  mg:
+    automaton:
+      url: http://localhost:8080/v1/automaton
+      namespace: cashreg
+    eventSink:
+      url: http://localhost:8022/v1/event_sink
+      sinkId: cashreg
+    networkTimeout: 5000
+  partyManagement:
+    url: http://hellgate:8022/v1/processing/partymgmt
+    networkTimeout: 5000
+  dominant:
+    url: http://dominant:8022/v1/domain/repository_client
+    networkTimeout: 5000
+cache:
+  maxSize: 100

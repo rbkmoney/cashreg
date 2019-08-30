@@ -44,7 +44,9 @@ public class InvoicePaymentRefundCreatedHandler implements PollingEventHandler {
             return;
         }
 
-        if (invoicePayer.getPayment().getRefund() != null) {
+        if (invoicePayer.getPayment().getRefund() != null
+                && (invoicePayer.getPayment().getRefund().getRefundId().equals(refundId)
+                || Integer.parseInt(refundId) < Integer.parseInt(invoicePayer.getPayment().getRefund().getRefundId()))) {
             log.info("Duplicate found, refund: {}.{}.{}", sourceId, paymentId, refundId);
             return;
         }
@@ -52,23 +54,23 @@ public class InvoicePaymentRefundCreatedHandler implements PollingEventHandler {
         Long amount = ic.getInvoicePaymentChange().getPayload().getInvoicePaymentRefundChange().getPayload()
                 .getInvoicePaymentRefundCreated().getRefund().getCash().getAmount();
 
-        Refund refund = new Refund();
-        refund.setAmount(amount);
-        refund.setRefundId(refundId);
-        refund.setStatus(RefundStatus.CREATED);
+        Refund.RefundBuilder refund = Refund.builder()
+                .amount(amount)
+                .refundId(refundId)
+                .status(RefundStatus.CREATED);
 
         List<InvoiceLine> lineList = ic.getInvoicePaymentChange().getPayload().getInvoicePaymentRefundChange().getPayload().getInvoicePaymentRefundCreated().getRefund().getCart().getLines();
         if (!lineList.isEmpty()) {
             try {
                 String lines = prepareCartInvoiceLine(objectMapper, lineList);
-                refund.setCart(lines);
-                refund.setPreviousCart(invoicePayer.getExchangeCart());
+                refund.cart(lines);
+                refund.previousCart(invoicePayer.getExchangeCart());
             } catch (JsonProcessingException e) {
                 log.debug("{}: InvoicePayer cart lines is empty", handlerEvent);
             }
         }
 
-        Refund refundDB = refundService.save(refund);
+        Refund refundDB = refundService.save(refund.build());
 
         Payment payment = invoicePayer.getPayment();
         payment.setRefund(refundDB);

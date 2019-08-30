@@ -3,7 +3,7 @@ package com.rbkmoney.cashreg.utils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class DateFormate {
+public class DateFormat {
 
     public static String getCurrentDate() {
         LocalDateTime now = LocalDateTime.now();
