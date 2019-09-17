@@ -9,6 +9,7 @@ import javax.persistence.*;
 @Builder
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "invoice_payer")
 @Table(name = "invoice_payer")
 public class InvoicePayer {
@@ -40,7 +41,6 @@ public class InvoicePayer {
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
-    @ManyToOne
     @JoinColumn(name = "currency")
     private String currency;
 

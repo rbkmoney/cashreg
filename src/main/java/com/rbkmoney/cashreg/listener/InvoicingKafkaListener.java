@@ -1,6 +1,6 @@
 package com.rbkmoney.cashreg.listener;
 
-import com.rbkmoney.cashreg.service.HandlerManager;
+import com.rbkmoney.cashreg.service.cashreg.HandlerManager;
 import com.rbkmoney.cashreg.service.exception.UnsuccessfulSaveException;
 import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.damsel.payment_processing.InvoiceChange;

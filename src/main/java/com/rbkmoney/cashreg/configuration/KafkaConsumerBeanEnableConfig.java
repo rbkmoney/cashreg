@@ -1,7 +1,7 @@
 package com.rbkmoney.cashreg.configuration;
 
 import com.rbkmoney.cashreg.listener.InvoicingKafkaListener;
-import com.rbkmoney.cashreg.service.HandlerManager;
+import com.rbkmoney.cashreg.service.cashreg.HandlerManager;
 import com.rbkmoney.damsel.payment_processing.EventPayload;
 import com.rbkmoney.sink.common.parser.impl.MachineEventParser;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

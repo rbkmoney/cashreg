@@ -1,4 +1,4 @@
-package com.rbkmoney.cashreg.service;
+package com.rbkmoney.cashreg.service.cashreg;
 
 
 import com.rbkmoney.cashreg.entity.Account;

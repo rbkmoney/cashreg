@@ -1,5 +1,6 @@
 package com.rbkmoney.cashreg.configuration;
 
+import com.rbkmoney.damsel.cashreg_processing.Change;
 import com.rbkmoney.machinarium.client.AutomatonClient;
 import com.rbkmoney.machinarium.client.EventSinkClient;
 import com.rbkmoney.machinarium.client.TBaseAutomatonClient;
@@ -29,11 +30,11 @@ public class MachinegunConfiguration {
     }
 
     @Bean
-    public AutomatonClient<com.rbkmoney.machinegun.msgpack.Value, CashRegChange> automatonClient(
+    public AutomatonClient<com.rbkmoney.machinegun.msgpack.Value, Change> automatonClient(
             @Value("${service.mg.automaton.namespace}") String namespace,
             AutomatonSrv.Iface automationThriftClient
     ) {
-        return new TBaseAutomatonClient<>(automationThriftClient, namespace, CashRegChange.class);
+        return new TBaseAutomatonClient<>(automationThriftClient, namespace, Change.class);
     }
 
     @Bean
@@ -48,11 +49,11 @@ public class MachinegunConfiguration {
     }
 
     @Bean
-    public EventSinkClient<CashRegChange> eventSinkClient(
+    public EventSinkClient<Change> eventSinkClient(
             @Value("${service.mg.eventSink.sinkId}") String eventSinkId,
             EventSinkSrv.Iface eventSinkThriftClient
     ) {
-        return new TBaseEventSinkClient<>(eventSinkThriftClient, eventSinkId, CashRegChange.class);
+        return new TBaseEventSinkClient<>(eventSinkThriftClient, eventSinkId, Change.class);
     }
 
 }

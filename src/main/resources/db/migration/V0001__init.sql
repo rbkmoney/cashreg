@@ -1,6 +1,27 @@
 CREATE SCHEMA IF NOT EXISTS cashreg;
 
 
+---------------   CASHBOX    ---------------
+
+CREATE SEQUENCE cashreg.seq_cashbox_id
+  START WITH 1
+  INCREMENT BY 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  CACHE 1;
+
+CREATE TABLE IF NOT EXISTS cashreg.cashbox
+(
+  id       BIGINT       NOT NULL DEFAULT nextval('cashreg.seq_cashbox_id' :: REGCLASS),
+  name     VARCHAR(255) NOT NULL,
+  url      VARCHAR(255) NOT NULL,
+  settings TEXT                  DEFAULT '{}',
+  comment  VARCHAR(255),
+  CONSTRAINT cashbox_pkey PRIMARY KEY (id)
+);
+
+COMMENT ON COLUMN cashreg.cashbox.url is 'URL adapter';
+
 ---------------   ACCOUNT   ---------------
 
 CREATE SEQUENCE cashreg.seq_account_id
@@ -41,6 +62,25 @@ CREATE TABLE IF NOT EXISTS cashreg.payer_info
 CREATE INDEX IF NOT EXISTS payer_info_contact
   ON cashreg.payer_info (contact);
 
+---------------   REFUND    ---------------
+
+CREATE SEQUENCE cashreg.seq_refund_id
+  START WITH 1
+  INCREMENT BY 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  CACHE 1;
+
+CREATE TABLE IF NOT EXISTS cashreg.refund
+(
+  id            BIGINT       NOT NULL DEFAULT nextval('cashreg.seq_refund_id' :: REGCLASS),
+  refund_id     VARCHAR(255) NOT NULL,
+  amount        NUMERIC      NOT NULL,
+  cart          TEXT                  DEFAULT '{}',
+  previous_cart TEXT                  DEFAULT '{}',
+  status        VARCHAR(12)           DEFAULT 'none',
+  CONSTRAINT refund_pkey PRIMARY KEY (id)
+);
 
 ---------------   PAYMENT   ---------------
 
@@ -67,51 +107,7 @@ CREATE TABLE IF NOT EXISTS cashreg.payment
 );
 
 COMMENT ON COLUMN cashreg.payment.payment_id is 'Payment ID. Example (1)';
-
-
----------------   REFUND    ---------------
-
-CREATE SEQUENCE cashreg.seq_refund_id
-  START WITH 1
-  INCREMENT BY 1
-  MINVALUE 1
-  MAXVALUE 9223372036854775807
-  CACHE 1;
-
-CREATE TABLE IF NOT EXISTS cashreg.refund
-(
-  id            BIGINT       NOT NULL DEFAULT nextval('cashreg.seq_refund_id' :: REGCLASS),
-  refund_id     VARCHAR(255) NOT NULL,
-  amount        NUMERIC      NOT NULL,
-  cart          TEXT                  DEFAULT '{}',
-  previous_cart TEXT                  DEFAULT '{}',
-  status        VARCHAR(12)           DEFAULT 'none',
-  CONSTRAINT refund_pkey PRIMARY KEY (id)
-);
-
 COMMENT ON COLUMN cashreg.payment.refund_id is 'Refund ID. Example (1AkoSR8NZbM)';
-
-
----------------   CASHBOX    ---------------
-
-CREATE SEQUENCE cashreg.seq_cashbox_id
-  START WITH 1
-  INCREMENT BY 1
-  MINVALUE 1
-  MAXVALUE 9223372036854775807
-  CACHE 1;
-
-CREATE TABLE IF NOT EXISTS cashreg.cashbox
-(
-  id       BIGINT       NOT NULL DEFAULT nextval('cashreg.seq_cashbox_id' :: REGCLASS),
-  name     VARCHAR(255) NOT NULL,
-  url      VARCHAR(255) NOT NULL,
-  settings TEXT                  DEFAULT '{}',
-  comment  VARCHAR(255),
-  CONSTRAINT cashbox_pkey PRIMARY KEY (id)
-);
-
-COMMENT ON COLUMN cashreg.cashbox.url is 'URL adapter';
 
 
 ---------------   INVOICE_PAYER    ---------------
