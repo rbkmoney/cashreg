@@ -6,6 +6,7 @@ import com.rbkmoney.cashreg.utils.cashreg.creators.StatusCreators;
 import com.rbkmoney.damsel.cashreg.provider.LegalEntity;
 import com.rbkmoney.damsel.cashreg.provider.RussianBankAccount;
 import com.rbkmoney.damsel.cashreg.provider.*;
+import com.rbkmoney.damsel.cashreg.status.Status;
 import com.rbkmoney.damsel.cashreg.type.Type;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
@@ -96,13 +97,13 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
             throw new IllegalStateException("Can't receive result; paymentInstitutionRef: " + paymentInstitutionRef.getId());
         }
 
+        Status status = StatusCreators.createFailedStatus();
         if (result.getIntent().getFinish().getStatus().isSetSuccess()) {
-            Change changePending = Change.status_changed(new StatusChange().setStatus(StatusCreators.createPendingStatus()));
-            changes.add(changePending);
-        } else {
-            Change changeFailure = Change.status_changed(new StatusChange().setStatus(StatusCreators.createFailedStatus()));
-            changes.add(changeFailure);
+            status = StatusCreators.createPendingStatus();
         }
+
+        Change statusChanged = Change.status_changed(new StatusChange().setStatus(status));
+        changes.add(statusChanged);
 
         // TODO: timer
         SignalResultData<Change> resultData = new SignalResultData<>(
