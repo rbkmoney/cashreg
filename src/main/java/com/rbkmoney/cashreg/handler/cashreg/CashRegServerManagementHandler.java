@@ -1,5 +1,7 @@
 package com.rbkmoney.cashreg.handler.cashreg;
 
+import com.rbkmoney.cashreg.service.dominant.DominantService;
+import com.rbkmoney.cashreg.service.pm.PartyManagementService;
 import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.damsel.cashreg.CashRegNotFound;
 import com.rbkmoney.damsel.cashreg.base.EventRange;
@@ -15,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.rbkmoney.cashreg.utils.ProtoUtils.toCashReg;
+import static com.rbkmoney.cashreg.utils.ProtoUtils.listChangesToCashReg;
 import static com.rbkmoney.cashreg.utils.ProtoUtils.toCashRegCreated;
 
 @Slf4j
@@ -23,31 +25,36 @@ import static com.rbkmoney.cashreg.utils.ProtoUtils.toCashRegCreated;
 public class CashRegServerManagementHandler implements ManagementSrv.Iface {
 
     private final AutomatonClient<Value, Change> automatonClient;
+    private final PartyManagementService partyManagementService;
+    private final DominantService dominantService;
 
     public CashRegServerManagementHandler(
-            AutomatonClient<Value, Change> automatonClient
+            AutomatonClient<Value, Change> automatonClient,
+            PartyManagementService partyManagementService,
+            DominantService dominantService
     ) {
         this.automatonClient = automatonClient;
+        this.partyManagementService = partyManagementService;
+        this.dominantService = dominantService;
     }
 
-    // Need do void
     @Override
-    public CashReg create(CashRegParams cashRegParams) throws CashRegNotFound, TException {
-        Change change = toCashRegCreated(cashRegParams);
+    public void create(CashRegParams cashRegParams) throws CashRegNotFound, TException {
+        Change change = toCashRegCreated(cashRegParams, partyManagementService, dominantService);
         automatonClient.start(cashRegParams.getId(), ProtoUtils.toValue(Collections.singletonList(change)));
-        return null;
     }
 
     @Override
     public CashReg get(String cashRegID) throws CashRegNotFound, TException {
-        Change change = automatonClient.getEvents(cashRegID).stream().findFirst().map(TMachineEvent::getData).orElse(null);
-        return toCashReg(change);
+        List<Change> changes = automatonClient.getEvents(cashRegID).stream().map(TMachineEvent::getData).collect(Collectors.toList());
+        return listChangesToCashReg(changes);
     }
 
+    /**
+     * TODO: Libs add range
+     */
     @Override
     public List<Event> getEvents(String cashRegID, EventRange eventRange) throws CashRegNotFound, TException {
-        // TODO: what about event range?
-        // TODO: Event Sink?
         return automatonClient.getMachine(cashRegID)
                 .getHistory().stream()
                 .map(event -> new Event(
@@ -56,10 +63,6 @@ public class CashRegServerManagementHandler implements ManagementSrv.Iface {
                                 ProtoUtils.toChangeList(event.getData()).get(0)
                         )
                 ).collect(Collectors.toList());
-    }
-
-    private Change getLastChange(List<TMachineEvent<Change>> machineEvents) {
-        return machineEvents.get(machineEvents.size() - 1).getData();
     }
 
 }
