@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -153,12 +152,12 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
         return resultData;
     }
 
-    /**
-     * For repairer
-     */
     @Override
     protected CallResultData<Change> processCall(String namespace, String machineId, Value args, List<TMachineEvent<Change>> tMachineEvents) {
-        return new CallResultData<>(getLastEvent(tMachineEvents), Collections.emptyList(), new ComplexAction());
+        List<Change> changes = toChangeList(args);
+        return new CallResultData<>(getLastEvent(tMachineEvents), toChangeList(toValue(changes)),
+                buildComplexActionWithTimer(Timer.timeout(DEFAULT_TIMER), buildLastEventHistoryRange())
+        );
     }
 
     private Change getLastEvent(List<TMachineEvent<Change>> tMachineEvents) {
@@ -167,7 +166,6 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
         }
         return tMachineEvents.get(tMachineEvents.size() - 1).getData();
     }
-
 
     private void prepareSessionFailed(CashRegResult result, SessionFinished sessionFinished, SessionResult sessionResult) {
         SessionFailed sessionFailed = new SessionFailed();
