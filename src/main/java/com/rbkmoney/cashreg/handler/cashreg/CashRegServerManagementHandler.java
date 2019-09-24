@@ -9,6 +9,8 @@ import com.rbkmoney.damsel.cashreg_processing.*;
 import com.rbkmoney.machinarium.client.AutomatonClient;
 import com.rbkmoney.machinarium.domain.TMachineEvent;
 import com.rbkmoney.machinegun.msgpack.Value;
+import com.rbkmoney.machinegun.stateproc.HistoryRange;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 import org.springframework.stereotype.Component;
@@ -22,21 +24,12 @@ import static com.rbkmoney.cashreg.utils.ProtoUtils.toCashRegCreated;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class CashRegServerManagementHandler implements ManagementSrv.Iface {
 
     private final AutomatonClient<Value, Change> automatonClient;
     private final PartyManagementService partyManagementService;
     private final DominantService dominantService;
-
-    public CashRegServerManagementHandler(
-            AutomatonClient<Value, Change> automatonClient,
-            PartyManagementService partyManagementService,
-            DominantService dominantService
-    ) {
-        this.automatonClient = automatonClient;
-        this.partyManagementService = partyManagementService;
-        this.dominantService = dominantService;
-    }
 
     @Override
     public void create(CashRegParams cashRegParams) throws CashRegNotFound, TException {
@@ -46,21 +39,25 @@ public class CashRegServerManagementHandler implements ManagementSrv.Iface {
 
     @Override
     public CashReg get(String cashRegID) throws CashRegNotFound, TException {
-        List<Change> changes = automatonClient.getEvents(cashRegID).stream().map(TMachineEvent::getData).collect(Collectors.toList());
+        List<Change> changes = automatonClient.getEvents(cashRegID, new HistoryRange()).stream().map(TMachineEvent::getData).collect(Collectors.toList());
         return listChangesToCashReg(changes);
     }
 
-    /**
-     * TODO: Libs add range
-     */
     @Override
     public List<Event> getEvents(String cashRegID, EventRange eventRange) throws CashRegNotFound, TException {
-        return automatonClient.getMachine(cashRegID)
-                .getHistory().stream()
+        HistoryRange historyRange = new HistoryRange();
+        if (eventRange.isSetAfter()) {
+            historyRange.setAfter(eventRange.getAfter());
+        }
+        if (eventRange.isSetLimit()) {
+            historyRange.setLimit(eventRange.getLimit());
+        }
+
+        return automatonClient.getEvents(cashRegID, historyRange).stream()
                 .map(event -> new Event(
                                 event.getId(),
-                                event.getCreatedAt(),
-                                ProtoUtils.toChangeList(event.getData()).get(0)
+                                event.getCreatedAt().toString(),
+                                event.getData()
                         )
                 ).collect(Collectors.toList());
     }

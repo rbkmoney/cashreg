@@ -29,11 +29,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.rbkmoney.cashreg.utils.ProtoUtils.*;
+import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeCreators.*;
 
 
 @Slf4j
 @Component
 public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, Change> {
+
+    private static final int DEFAULT_TIMER = 1;
+    private static final int NETWORK_TIMEOUT = 10;
 
     private final PartyManagementService partyManagementService;
     private final DominantService dominantService;
@@ -54,7 +58,7 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
         Change statusChanged = Change.status_changed(new StatusChange().setStatus(StatusCreators.createPendingStatus()));
         changes.add(statusChanged);
         SignalResultData<Change> resultData = new SignalResultData<>(
-                toChangeList(toValue(changes)), buildComplexActionWithTimer(Timer.timeout(1), buildLastEventHistoryRange())
+                toChangeList(toValue(changes)), buildComplexActionWithTimer(Timer.timeout(DEFAULT_TIMER), buildLastEventHistoryRange())
         );
         log.info("Response of processSignalInit: {}", resultData);
         return resultData;
@@ -77,39 +81,27 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
         String url = proxyDefinition.getUrl();
         Map<String, String> proxyOptions = proxyDefinition.getOptions();
 
-        // TODO: create wrappers
-        // TODO: add default timer
         CashRegContext context;
-        ComplexAction complexAction = new ComplexAction();
+        ComplexAction complexAction = buildComplexActionWithTimer(Timer.timeout(DEFAULT_TIMER), buildLastEventHistoryRange());
+
         if (lastChange.isSetCreated()) {
-            Change statusChanged = Change.status_changed(new StatusChange().setStatus(StatusCreators.createPendingStatus()));
-            changes.add(statusChanged);
+            changes.add(createStatusChangePending());
         } else if (lastChange.isSetStatusChanged()) {
-            Status status = lastChange.getStatusChanged().getStatus();
-            Change statusChanged;
-            if (status.isSetPending()) {
-                SessionChangePayload sessionChangePayload = new SessionChangePayload();
-                sessionChangePayload.setStarted(new SessionStarted());
-                statusChanged = Change.session(new SessionChange().setPayload(sessionChangePayload));
-                changes.add(statusChanged);
-            } else if (status.isSetDelivered()) {
-                statusChanged = Change.status_changed(new StatusChange().setStatus(StatusCreators.createDeliveredStatus()));
-                changes.add(statusChanged);
-            } else {
-                statusChanged = Change.status_changed(new StatusChange().setStatus(StatusCreators.createFailedStatus()));
-                changes.add(statusChanged);
-            }
+            complexAction = addChangeStatus(changes, lastChange, complexAction);
         } else if (lastChange.isSetSession()) {
 
+            SessionChangePayload sessionChangePayload = new SessionChangePayload();
+            SessionAdapterStateChanged sessionAdapterStateChanged = new SessionAdapterStateChanged();
+            sessionChangePayload.setSessionAdapterStateChanged(sessionAdapterStateChanged);
+
             if (lastChange.getSession().getPayload().isSetStarted()) {
-                Change statusChanged = Change.status_changed(new StatusChange().setStatus(StatusCreators.createDeliveredStatus()));
-                changes.add(statusChanged);
-                complexAction = buildComplexActionWithTimer(Timer.timeout(1), buildLastEventHistoryRange());
+                changes.add(createSessionChange(sessionChangePayload));
+                complexAction = buildComplexActionWithTimer(Timer.timeout(DEFAULT_TIMER), buildLastEventHistoryRange());
             }
 
             if (lastChange.getSession().getPayload().isSetSessionAdapterStateChanged()) {
                 context = prepareCashRegContext(cashReg, proxyOptions);
-                CashRegProviderSrv.Iface prv = ProtoUtils.cashRegProviderSrv(url, 10);
+                CashRegProviderSrv.Iface prv = ProtoUtils.cashRegProviderSrv(url, NETWORK_TIMEOUT);
                 CashRegResult result;
                 try {
                     result = prv.register(context);
@@ -117,68 +109,48 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
                     throw new IllegalStateException("Can't receive result");
                 }
 
-                SessionChangePayload sessionChangePayload = new SessionChangePayload();
-                SessionAdapterStateChanged sessionAdapterStateChanged = new SessionAdapterStateChanged();
                 sessionAdapterStateChanged.setState(com.rbkmoney.damsel.msgpack.Value.bin(result.getState()));
                 if (result.getIntent().isSetSleep()) {
-
                     sessionChangePayload.setSessionAdapterStateChanged(sessionAdapterStateChanged);
-                    Change statusChanged = Change.session(new SessionChange().setPayload(sessionChangePayload));
-                    changes.add(statusChanged);
 
-                    com.rbkmoney.machinegun.base.Timer timer = prepareTimer(result.getIntent().getSleep().getTimer());
-                    complexAction = buildComplexActionWithTimer(timer, buildLastEventHistoryRange());
+                    complexAction = buildComplexActionWithTimer(
+                            prepareTimer(result.getIntent().getSleep().getTimer()),
+                            buildLastEventHistoryRange()
+                    );
                 }
 
                 if (result.getIntent().isSetFinish()) {
                     FinishIntent finishIntent = result.getIntent().getFinish();
                     SessionFinished sessionFinished = new SessionFinished();
                     SessionResult sessionResult = new SessionResult();
+
                     if (finishIntent.getStatus().isSetFailure()) {
-                        SessionFailed sessionFailed = new SessionFailed();
-                        com.rbkmoney.damsel.cashreg.base.Failure failure = new com.rbkmoney.damsel.cashreg.base.Failure();
-                        failure.setCode(result.getIntent().getFinish().getStatus().getFailure().getCode());
-                        failure.setCode(result.getIntent().getFinish().getStatus().getFailure().getReason());
-                        sessionFailed.setFailure(failure);
-                        sessionResult.setFailed(sessionFailed);
-                        sessionFinished.setResult(sessionResult);
+                        prepareSessionFailed(result, sessionFinished, sessionResult);
                     } else {
-                        SessionSucceeded sessionSucceeded = new SessionSucceeded();
-                        sessionSucceeded.setInfo(result.getCashregInfo());
-                        sessionResult.setSucceeded(sessionSucceeded);
-                        sessionFinished.setResult(sessionResult);
+                        prepareSessionSucceeded(result, sessionFinished, sessionResult);
                     }
+
                     sessionChangePayload.setFinished(sessionFinished);
-                    Change statusChanged = Change.session(new SessionChange().setPayload(sessionChangePayload));
-                    changes.add(statusChanged);
+                    complexAction = new ComplexAction();
                 }
 
-                sessionChangePayload.setSessionAdapterStateChanged(new SessionAdapterStateChanged());
-                Change statusChanged = Change.session(new SessionChange().setPayload(sessionChangePayload));
-                changes.add(statusChanged);
+                changes.add(createSessionChange(sessionChangePayload));
             }
 
             if (lastChange.getSession().getPayload().isSetFinished()) {
-                Change statusChanged = Change.status_changed(new StatusChange().setStatus(StatusCreators.createDeliveredStatus()));
-                changes.add(statusChanged);
+                SessionChangePayload payload = lastChange.getSession().getPayload();
+                SessionResult sessionResult = payload.getFinished().getResult();
+                if (sessionResult.isSetSucceeded()) {
+                    changes.add(createStatusChangeDelivered());
+                } else {
+                    changes.add(createStatusChangeFailed());
+                }
             }
-
-            // complexAction need to use
         }
 
         SignalResultData<Change> resultData = new SignalResultData<>(toChangeList(toValue(changes)), complexAction);
         log.info("Response of processSignalTimeout: {}", resultData);
         return resultData;
-    }
-
-    public static com.rbkmoney.machinegun.base.Timer prepareTimer(com.rbkmoney.damsel.cashreg.base.Timer incomeTimer) {
-        com.rbkmoney.machinegun.base.Timer timer = new com.rbkmoney.machinegun.base.Timer();
-        if (incomeTimer.isSetTimeout()) {
-            timer.setTimeout(incomeTimer.getTimeout());
-        } else {
-            timer.setDeadline(incomeTimer.getDeadline());
-        }
-        return timer;
     }
 
     /**
@@ -194,6 +166,48 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
             return null;
         }
         return tMachineEvents.get(tMachineEvents.size() - 1).getData();
+    }
+
+
+    private void prepareSessionFailed(CashRegResult result, SessionFinished sessionFinished, SessionResult sessionResult) {
+        SessionFailed sessionFailed = new SessionFailed();
+        com.rbkmoney.damsel.cashreg.base.Failure failure = new com.rbkmoney.damsel.cashreg.base.Failure();
+        failure.setCode(result.getIntent().getFinish().getStatus().getFailure().getCode());
+        failure.setCode(result.getIntent().getFinish().getStatus().getFailure().getReason());
+        sessionFailed.setFailure(failure);
+        sessionResult.setFailed(sessionFailed);
+        sessionFinished.setResult(sessionResult);
+    }
+
+    private void prepareSessionSucceeded(CashRegResult result, SessionFinished sessionFinished, SessionResult sessionResult) {
+        SessionSucceeded sessionSucceeded = new SessionSucceeded();
+        sessionSucceeded.setInfo(result.getCashregInfo());
+        sessionResult.setSucceeded(sessionSucceeded);
+        sessionFinished.setResult(sessionResult);
+    }
+
+    private ComplexAction addChangeStatus(List<Change> changes, Change lastChange, ComplexAction complexAction) {
+        Status status = lastChange.getStatusChanged().getStatus();
+        if (status.isSetPending()) {
+            changes.add(createSessionChangeStarted());
+        } else if (status.isSetDelivered()) {
+            changes.add(createStatusChangeDelivered());
+            complexAction = new ComplexAction();
+        } else {
+            changes.add(createStatusChangeFailed());
+            complexAction = new ComplexAction();
+        }
+        return complexAction;
+    }
+
+    public static com.rbkmoney.machinegun.base.Timer prepareTimer(com.rbkmoney.damsel.cashreg.base.Timer incomeTimer) {
+        com.rbkmoney.machinegun.base.Timer timer = new com.rbkmoney.machinegun.base.Timer();
+        if (incomeTimer.isSetTimeout()) {
+            timer.setTimeout(incomeTimer.getTimeout());
+        } else {
+            timer.setDeadline(incomeTimer.getDeadline());
+        }
+        return timer;
     }
 
 }
