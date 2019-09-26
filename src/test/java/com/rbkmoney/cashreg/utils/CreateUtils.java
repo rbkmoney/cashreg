@@ -1,11 +1,11 @@
 package com.rbkmoney.cashreg.utils;
 
+import com.rbkmoney.damsel.cashreg.Cart;
+import com.rbkmoney.damsel.cashreg.ItemsLine;
 import com.rbkmoney.damsel.cashreg.type.Debit;
 import com.rbkmoney.damsel.cashreg.type.Type;
-import com.rbkmoney.damsel.cashreg_processing.Cart;
+import com.rbkmoney.damsel.cashreg_domain.PaymentInfo;
 import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
-import com.rbkmoney.damsel.cashreg_processing.ItemsLine;
-import com.rbkmoney.damsel.cashreg_processing.PaymentInfo;
 import com.rbkmoney.damsel.domain.Cash;
 import com.rbkmoney.damsel.domain.CurrencyRef;
 

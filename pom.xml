@@ -22,7 +22,6 @@
         <sonar.jacoco.reportPath>target/sites/jacoco/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.cobertura.reportPath>
         <server.port>8022</server.port>
-        <stage>dev</stage>
         <exposed.ports>${server.port}</exposed.ports>
         <project.maintainer>Anatoly Cherkasov &lt;a.cherkasov@rbkmoney.com&gt;</project.maintainer>
         <dockerfile.Template>GENERATED DOCKER FILE</dockerfile.Template>
@@ -30,18 +29,9 @@
         <dockerfile.registry>dr2.rbkmoney.com</dockerfile.registry>
         <shared.resources.version>0.3.6</shared.resources.version>
         <logstash-logback-encoder.version>5.2</logstash-logback-encoder.version>
-        <nop-rolling.version>1.0.1</nop-rolling.version>
         <geck.version>0.6.9</geck.version>
-
-        <spring.kafka.version>2.2.4.RELEASE</spring.kafka.version>
         <lombok.version>1.18.4</lombok.version>
-
-        <postgresql.jdbc.version>42.2.5</postgresql.jdbc.version>
-        <custom.flyway.version>5.2.4</custom.flyway.version>
-        <hikaricp.version>3.3.1</hikaricp.version>
-
         <testcontainers.version>1.10.2</testcontainers.version>
-        <kafka.common.lib.version>0.0.9</kafka.common.lib.version>
         <damsel.version>1.303-d99319c</damsel.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -66,6 +56,16 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+            <version>1.2.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>${httpclient.version}</version>
@@ -74,11 +74,6 @@
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>${logstash-logback-encoder.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -91,16 +86,6 @@
             <version>1.1.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>2.6.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-            <version>${spring.kafka.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
@@ -110,17 +95,6 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>${hikaricp.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${postgresql.jdbc.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>${custom.flyway.version}</version>
         </dependency>
         <!--RBK libs-->
         <dependency>
@@ -140,18 +114,8 @@
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
-            <artifactId>kafka-common-lib</artifactId>
-            <version>${kafka.common.lib.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.rbkmoney</groupId>
             <artifactId>damsel</artifactId>
             <version>${damsel.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.rbkmoney.logback</groupId>
-            <artifactId>nop-rolling</artifactId>
-            <version>${nop-rolling.version}</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney</groupId>
@@ -163,6 +127,7 @@
             <artifactId>machinarium</artifactId>
             <version>${machinarium.version}</version>
         </dependency>
+
         <!--Test libs-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -173,29 +138,6 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
             <version>1.9.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>1.10.6</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.2.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>kafka</artifactId>
-            <version>1.10.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-streams-test-utils</artifactId>
-            <version>2.1.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -6,7 +6,6 @@ spring:
 info:
   version: @version@
   responsible: @project.maintainer@
-  stage: @stage@
 ---
 management:
   metrics:
@@ -17,79 +16,12 @@ management:
 server:
   port: @server.port@
 ---
-kafka:
-  exception.sleep: 1000
-  bootstrap-servers: kenny-kafka1.bst1.rbkmoney.net:9092
-  client-id: starrys
-  ssl:
-    enabled: false
-  #    trust-store-location: "test"
-  #    trust-store-password: "test"
-  #    key-store-location: "test"
-  #    key-store-password: "test"
-  #    key-password: "test"
-  #    key-store-type: PKCS12
-  #    trust-store-type: PKCS12
-  consumer:
-    concurrency: 8
-    group-id: "StarrysListener"
-    enable-auto-commit: false
-    auto-offset-reset: latest
-    max-poll-records: 20
-  topics:
-    invoice:
-      id: mg-invoice-100-2
-      enabled: false
----
-spring:
-  flyway:
-    validate-on-migrate: true
-    schemas: cashreg
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
-    properties:
-      hibernate:
-        default_schema: cashreg
-        temp:
-          use_jdbc_metadata_defaults: false
-        jdbc:
-          lob:
-            non_contextual_creation: true
-    show-sql: false
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1:5432/cashreg
-    username: test
-    password: test
-    hikari:
-      maximum-pool-size: 3
-      idle-timeout: 30000
-      leak-detection-threshold: 60000
-      schema: cashreg
----
-cron:
-  expression:
-    debit: 60000
-    refund_debit: 60000
-    status: 60000
-query:
-  limit:
-    debit: 30
-    refund_debit: 30
-    status: 30
-polling:
-  limit:
-    timeout: 60
-caffeine:
-  expire_after_write: 90
-  maximum_size: 1000
----
 retry-policy:
   maxAttempts: -1
 ---
 cashreg:
   networkTimeout: 60
+---
 service:
   mg:
     automaton:
@@ -105,5 +37,6 @@ service:
   dominant:
     url: http://dominant:8022/v1/domain/repository_client
     networkTimeout: 5000
+---
 cache:
   maxSize: 100
