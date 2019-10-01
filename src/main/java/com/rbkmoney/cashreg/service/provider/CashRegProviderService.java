@@ -1,18 +1,29 @@
 package com.rbkmoney.cashreg.service.provider;
 
+import com.rbkmoney.cashreg.service.management.aggregate.ManagementAggregate;
 import com.rbkmoney.damsel.cashreg.provider.CashRegContext;
 import com.rbkmoney.damsel.cashreg.provider.CashRegProviderSrv;
 import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
+import com.rbkmoney.damsel.cashreg_processing.CashReg;
+import com.rbkmoney.damsel.domain.ProxyObject;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
+import lombok.RequiredArgsConstructor;
 import org.apache.thrift.TException;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
+
+import static com.rbkmoney.cashreg.service.management.impl.ManagementServiceImpl.NETWORK_TIMEOUT;
+import static com.rbkmoney.cashreg.utils.ProtoUtils.prepareCashRegContext;
 
 
 @Component
+@RequiredArgsConstructor
 public class CashRegProviderService implements CashRegProvider {
+
+    private final ManagementAggregate managementAggregate;
 
     private CashRegProviderSrv.Iface cashRegProviderSrv(String url, Integer networkTimeout) {
         try {
@@ -26,7 +37,14 @@ public class CashRegProviderService implements CashRegProvider {
     }
 
     @Override
-    public CashRegResult register(String url, Integer networkTimeout, CashRegContext context) {
+    public CashRegResult register(CashReg cashReg) {
+        String url = extractUrl(cashReg);
+        Map<String, String> options = extractOptions(cashReg);
+        CashRegContext context = prepareCashRegContext(cashReg, options);
+        return call(url, NETWORK_TIMEOUT, context);
+    }
+
+    private CashRegResult call(String url, Integer networkTimeout, CashRegContext context) {
         CashRegProviderSrv.Iface provider = cashRegProviderSrv(url, networkTimeout);
         try {
             return provider.register(context);
@@ -35,5 +53,15 @@ public class CashRegProviderService implements CashRegProvider {
             throw new RuntimeException(e);
         }
     }
+
+    private String extractUrl(CashReg cashReg) {
+        ProxyObject proxyObject = managementAggregate.extractProxyObject(cashReg);
+        return proxyObject.getData().getUrl();
+    }
+
+    private Map<String, String> extractOptions(CashReg cashReg) {
+        return managementAggregate.aggregateOptions(cashReg);
+    }
+
 
 }
