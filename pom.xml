@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>cashreg-proto</artifactId>
-            <version>SNAPSHOT</version>
+            <version>1.5-c0ce235</version>
         </dependency>
 
         <!--Thrirdparty libs-->
