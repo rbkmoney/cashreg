@@ -1,6 +1,5 @@
 package com.rbkmoney.cashreg.handler.cashreg;
 
-import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.damsel.cashreg.CashRegNotFound;
 import com.rbkmoney.damsel.cashreg.MachineAlreadyWorking;
 import com.rbkmoney.damsel.cashreg_processing.Change;
@@ -22,7 +21,7 @@ public class CashRegServerRepairerHandler implements RepairerSrv.Iface {
 
     @Override
     public void repair(String cashRegID, RepairScenario repairScenario) throws CashRegNotFound, MachineAlreadyWorking, TException {
-        automatonClient.call(cashRegID, ProtoUtils.toValue(repairScenario.getAddEvents().getEvents()));
+        throw new RuntimeException("Not supported yet");
     }
 
 }

@@ -3,7 +3,9 @@ package com.rbkmoney.cashreg.service.pm.impl;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.rbkmoney.cashreg.service.exception.NotFoundException;
+import com.rbkmoney.cashreg.service.exception.PartyNotFoundException;
 import com.rbkmoney.cashreg.service.pm.PartyManagementService;
+import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
 import com.rbkmoney.damsel.domain.Contract;
 import com.rbkmoney.damsel.domain.Party;
 import com.rbkmoney.damsel.domain.PaymentInstitutionRef;
@@ -19,6 +21,8 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.AbstractMap;
 import java.util.Map;
+
+import static com.rbkmoney.damsel.payment_processing.PartyRevisionParam.revision;
 
 @Slf4j
 @Service
@@ -71,7 +75,6 @@ public class PartyManagementServiceImpl implements PartyManagementService {
         log.info("Trying to get shop, partyId='{}', shopId='{}', ", partyId, shopId);
         PartyRevisionParam partyRevisionParam = PartyRevisionParam.timestamp(TypeUtil.temporalToString(Instant.now()));
         Party party = getParty(partyId, partyRevisionParam);
-
         Shop shop = party.getShops().get(shopId);
         if (shop == null) {
             throw new NotFoundException(String.format("Shop not found, partyId='%s', shopId='%s'", partyId, shopId));
@@ -81,18 +84,35 @@ public class PartyManagementServiceImpl implements PartyManagementService {
     }
 
     @Override
+    public Shop getShop(CashRegParams cashRegParams) throws NotFoundException {
+        return getShop(cashRegParams.getPartyId(), cashRegParams.getShopId());
+    }
+
+    @Override
     public Contract getContract(String partyId, String contractId) throws NotFoundException {
         log.info("Trying to get contract, partyId='{}', contractId='{}'", partyId, contractId);
-
-        PartyRevisionParam partyRevisionParam = PartyRevisionParam.timestamp(TypeUtil.temporalToString(Instant.now()));
+        PartyRevisionParam partyRevisionParam = revision(getPartyRevision(partyId));
         Party party = getParty(partyId, partyRevisionParam);
-
         Contract contract = party.getContracts().get(contractId);
         if (contract == null) {
             throw new NotFoundException(String.format("Contract not found, partyId='%s', contractId='%s', partyRevisionParam='%s'", partyId, contractId, partyRevisionParam));
         }
         log.info("Contract has been found, partyId='{}', contractId='{}', partyRevisionParam='{}'", partyId, contractId, partyRevisionParam);
         return contract;
+    }
+
+    @Override
+    public long getPartyRevision(String partyId) {
+        try {
+            log.info("Trying to get revision, partyId='{}'", partyId);
+            long revision = partyManagementClient.getRevision(userInfo, partyId);
+            log.info("Revision has been found, partyId='{}', revision='{}'", partyId, revision);
+            return revision;
+        } catch (PartyNotFound ex) {
+            throw new PartyNotFoundException(String.format("Party not found, partyId='%s'", partyId), ex);
+        } catch (TException ex) {
+            throw new RuntimeException(String.format("Failed to get party revision, partyId='%s'", partyId), ex);
+        }
     }
 
     @Override

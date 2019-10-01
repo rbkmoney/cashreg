@@ -35,8 +35,7 @@
         <damsel.version>1.303-d99319c</damsel.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <machinarium.version>0.2.5-SNAPSHOT</machinarium.version>
+        <machinarium.version>0.2.6</machinarium.version>
     </properties>
 
     <dependencies>
