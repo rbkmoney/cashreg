@@ -26,6 +26,7 @@ public class CreateUtils {
         List<ItemsLine> lines = new ArrayList();
         cart.setLines(lines);
         paymentInfo.setCart(cart);
+        paymentInfo.setEmail("test@test.ru");
         return paymentInfo;
     }
 

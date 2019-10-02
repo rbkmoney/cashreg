@@ -74,7 +74,6 @@ public class CashRegServerManagementHandlerTest extends AbstractIntegrationTest 
                 cashregId, partyId, shopId,
                 TypeCreators.createDebit(), createPaymentInfo()
         );
-        // TODO: need void for create
         management.create(params);
     }
 

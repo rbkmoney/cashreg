@@ -10,7 +10,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
@@ -28,9 +27,6 @@ public abstract class AbstractIntegrationTest {
     public final static String MG_IMAGE = "dr2.rbkmoney.com/rbkmoney/machinegun";
     public final static String MG_TAG = "5b85e3c73041e5cbcfcc35c465cf14214163389b";
 
-    public final static String POSTGRES_IMAGE = "dr2.rbkmoney.com/rbkmoney/postgres";
-    public final static String POSTGRES_TAG = "a5ebd642e6efdd1ef87d844c58765fd3766b0440";
-
     @ClassRule
     public static GenericContainer machinegunContainer = new GenericContainer(MG_IMAGE + ":" + MG_TAG)
             .withExposedPorts(8022)
@@ -45,20 +41,11 @@ public abstract class AbstractIntegrationTest {
                             .forStatusCode(200)
             );
 
-    @ClassRule
-    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer(POSTGRES_IMAGE + ":" + POSTGRES_TAG)
-            .withDatabaseName("cashreg")
-            .withUsername("test")
-            .withPassword("test");
-
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @Override
         public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
             TestPropertyValues.of(
-                    "service.mg.automaton.url=http://" + machinegunContainer.getContainerIpAddress() + ":" + machinegunContainer.getMappedPort(8022) + "/v1/automaton",
-                    "spring.datasource.url=" + postgreSQLContainer.getJdbcUrl(),
-                    "spring.datasource.username=" + postgreSQLContainer.getUsername(),
-                    "spring.datasource.password=" + postgreSQLContainer.getPassword()
+                    "service.mg.automaton.url=http://" + machinegunContainer.getContainerIpAddress() + ":" + machinegunContainer.getMappedPort(8022) + "/v1/automaton"
             ).applyTo(configurableApplicationContext);
         }
     }
