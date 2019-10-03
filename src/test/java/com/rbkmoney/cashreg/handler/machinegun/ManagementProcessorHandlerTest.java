@@ -51,19 +51,6 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void processSignalTimeout() throws TException {
-        SignalArgs signalArgs = new SignalArgs();
-        TimeoutSignal timeoutSignal = new TimeoutSignal();
-        signalArgs.setSignal(Signal.timeout(timeoutSignal));
-        signalArgs.setMachine(new Machine()
-                .setId(cashregId)
-                .setNs(namespace)
-                .setHistory(new ArrayList<>())
-                .setHistoryRange(new HistoryRange()));
-        client.processSignal(signalArgs);
-    }
-
-    @Test
     public void processCall() throws TException {
         Change change = Change.status_changed(new StatusChange().setStatus(createPendingStatus()));
         CallArgs callArgs = new CallArgs();
