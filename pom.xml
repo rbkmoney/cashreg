@@ -24,7 +24,6 @@
         <server.port>8022</server.port>
         <exposed.ports>${server.port}</exposed.ports>
         <project.maintainer>Anatoly Cherkasov &lt;a.cherkasov@rbkmoney.com&gt;</project.maintainer>
-        <dockerfile.Template>GENERATED DOCKER FILE</dockerfile.Template>
         <dockerfile.base.service.tag>c0d0900ec19c907d866f8360031a836049985110</dockerfile.base.service.tag>
         <dockerfile.registry>dr2.rbkmoney.com</dockerfile.registry>
         <shared.resources.version>0.3.6</shared.resources.version>
@@ -32,7 +31,7 @@
         <geck.version>0.6.9</geck.version>
         <lombok.version>1.18.4</lombok.version>
         <testcontainers.version>1.10.2</testcontainers.version>
-        <damsel.version>1.303-d99319c</damsel.version>
+        <damsel.version>1.343-2610822</damsel.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <machinarium.version>0.2.6</machinarium.version>
