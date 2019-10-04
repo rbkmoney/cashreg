@@ -6,7 +6,7 @@ import com.rbkmoney.damsel.cashreg.status.Pending;
 import com.rbkmoney.damsel.cashreg.status.Status;
 import com.rbkmoney.damsel.cashreg_processing.*;
 
-public class ChangeCreators {
+public class ChangeFactory {
 
     // Change
     public static Change createStatusChangePending() {

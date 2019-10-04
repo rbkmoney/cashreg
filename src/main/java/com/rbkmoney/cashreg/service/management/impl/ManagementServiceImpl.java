@@ -4,7 +4,7 @@ import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.management.ManagementService;
 import com.rbkmoney.cashreg.service.management.handler.ManagementHandler;
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.MgChangeManagerMapper;
-import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeCreators;
+import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import com.rbkmoney.machinegun.base.Timer;
@@ -31,7 +31,7 @@ public class ManagementServiceImpl implements ManagementService {
     @Override
     public SourceData init() {
         return SourceData.builder()
-                .change(ChangeCreators.createStatusChangePending())
+                .change(ChangeFactory.createStatusChangePending())
                 .complexAction(
                         buildComplexActionWithTimer(
                                 Timer.timeout(DEFAULT_TIMER),

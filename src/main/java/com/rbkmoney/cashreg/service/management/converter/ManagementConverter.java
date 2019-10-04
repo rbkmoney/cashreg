@@ -11,7 +11,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Service;
 
 import static com.rbkmoney.cashreg.utils.ProtoUtils.*;
-import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeCreators.createSessionChange;
+import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory.createSessionChange;
 
 @Service
 @Slf4j

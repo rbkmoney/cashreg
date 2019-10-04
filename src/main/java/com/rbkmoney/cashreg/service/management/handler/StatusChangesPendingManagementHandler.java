@@ -1,7 +1,7 @@
 package com.rbkmoney.cashreg.service.management.handler;
 
 import com.rbkmoney.cashreg.domain.SourceData;
-import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeCreators;
+import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import com.rbkmoney.machinegun.base.Timer;
@@ -25,7 +25,7 @@ public class StatusChangesPendingManagementHandler implements ManagementHandler 
     @Override
     public SourceData handle(Change change, CashReg cashReg) {
         return SourceData.builder()
-                .change(ChangeCreators.createSessionChangeStarted())
+                .change(ChangeFactory.createSessionChangeStarted())
                 .complexAction(
                         buildComplexActionWithTimer(
                                 Timer.timeout(DEFAULT_TIMER),

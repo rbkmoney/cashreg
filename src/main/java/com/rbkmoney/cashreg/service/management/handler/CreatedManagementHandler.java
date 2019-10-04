@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import static com.rbkmoney.cashreg.service.management.impl.ManagementServiceImpl.DEFAULT_TIMER;
 import static com.rbkmoney.cashreg.utils.ProtoUtils.buildComplexActionWithTimer;
 import static com.rbkmoney.cashreg.utils.ProtoUtils.buildLastEventHistoryRange;
-import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeCreators.createStatusChangePending;
+import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory.createStatusChangePending;
 
 @Component
 @RequiredArgsConstructor

@@ -7,7 +7,7 @@ import com.rbkmoney.machinegun.stateproc.ComplexAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeCreators.createStatusChangeDelivered;
+import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory.createStatusChangeDelivered;
 
 
 @Component
