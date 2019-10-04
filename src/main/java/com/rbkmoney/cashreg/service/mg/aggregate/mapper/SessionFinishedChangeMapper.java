@@ -1,16 +1,16 @@
-package com.rbkmoney.cashreg.service.mg.aggregate.handler;
+package com.rbkmoney.cashreg.service.mg.aggregate.mapper;
 
+import com.rbkmoney.damsel.cashreg.status.Delivered;
+import com.rbkmoney.damsel.cashreg.status.Failed;
+import com.rbkmoney.damsel.cashreg.status.Status;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import com.rbkmoney.damsel.cashreg_processing.SessionFinished;
 import com.rbkmoney.damsel.cashreg_processing.SessionResult;
 import org.springframework.stereotype.Component;
 
-import static com.rbkmoney.cashreg.utils.cashreg.creators.StatusCreators.createDeliveredStatus;
-import static com.rbkmoney.cashreg.utils.cashreg.creators.StatusCreators.createFailedStatus;
-
 @Component
-public class SessionFinishedChange implements ChangeHandler {
+public class SessionFinishedChangeMapper implements ChangeMapper {
 
     @Override
     public boolean filter(Change change) {
@@ -18,16 +18,16 @@ public class SessionFinishedChange implements ChangeHandler {
     }
 
     @Override
-    public CashReg handle(Change change) {
+    public CashReg map(Change change) {
         SessionFinished sessionFinished = change.getSession().getPayload().getFinished();
         SessionResult sessionResult = sessionFinished.getResult();
         CashReg cashReg = new CashReg();
+
         if (sessionResult.isSetFailed()) {
-            cashReg.setStatus(createFailedStatus());
-        }
-        if (sessionResult.isSetSucceeded()) {
+            cashReg.setStatus(Status.failed(new Failed()));
+        } else {
             cashReg.setInfo(sessionResult.getSucceeded().getInfo());
-            cashReg.setStatus(createDeliveredStatus());
+            cashReg.setStatus(Status.delivered(new Delivered()));
         }
         return cashReg;
     }

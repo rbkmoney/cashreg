@@ -17,8 +17,7 @@ public class StatusChangesDeliveredManagementHandler implements ManagementHandle
     @Override
     public boolean filter(Change change) {
         return change.isSetStatusChanged()
-                && change.getStatusChanged().getStatus().isSetFailed()
-                ;
+                && change.getStatusChanged().getStatus().isSetFailed();
     }
 
     @Override

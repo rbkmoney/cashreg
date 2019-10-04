@@ -2,6 +2,7 @@ package com.rbkmoney.cashreg.handler.machinegun;
 
 import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.management.impl.ManagementServiceImpl;
+import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import com.rbkmoney.machinarium.domain.CallResultData;
 import com.rbkmoney.machinarium.domain.SignalResultData;
@@ -36,11 +37,11 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
     @Override
     protected SignalResultData<Change> processSignalInit(String namespace, String machineId, Value args) {
         log.info("Request processSignalInit() machineId: {} value: {}", machineId, args);
-        List<Change> changes = toChangeList(args);
-        SourceData sourceData = managementService.init(changes);
+        List<Change> changes = ProtoUtils.toChangeList(args);
+        SourceData sourceData = managementService.init();
         changes.add(sourceData.getChange());
         SignalResultData<Change> resultData = new SignalResultData<>(
-                toChangeList(toValue(changes)),
+                ProtoUtils.toChangeList(toValue(changes)),
                 sourceData.getComplexAction()
         );
         log.info("Response of processSignalInit: {}", resultData);

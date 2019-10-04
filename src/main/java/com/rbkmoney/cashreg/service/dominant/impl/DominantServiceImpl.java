@@ -5,6 +5,7 @@ import com.rbkmoney.cashreg.service.exception.NotFoundException;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain_config.Reference;
 import com.rbkmoney.damsel.domain_config.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 import org.springframework.retry.support.RetryTemplate;
@@ -15,18 +16,11 @@ import static com.rbkmoney.damsel.domain.Reference.system_account_set;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DominantServiceImpl implements DominantService {
 
     private final RepositoryClientSrv.Iface dominantClient;
     private final RetryTemplate retryTemplate;
-
-    public DominantServiceImpl(
-            RepositoryClientSrv.Iface dominantClient,
-            RetryTemplate retryTemplate
-    ) {
-        this.dominantClient = dominantClient;
-        this.retryTemplate = retryTemplate;
-    }
 
     @Override
     public PaymentInstitution getPaymentInstitution(PaymentInstitutionRef paymentInstitutionRef) throws NotFoundException {
@@ -46,7 +40,7 @@ public class DominantServiceImpl implements DominantService {
                     Reference.head(new Head()),
                     payment_institution(paymentInstitutionRef)
             );
-            log.info("VersionedObject has been found, paymentInstitutionRef='{}'", versionedObject, paymentInstitutionRef);
+            log.info("VersionedObject {} has been found, paymentInstitutionRef='{}'", versionedObject, paymentInstitutionRef);
             return versionedObject;
         } catch (VersionNotFound | ObjectNotFound ex) {
             throw new NotFoundException(String.format("Version not found, paymentInstitutionRef='%s'", paymentInstitutionRef), ex);

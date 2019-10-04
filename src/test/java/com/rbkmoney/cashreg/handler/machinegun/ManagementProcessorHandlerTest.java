@@ -2,6 +2,8 @@ package com.rbkmoney.cashreg.handler.machinegun;
 
 import com.rbkmoney.cashreg.AbstractIntegrationTest;
 import com.rbkmoney.cashreg.utils.ProtoUtils;
+import com.rbkmoney.damsel.cashreg.status.Pending;
+import com.rbkmoney.damsel.cashreg.status.Status;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import com.rbkmoney.damsel.cashreg_processing.StatusChange;
 import com.rbkmoney.geck.serializer.Geck;
@@ -18,7 +20,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.rbkmoney.cashreg.utils.cashreg.creators.StatusCreators.createPendingStatus;
+import static org.junit.Assert.assertTrue;
 
 
 public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
@@ -37,7 +39,7 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
 
     @Test
     public void processSignalInit() throws TException {
-        Change change = Change.status_changed(new StatusChange().setStatus(createPendingStatus()));
+        Change change = Change.status_changed(new StatusChange().setStatus(Status.pending(new Pending())));
 
         SignalArgs signalArgs = new SignalArgs();
         signalArgs.setSignal(Signal.init(new InitSignal(Value.bin(Geck.toMsgPack(ProtoUtils.toValue(Collections.singletonList(change)))))));
@@ -47,12 +49,13 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
                 .setHistory(new ArrayList<>())
                 .setHistoryRange(new HistoryRange()));
 
-        client.processSignal(signalArgs);
+        SignalResult result = client.processSignal(signalArgs);
+        assertTrue(result.getAction().getTimer().isSetSetTimer());
     }
 
     @Test
     public void processCall() throws TException {
-        Change change = Change.status_changed(new StatusChange().setStatus(createPendingStatus()));
+        Change change = Change.status_changed(new StatusChange().setStatus(Status.pending(new Pending())));
         CallArgs callArgs = new CallArgs();
         callArgs.setArg(Value.bin(Geck.toMsgPack(ProtoUtils.toValue(Collections.singletonList(change)))));
         callArgs.setMachine(new Machine()
@@ -60,7 +63,8 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
                 .setNs(namespace)
                 .setHistory(new ArrayList<>())
                 .setHistoryRange(new HistoryRange()));
-        client.processCall(callArgs);
+        CallResult result = client.processCall(callArgs);
+        assertTrue(result.isSetAction());
     }
 
 }

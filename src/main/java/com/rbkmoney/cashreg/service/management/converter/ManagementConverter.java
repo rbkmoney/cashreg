@@ -26,7 +26,7 @@ public class ManagementConverter implements Converter<CashRegResult, SourceData>
 
         sessionAdapterStateChanged.setState(com.rbkmoney.damsel.msgpack.Value.bin(result.getState()));
         ComplexAction complexAction = new ComplexAction();
-        if (isSleepIntent(result)) {
+        if (result.getIntent().isSetSleep()) {
             sessionChangePayload.setSessionAdapterStateChanged(sessionAdapterStateChanged);
             complexAction = buildComplexActionWithTimer(
                     prepareTimer(result.getIntent().getSleep().getTimer()),
@@ -56,11 +56,6 @@ public class ManagementConverter implements Converter<CashRegResult, SourceData>
         }
         return sessionFinished;
     }
-
-    private boolean isSleepIntent(CashRegResult result) {
-        return result.getIntent().isSetSleep();
-    }
-
 
     private void prepareSessionFailed(CashRegResult result, SessionFinished sessionFinished, SessionResult sessionResult) {
         com.rbkmoney.damsel.domain.Failure failure = result.getIntent().getFinish().getStatus().getFailure();

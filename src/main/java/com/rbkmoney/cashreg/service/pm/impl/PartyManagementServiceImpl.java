@@ -5,7 +5,6 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.rbkmoney.cashreg.service.exception.NotFoundException;
 import com.rbkmoney.cashreg.service.exception.PartyNotFoundException;
 import com.rbkmoney.cashreg.service.pm.PartyManagementService;
-import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
 import com.rbkmoney.damsel.domain.Contract;
 import com.rbkmoney.damsel.domain.Party;
 import com.rbkmoney.damsel.domain.PaymentInstitutionRef;
@@ -81,11 +80,6 @@ public class PartyManagementServiceImpl implements PartyManagementService {
         }
         log.info("Shop has been found, partyId='{}', shopId='{}'", partyId, shopId);
         return shop;
-    }
-
-    @Override
-    public Shop getShop(CashRegParams cashRegParams) throws NotFoundException {
-        return getShop(cashRegParams.getPartyId(), cashRegParams.getShopId());
     }
 
     @Override

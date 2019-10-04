@@ -1,6 +1,6 @@
 package com.rbkmoney.cashreg.service.provider;
 
-import com.rbkmoney.cashreg.service.management.aggregate.ManagementAggregate;
+import com.rbkmoney.cashreg.service.management.aggregate.ManagementAggregator;
 import com.rbkmoney.damsel.cashreg.provider.CashRegContext;
 import com.rbkmoney.damsel.cashreg.provider.CashRegProviderSrv;
 import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
@@ -23,7 +23,7 @@ import static com.rbkmoney.cashreg.utils.ProtoUtils.prepareCashRegContext;
 @RequiredArgsConstructor
 public class CashRegProviderService implements CashRegProvider {
 
-    private final ManagementAggregate managementAggregate;
+    private final ManagementAggregator managementAggregate;
 
     private CashRegProviderSrv.Iface cashRegProviderSrv(String url, Integer networkTimeout) {
         try {
@@ -39,7 +39,7 @@ public class CashRegProviderService implements CashRegProvider {
     @Override
     public CashRegResult register(CashReg cashReg) {
         String url = extractUrl(cashReg);
-        Map<String, String> options = extractOptions(cashReg);
+        Map<String, String> options = managementAggregate.aggregateOptions(cashReg);
         CashRegContext context = prepareCashRegContext(cashReg, options);
         return call(url, NETWORK_TIMEOUT, context);
     }
@@ -58,10 +58,5 @@ public class CashRegProviderService implements CashRegProvider {
         ProxyObject proxyObject = managementAggregate.extractProxyObject(cashReg);
         return proxyObject.getData().getUrl();
     }
-
-    private Map<String, String> extractOptions(CashReg cashReg) {
-        return managementAggregate.aggregateOptions(cashReg);
-    }
-
 
 }

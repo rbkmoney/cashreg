@@ -3,17 +3,17 @@ package com.rbkmoney.cashreg.endpoint;
 import com.rbkmoney.cashreg.handler.cashreg.CashRegServerManagementHandler;
 import com.rbkmoney.damsel.cashreg_processing.ManagementSrv;
 import com.rbkmoney.woody.thrift.impl.http.THServiceBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import java.io.IOException;
 
+@RequiredArgsConstructor
 @WebServlet("/cashreg/management")
 public class AdapterManagementServlet extends GenericServlet {
 
-    @Autowired
-    private CashRegServerManagementHandler handler;
+    private final CashRegServerManagementHandler handler;
 
     private Servlet servlet;
 

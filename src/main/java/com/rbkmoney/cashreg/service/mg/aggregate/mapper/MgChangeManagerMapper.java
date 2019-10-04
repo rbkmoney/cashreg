@@ -1,4 +1,4 @@
-package com.rbkmoney.cashreg.service.mg.aggregate.handler;
+package com.rbkmoney.cashreg.service.mg.aggregate.mapper;
 
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
@@ -9,19 +9,19 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class MgChangeHandler {
+public class MgChangeManagerMapper {
 
-    private final List<ChangeHandler> changeHandlers;
+    private final List<ChangeMapper> changeHandlers;
 
     public CashReg handle(Change change) {
         return changeHandlers.stream()
-                .filter(handler -> handler.filter(change))
+                .filter(mapper -> mapper.filter(change))
                 .findFirst()
-                .orElseThrow(RuntimeException::new)
-                .handle(change);
+                .orElseThrow(() -> new RuntimeException("Can't find mapper"))
+                .map(change);
     }
 
-    public CashReg listChangesToCashReg(List<Change> changes) {
+    public CashReg process(List<Change> changes) {
         return changes.stream().reduce(new CashReg(),
                 (cashReg, change) -> handle(change),
                 (cashRegCurrent, cashRegNew) -> cashRegCurrent.setStatus(cashRegNew.getStatus())

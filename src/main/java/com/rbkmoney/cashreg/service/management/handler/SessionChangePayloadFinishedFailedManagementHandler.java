@@ -1,13 +1,12 @@
 package com.rbkmoney.cashreg.service.management.handler;
 
 import com.rbkmoney.cashreg.domain.SourceData;
+import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeCreators;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import com.rbkmoney.machinegun.stateproc.ComplexAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeCreators.createStatusChangeFailed;
 
 
 @Component
@@ -20,14 +19,13 @@ public class SessionChangePayloadFinishedFailedManagementHandler implements Mana
                 && change.getSession().isSetPayload()
                 && change.getSession().getPayload().isSetFinished()
                 && change.getSession().getPayload().getFinished().isSetResult()
-                && change.getSession().getPayload().getFinished().getResult().isSetFailed()
-                ;
+                && change.getSession().getPayload().getFinished().getResult().isSetFailed();
     }
 
     @Override
     public SourceData handle(Change change, CashReg cashReg) {
         return SourceData.builder()
-                .change(createStatusChangeFailed())
+                .change(ChangeCreators.createStatusChangeFailed())
                 .complexAction(new ComplexAction())
                 .build();
     }

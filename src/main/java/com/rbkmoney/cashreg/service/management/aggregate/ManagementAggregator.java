@@ -2,7 +2,8 @@ package com.rbkmoney.cashreg.service.management.aggregate;
 
 import com.rbkmoney.cashreg.service.dominant.DominantService;
 import com.rbkmoney.cashreg.service.pm.PartyManagementService;
-import com.rbkmoney.cashreg.utils.cashreg.creators.StatusCreators;
+import com.rbkmoney.damsel.cashreg.status.Pending;
+import com.rbkmoney.damsel.cashreg.status.Status;
 import com.rbkmoney.damsel.cashreg_domain.AccountInfo;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
@@ -22,12 +23,12 @@ import static com.rbkmoney.cashreg.utils.cashreg.extractors.TaxModeExtractor.ext
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ManagementAggregate {
+public class ManagementAggregator {
 
     private final PartyManagementService partyManagementService;
     private final DominantService dominantService;
 
-    public Change toCashRegCreated(CashRegParams params) {
+    public Change toCashRegCreatedChange(CashRegParams params) {
         CreatedChange created = new CreatedChange();
         CashReg cashReg = new CashReg();
         cashReg.setId(params.getId());
@@ -35,7 +36,7 @@ public class ManagementAggregate {
         cashReg.setType(params.getType());
         cashReg.setShopId(params.getShopId());
         cashReg.setPartyId(params.getPartyId());
-        cashReg.setStatus(StatusCreators.createPendingStatus());
+        cashReg.setStatus(Status.pending(new Pending()));
 
         Shop shop = partyManagementService.getShop(params.getShopId(), params.getPartyId());
         PaymentInstitutionRef paymentInstitutionRef = partyManagementService.getPaymentInstitutionRef(params.getPartyId(), shop.getContractId());
@@ -71,7 +72,7 @@ public class ManagementAggregate {
         return aggregateOptions(versionedObject);
     }
 
-    private static com.rbkmoney.damsel.cashreg_domain.LegalEntity prepareLegalEntity(Contract contract, Map<String, String> proxyOptions) {
+    private com.rbkmoney.damsel.cashreg_domain.LegalEntity prepareLegalEntity(Contract contract, Map<String, String> proxyOptions) {
         com.rbkmoney.damsel.domain.RussianLegalEntity russianLegalEntityDomain = contract.getContractor().getLegalEntity().getRussianLegalEntity();
 
         com.rbkmoney.damsel.cashreg_domain.LegalEntity legalEntity = new com.rbkmoney.damsel.cashreg_domain.LegalEntity();

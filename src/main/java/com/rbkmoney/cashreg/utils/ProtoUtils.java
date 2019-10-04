@@ -3,8 +3,6 @@ package com.rbkmoney.cashreg.utils;
 import com.rbkmoney.damsel.cashreg.provider.CashRegContext;
 import com.rbkmoney.damsel.cashreg.provider.Session;
 import com.rbkmoney.damsel.cashreg.provider.SourceCreation;
-import com.rbkmoney.damsel.cashreg.type.Type;
-import com.rbkmoney.damsel.cashreg_domain.PaymentInfo;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import com.rbkmoney.geck.serializer.Geck;
@@ -39,39 +37,25 @@ public class ProtoUtils {
 
     private static SourceCreation prepareSourceCreation(CashReg cashreg) {
         SourceCreation sourceCreation = new SourceCreation();
-        PaymentInfo paymentInfo = new PaymentInfo();
-        paymentInfo.setCart(cashreg.getPaymentInfo().getCart());
-        paymentInfo.setCash(cashreg.getPaymentInfo().getCash());
-        paymentInfo.setEmail(cashreg.getPaymentInfo().getEmail());
-        sourceCreation.setPayment(paymentInfo);
+        sourceCreation.setPayment(cashreg.getPaymentInfo());
         return sourceCreation;
-    }
-
-    private static Session prepareSession(Type type) {
-        Session session = new Session();
-        session.setType(type);
-        return session;
     }
 
     public static CashRegContext prepareCashRegContext(CashReg cashReg, Map<String, String> proxyOptions) {
         CashRegContext context = new CashRegContext();
         context.setAccountInfo(cashReg.getAccountInfo());
         context.setOptions(proxyOptions);
-
-        Session session = prepareSession(cashReg.getType());
-        context.setSession(session);
-
-        SourceCreation sourceCreation = prepareSourceCreation(cashReg);
-        context.setSourceCreation(sourceCreation);
+        context.setSession(new Session().setType(cashReg.getType()));
+        context.setSourceCreation(prepareSourceCreation(cashReg));
         return context;
     }
 
-    public static com.rbkmoney.machinegun.base.Timer prepareTimer(com.rbkmoney.damsel.cashreg.base.Timer incomeTimer) {
+    public static com.rbkmoney.machinegun.base.Timer prepareTimer(com.rbkmoney.damsel.cashreg.base.Timer incomingTimer) {
         com.rbkmoney.machinegun.base.Timer timer = new com.rbkmoney.machinegun.base.Timer();
-        if (incomeTimer.isSetTimeout()) {
-            timer.setTimeout(incomeTimer.getTimeout());
+        if (incomingTimer.isSetTimeout()) {
+            timer.setTimeout(incomingTimer.getTimeout());
         } else {
-            timer.setDeadline(incomeTimer.getDeadline());
+            timer.setDeadline(incomingTimer.getDeadline());
         }
         return timer;
     }

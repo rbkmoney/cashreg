@@ -1,5 +1,8 @@
 package com.rbkmoney.cashreg.utils.cashreg.creators;
 
+import com.rbkmoney.damsel.cashreg.status.Delivered;
+import com.rbkmoney.damsel.cashreg.status.Failed;
+import com.rbkmoney.damsel.cashreg.status.Pending;
 import com.rbkmoney.damsel.cashreg.status.Status;
 import com.rbkmoney.damsel.cashreg_processing.*;
 
@@ -7,15 +10,15 @@ public class ChangeCreators {
 
     // Change
     public static Change createStatusChangePending() {
-        return createStatusChanged(StatusCreators.createPendingStatus());
+        return createStatusChanged(Status.pending(new Pending()));
     }
 
     public static Change createStatusChangeDelivered() {
-        return createStatusChanged(StatusCreators.createDeliveredStatus());
+        return createStatusChanged(Status.delivered(new Delivered()));
     }
 
     public static Change createStatusChangeFailed() {
-        return createStatusChanged(StatusCreators.createFailedStatus());
+        return createStatusChanged(Status.failed(new Failed()));
     }
 
     public static Change createStatusChanged(Status status) {

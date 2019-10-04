@@ -1,11 +1,11 @@
-package com.rbkmoney.cashreg.service.mg.aggregate.handler;
+package com.rbkmoney.cashreg.service.mg.aggregate.mapper;
 
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StatusChangedChange implements ChangeHandler {
+public class StatusChangedChangeMapper implements ChangeMapper {
 
     @Override
     public boolean filter(Change change) {
@@ -13,7 +13,7 @@ public class StatusChangedChange implements ChangeHandler {
     }
 
     @Override
-    public CashReg handle(Change change) {
+    public CashReg map(Change change) {
         return new CashReg().setStatus(change.getStatusChanged().getStatus());
     }
 
