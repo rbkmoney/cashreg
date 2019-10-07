@@ -13,7 +13,6 @@ import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import com.rbkmoney.damsel.cashreg_processing.CreatedChange;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +42,6 @@ public class MgChangeManagerMapperTest {
     @Autowired
     private MgChangeManagerMapper mgChangeManagerMapper;
 
-    @Before
-    public void setup() {
-
-    }
-
     @Test
     public void testMgChangeManagerMapperProcess() {
 
@@ -63,22 +57,20 @@ public class MgChangeManagerMapperTest {
 
         CashReg cashReg = mgChangeManagerMapper.process(changeList);
 
-        assertEquals("cashreg_id", cashReg.getId());
+        assertEquals(cashregId, cashReg.getId());
         assertEquals(Status.failed(new Failed()), cashReg.getStatus());
     }
 
     private Change prepareCreatedChange(CashRegParams params) {
         CreatedChange created = new CreatedChange();
         CashReg cashReg = new CashReg();
-        cashReg.setId(cashregId);
+        cashReg.setId(params.getId());
         cashReg.setPaymentInfo(new PaymentInfo());
         cashReg.setType(Type.debit(new Debit()));
-        cashReg.setShopId(shopId);
-        cashReg.setPartyId(partyId);
+        cashReg.setShopId(params.getShopId());
+        cashReg.setPartyId(params.getPartyId());
         cashReg.setStatus(Status.pending(new Pending()));
-
         cashReg.setAccountInfo(new AccountInfo());
-
         created.setCashreg(cashReg);
         return Change.created(created);
     }
