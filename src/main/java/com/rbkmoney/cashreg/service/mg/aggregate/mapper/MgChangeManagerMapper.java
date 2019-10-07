@@ -11,10 +11,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MgChangeManagerMapper {
 
-    private final List<ChangeMapper> changeHandlers;
+    private final List<ChangeMapper> changeMappers;
 
     public CashReg handle(Change change) {
-        return changeHandlers.stream()
+        return changeMappers.stream()
                 .filter(mapper -> mapper.filter(change))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Can't find mapper"))

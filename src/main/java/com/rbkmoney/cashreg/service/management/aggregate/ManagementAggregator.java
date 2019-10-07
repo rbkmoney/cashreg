@@ -64,9 +64,9 @@ public class ManagementAggregator {
         return proxyOptions;
     }
 
-    public Map<String, String> aggregateOptions(CashReg cashReg) {
-        Shop shop = partyManagementService.getShop(cashReg.getShopId(), cashReg.getPartyId());
-        PaymentInstitutionRef paymentInstitutionRef = partyManagementService.getPaymentInstitutionRef(cashReg.getPartyId(), shop.getContractId());
+    public Map<String, String> aggregateOptions(String shopId, String partyId) {
+        Shop shop = partyManagementService.getShop(shopId, partyId);
+        PaymentInstitutionRef paymentInstitutionRef = partyManagementService.getPaymentInstitutionRef(partyId, shop.getContractId());
 
         VersionedObject versionedObject = dominantService.getVersionedObjectFromPaymentInstitution(paymentInstitutionRef);
         return aggregateOptions(versionedObject);
