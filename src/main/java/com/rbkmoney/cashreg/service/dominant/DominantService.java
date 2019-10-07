@@ -1,21 +1,18 @@
 package com.rbkmoney.cashreg.service.dominant;
 
-import com.rbkmoney.cashreg.service.exception.NotFoundException;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain_config.VersionedObject;
 
 public interface DominantService {
-    PaymentInstitution getPaymentInstitution(PaymentInstitutionRef paymentInstitutionRef) throws NotFoundException;
 
-    SystemAccountSet getSystemAccountSet(SystemAccountSetRef systemAccountSetRef) throws NotFoundException;
+    PaymentInstitutionObject getPaymentInstitutionRef(PaymentInstitutionRef paymentInstitutionRef);
 
-    ProxyObject getProxyObject(VersionedObject versionedObject);
+    ProxyObject getProxyObject(ProxyRef proxyRef);
 
-    TerminalObject getTerminalObject(VersionedObject versionedObject);
+    TerminalObject getTerminalObject(TerminalRef terminalRef);
 
-    ProviderObject getProviderObject(VersionedObject versionedObject);
+    ProviderObject getProviderObject(ProviderRef providerRef);
 
-    VersionedObject getVersionedObjectFromPaymentInstitution(PaymentInstitutionRef paymentInstitutionRef) throws NotFoundException;
+    VersionedObject getVersionedObjectFromReference(com.rbkmoney.damsel.domain.Reference reference);
 
-    VersionedObject getVersionedObjectFromSystemAccount(SystemAccountSetRef systemAccountSetRef);
 }

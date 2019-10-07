@@ -11,8 +11,7 @@ import org.apache.thrift.TException;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
-import static com.rbkmoney.damsel.domain.Reference.payment_institution;
-import static com.rbkmoney.damsel.domain.Reference.system_account_set;
+import static com.rbkmoney.damsel.domain.Reference.*;
 
 @Slf4j
 @Service
@@ -23,80 +22,53 @@ public class DominantServiceImpl implements DominantService {
     private final RetryTemplate retryTemplate;
 
     @Override
-    public PaymentInstitution getPaymentInstitution(PaymentInstitutionRef paymentInstitutionRef) throws NotFoundException {
-        log.info("Trying to get payment institution, paymentInstitutionRef='{}'", paymentInstitutionRef);
-        VersionedObject versionedObject = getVersionedObjectFromPaymentInstitution(paymentInstitutionRef);
-        versionedObject.getObject().getProvider().getData().getProxy();
-        PaymentInstitution paymentInstitution = versionedObject.getObject().getPaymentInstitution().getData();
-        log.info("Payment institution has been found, PaymentInstitutionRef='{}', paymentInstitution='{}'", paymentInstitutionRef, paymentInstitution);
+    public VersionedObject getVersionedObjectFromReference(com.rbkmoney.damsel.domain.Reference reference) {
+        log.info("Trying to get VersionedObject, reference='{}'", reference);
+        try {
+            VersionedObject versionedObject = checkoutObject(Reference.head(new Head()), reference);
+            log.info("VersionedObject has been found, reference='{}'", versionedObject, reference);
+            return versionedObject;
+        } catch (VersionNotFound | ObjectNotFound ex) {
+            throw new NotFoundException(String.format("Version not found, reference='%s'", reference), ex);
+        } catch (TException ex) {
+            throw new RuntimeException(String.format("Failed to get payment institution, reference='%s'", reference), ex);
+        }
+    }
+
+    @Override
+    public PaymentInstitutionObject getPaymentInstitutionRef(PaymentInstitutionRef paymentInstitutionRef) {
+        log.info("Trying to get ProviderObject, paymentInstitutionRef='{}'", paymentInstitutionRef);
+        VersionedObject versionedObject = getVersionedObjectFromReference(payment_institution(paymentInstitutionRef));
+        PaymentInstitutionObject paymentInstitution = versionedObject.getObject().getPaymentInstitution();
+        log.info("PaymentInstitution has been found, versionedObject='{}'", paymentInstitution, versionedObject);
         return paymentInstitution;
     }
 
     @Override
-    public VersionedObject getVersionedObjectFromPaymentInstitution(PaymentInstitutionRef paymentInstitutionRef) throws NotFoundException {
-        log.info("Trying to get VersionedObject, paymentInstitutionRef='{}'", paymentInstitutionRef);
-        try {
-            VersionedObject versionedObject = checkoutObject(
-                    Reference.head(new Head()),
-                    payment_institution(paymentInstitutionRef)
-            );
-            log.info("VersionedObject {} has been found, paymentInstitutionRef='{}'", versionedObject, paymentInstitutionRef);
-            return versionedObject;
-        } catch (VersionNotFound | ObjectNotFound ex) {
-            throw new NotFoundException(String.format("Version not found, paymentInstitutionRef='%s'", paymentInstitutionRef), ex);
-        } catch (TException ex) {
-            throw new RuntimeException(String.format("Failed to get payment institution, paymentInstitutionRef='%s'", paymentInstitutionRef), ex);
-        }
-    }
-
-    @Override
-    public VersionedObject getVersionedObjectFromSystemAccount(SystemAccountSetRef systemAccountSetRef) throws NotFoundException {
-        log.info("Trying to get VersionedObject, systemAccountSetRef='{}'", systemAccountSetRef);
-        try {
-            VersionedObject versionedObject = checkoutObject(
-                    Reference.head(new Head()),
-                    system_account_set(systemAccountSetRef)
-            );
-            log.info("VersionedObject has been found, systemAccountSetRef='{}'", versionedObject, systemAccountSetRef);
-            return versionedObject;
-        } catch (VersionNotFound | ObjectNotFound ex) {
-            throw new NotFoundException(String.format("Version not found, systemAccountSetRef='%s'", systemAccountSetRef), ex);
-        } catch (TException ex) {
-            throw new RuntimeException(String.format("Failed to get payment institution, systemAccountSetRef='%s'", systemAccountSetRef), ex);
-        }
-    }
-
-    @Override
-    public ProxyObject getProxyObject(VersionedObject versionedObject) {
-        log.info("Trying to get ProxyObject, versionedObject='{}'", versionedObject);
+    public ProxyObject getProxyObject(ProxyRef proxyRef) {
+        log.info("Trying to get ProviderObject, proxyRef='{}'", proxyRef);
+        VersionedObject versionedObject = getVersionedObjectFromReference(proxy(proxyRef));
         ProxyObject proxyObject = versionedObject.getObject().getProxy();
         log.info("ProxyObject has been found, versionedObject='{}'", proxyObject, versionedObject);
         return proxyObject;
     }
 
     @Override
-    public TerminalObject getTerminalObject(VersionedObject versionedObject) {
-        log.info("Trying to get TerminalObject, versionedObject='{}'", versionedObject);
+    public TerminalObject getTerminalObject(TerminalRef terminalRef) {
+        log.info("Trying to get TerminalObject, terminalRef='{}'", terminalRef);
+        VersionedObject versionedObject = getVersionedObjectFromReference(terminal(terminalRef));
         TerminalObject terminalObject = versionedObject.getObject().getTerminal();
         log.info("TerminalObject has been found, versionedObject='{}'", terminalObject, versionedObject);
         return terminalObject;
     }
 
     @Override
-    public ProviderObject getProviderObject(VersionedObject versionedObject) {
-        log.info("Trying to get ProviderObject, versionedObject='{}'", versionedObject);
+    public ProviderObject getProviderObject(ProviderRef providerRef) {
+        log.info("Trying to get ProviderObject, providerRef='{}'", providerRef);
+        VersionedObject versionedObject = getVersionedObjectFromReference(provider(providerRef));
         ProviderObject providerObject = versionedObject.getObject().getProvider();
         log.info("ProviderObject has been found, versionedObject='{}'", providerObject, versionedObject);
         return providerObject;
-    }
-
-    @Override
-    public SystemAccountSet getSystemAccountSet(SystemAccountSetRef systemAccountSetRef) {
-        log.info("Trying to get systemAccountSet, systemAccountSetRef='{}'", systemAccountSetRef);
-        VersionedObject versionedObject = getVersionedObjectFromSystemAccount(systemAccountSetRef);
-        SystemAccountSet systemAccountSet = versionedObject.getObject().getSystemAccountSet().getData();
-        log.info("SystemAccountSet has been found, systemAccountSetRef='{}', systemAccountSet='{}'", systemAccountSetRef, systemAccountSet);
-        return systemAccountSet;
     }
 
     private VersionedObject checkoutObject(Reference revisionReference, com.rbkmoney.damsel.domain.Reference reference) throws TException {

@@ -19,6 +19,7 @@ import java.util.Map;
 
 import static com.rbkmoney.cashreg.service.management.model.ExtraField.RUSSIAN_LEGAL_ENTITY_EMAIL;
 import static com.rbkmoney.cashreg.utils.cashreg.extractors.TaxModeExtractor.extractTaxModeFromOptions;
+import static com.rbkmoney.damsel.domain.Reference.payment_institution;
 
 @Slf4j
 @Component
@@ -41,8 +42,12 @@ public class ManagementAggregator {
         Shop shop = partyManagementService.getShop(params.getShopId(), params.getPartyId());
         PaymentInstitutionRef paymentInstitutionRef = partyManagementService.getPaymentInstitutionRef(params.getPartyId(), shop.getContractId());
 
-        VersionedObject versionedObject = dominantService.getVersionedObjectFromPaymentInstitution(paymentInstitutionRef);
-        Map<String, String> aggregateOptions = aggregateOptions(versionedObject);
+        VersionedObject versionedObject = dominantService.getVersionedObjectFromReference(payment_institution(paymentInstitutionRef));
+        ProviderRef providerRef = versionedObject.getObject().getPaymentInstitution().getData().getProviders().getValue().iterator().next();
+
+        ProviderObject providerObject = dominantService.getProviderObject(providerRef);
+
+        Map<String, String> aggregateOptions = aggregateOptions(providerObject);
 
         AccountInfo accountInfo = new AccountInfo();
         Contract contract = partyManagementService.getContract(params.getPartyId(), shop.getContractId());
@@ -53,13 +58,16 @@ public class ManagementAggregator {
         return Change.created(created);
     }
 
-    private Map<String, String> aggregateOptions(VersionedObject versionedObject) {
-        ProxyObject proxyObject = extractProxyObject(versionedObject);
-        ProviderObject providerObject = extractProviderObject(versionedObject);
-        TerminalObject terminalObject = extractTerminalObject(versionedObject);
+    private Map<String, String> aggregateOptions(ProviderObject providerObject) {
+        Proxy proxy = providerObject.getData().getProxy();
+        ProxyObject proxyObject = dominantService.getProxyObject(proxy.getRef());
+
+        ProviderTerminalRef providerTerminalRef = providerObject.getData().getTerminal().getValue().iterator().next();
+        TerminalRef terminalRef = new TerminalRef().setId(providerTerminalRef.getId());
+        TerminalObject terminalObject = dominantService.getTerminalObject(terminalRef);
 
         Map<String, String> proxyOptions = proxyObject.getData().getOptions();
-        proxyOptions.putAll(providerObject.getData().getProxy().getAdditional());
+        proxyOptions.putAll(proxy.getAdditional());
         proxyOptions.putAll(terminalObject.getData().getOptions());
         return proxyOptions;
     }
@@ -68,8 +76,8 @@ public class ManagementAggregator {
         Shop shop = partyManagementService.getShop(shopId, partyId);
         PaymentInstitutionRef paymentInstitutionRef = partyManagementService.getPaymentInstitutionRef(partyId, shop.getContractId());
 
-        VersionedObject versionedObject = dominantService.getVersionedObjectFromPaymentInstitution(paymentInstitutionRef);
-        return aggregateOptions(versionedObject);
+        VersionedObject versionedObject = dominantService.getVersionedObjectFromReference(payment_institution(paymentInstitutionRef));
+        return aggregateOptions(versionedObject.getObject().getProvider());
     }
 
     private com.rbkmoney.damsel.cashreg_domain.LegalEntity prepareLegalEntity(Contract contract, Map<String, String> proxyOptions) {
@@ -100,30 +108,16 @@ public class ManagementAggregator {
         Shop shop = partyManagementService.getShop(cashReg.getShopId(), cashReg.getPartyId());
         PaymentInstitutionRef paymentInstitutionRef = partyManagementService.getPaymentInstitutionRef(cashReg.getPartyId(), shop.getContractId());
 
-        VersionedObject versionedObject = dominantService.getVersionedObjectFromPaymentInstitution(paymentInstitutionRef);
-        return extractProxyObject(versionedObject);
+        PaymentInstitutionObject paymentInstitution = dominantService.getPaymentInstitutionRef(paymentInstitutionRef);
+        ProviderObject provider = dominantService.getProviderObject(paymentInstitution.getData().getProviders().getValue().iterator().next());
+
+        return extractProxyObject(provider.getData().getProxy().getRef());
     }
 
-    private ProxyObject extractProxyObject(VersionedObject versionedObject) {
-        ProxyObject object = dominantService.getProxyObject(versionedObject);
+    private ProxyObject extractProxyObject(ProxyRef proxyRef) {
+        ProxyObject object = dominantService.getProxyObject(proxyRef);
         if (!object.isSetData()) {
-            throw new IllegalStateException("ProxyObject not found; versionedObject: " + versionedObject.getVersion());
-        }
-        return object;
-    }
-
-    private ProviderObject extractProviderObject(VersionedObject versionedObject) {
-        ProviderObject object = dominantService.getProviderObject(versionedObject);
-        if (!object.isSetData()) {
-            throw new IllegalStateException("ProviderObject not found; versionedObject: " + versionedObject.getVersion());
-        }
-        return object;
-    }
-
-    private TerminalObject extractTerminalObject(VersionedObject versionedObject) {
-        TerminalObject object = dominantService.getTerminalObject(versionedObject);
-        if (!object.isSetData()) {
-            throw new IllegalStateException("TerminalObject not found; versionedObject: " + versionedObject.getVersion());
+            throw new IllegalStateException("ProxyObject not found; proxyRef: " + proxyRef);
         }
         return object;
     }
