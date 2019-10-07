@@ -10,14 +10,12 @@ import com.rbkmoney.damsel.domain.Party;
 import com.rbkmoney.damsel.domain.PaymentInstitutionRef;
 import com.rbkmoney.damsel.domain.Shop;
 import com.rbkmoney.damsel.payment_processing.*;
-import com.rbkmoney.geck.common.util.TypeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.AbstractMap;
 import java.util.Map;
 
@@ -72,7 +70,7 @@ public class PartyManagementServiceImpl implements PartyManagementService {
     @Override
     public Shop getShop(String partyId, String shopId) throws NotFoundException {
         log.info("Trying to get shop, partyId='{}', shopId='{}', ", partyId, shopId);
-        PartyRevisionParam partyRevisionParam = PartyRevisionParam.timestamp(TypeUtil.temporalToString(Instant.now()));
+        PartyRevisionParam partyRevisionParam = PartyRevisionParam.revision(getPartyRevision(partyId));
         Party party = getParty(partyId, partyRevisionParam);
         Shop shop = party.getShops().get(shopId);
         if (shop == null) {
