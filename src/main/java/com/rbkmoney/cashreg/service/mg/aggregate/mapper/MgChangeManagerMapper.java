@@ -22,10 +22,7 @@ public class MgChangeManagerMapper {
     }
 
     public CashReg process(List<Change> changes) {
-        return changes.stream().reduce(new CashReg(),
-                (cashReg, change) -> handle(change),
-                (cashRegCurrent, cashRegNew) -> cashRegCurrent.setStatus(cashRegNew.getStatus())
-        );
+        return changes.stream().map(this::handle).reduce((cashReg1, cashReg2) -> cashReg1.setStatus(cashReg2.getStatus())).get();
     }
 
 }

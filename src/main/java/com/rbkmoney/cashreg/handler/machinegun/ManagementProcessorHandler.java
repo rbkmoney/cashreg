@@ -1,7 +1,7 @@
 package com.rbkmoney.cashreg.handler.machinegun;
 
 import com.rbkmoney.cashreg.domain.SourceData;
-import com.rbkmoney.cashreg.service.management.impl.ManagementServiceImpl;
+import com.rbkmoney.cashreg.service.management.ManagementService;
 import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import com.rbkmoney.machinarium.domain.CallResultData;
@@ -25,10 +25,10 @@ import static com.rbkmoney.cashreg.utils.ProtoUtils.toValue;
 @Component
 public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, Change> {
 
-    private final ManagementServiceImpl managementService;
+    private final ManagementService managementService;
 
     public ManagementProcessorHandler(
-            ManagementServiceImpl managementService
+            ManagementService managementService
     ) {
         super(Value.class, Change.class);
         this.managementService = managementService;

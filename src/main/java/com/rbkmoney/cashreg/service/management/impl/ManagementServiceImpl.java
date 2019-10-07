@@ -25,7 +25,7 @@ public class ManagementServiceImpl implements ManagementService {
     public static final int DEFAULT_TIMER = 1;
     public static final int NETWORK_TIMEOUT = 10;
 
-    private final MgChangeManagerMapper mgChangeHandler;
+    private final MgChangeManagerMapper mgChangeManagerMapper;
     private final List<ManagementHandler> managementHandlers;
 
     @Override
@@ -43,7 +43,7 @@ public class ManagementServiceImpl implements ManagementService {
     @Override
     public SourceData timeout(List<Change> changes) {
         Change lastChange = getLastChange(changes);
-        CashReg cashReg = mgChangeHandler.process(changes);
+        CashReg cashReg = mgChangeManagerMapper.process(changes);
         return managementHandlers.stream()
                 .filter(handler -> handler.filter(lastChange))
                 .findFirst()

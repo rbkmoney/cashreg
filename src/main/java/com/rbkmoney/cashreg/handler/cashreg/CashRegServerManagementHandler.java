@@ -26,7 +26,7 @@ public class CashRegServerManagementHandler implements ManagementSrv.Iface {
 
     private final AutomatonClient<Value, Change> automatonClient;
     private final ManagementAggregator managementAggregate;
-    private final MgChangeManagerMapper mgChangeHandler;
+    private final MgChangeManagerMapper mgChangeManagerMapper;
 
     @Override
     public void create(CashRegParams cashRegParams) throws CashRegNotFound, TException {
@@ -37,21 +37,16 @@ public class CashRegServerManagementHandler implements ManagementSrv.Iface {
     @Override
     public CashReg get(String cashRegID) throws CashRegNotFound, TException {
         List<Change> changes = automatonClient.getEvents(cashRegID, new HistoryRange()).stream().map(TMachineEvent::getData).collect(Collectors.toList());
-        return mgChangeHandler.process(changes);
+        return mgChangeManagerMapper.process(changes);
     }
 
     @Override
     public List<Event> getEvents(String cashRegID, EventRange eventRange) throws CashRegNotFound, TException {
         HistoryRange historyRange = new HistoryRange();
-
-
         if (eventRange.isSetAfter()) {
             historyRange.setAfter(eventRange.getAfter());
         }
-        if (eventRange.isSetLimit()) {
-            historyRange.setLimit(eventRange.getLimit());
-        }
-
+        historyRange.setLimit(eventRange.getLimit());
         return automatonClient.getEvents(cashRegID, historyRange).stream()
                 .map(event -> new Event(
                                 event.getId(),

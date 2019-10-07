@@ -1,7 +1,7 @@
 package com.rbkmoney.cashreg.endpoint;
 
-import com.rbkmoney.cashreg.handler.cashreg.CashRegServerManagementHandler;
-import com.rbkmoney.damsel.cashreg_processing.ManagementSrv;
+import com.rbkmoney.cashreg.handler.cashreg.CashRegServerRepairerHandler;
+import com.rbkmoney.damsel.cashreg_processing.RepairerSrv;
 import com.rbkmoney.woody.thrift.impl.http.THServiceBuilder;
 import lombok.RequiredArgsConstructor;
 
@@ -13,14 +13,14 @@ import java.io.IOException;
 @WebServlet("/cashreg/repairer")
 public class AdapterRepairerServlet extends GenericServlet {
 
-    private final CashRegServerManagementHandler handler;
+    private final CashRegServerRepairerHandler handler;
 
     private Servlet servlet;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        servlet = new THServiceBuilder().build(ManagementSrv.Iface.class, handler);
+        servlet = new THServiceBuilder().build(RepairerSrv.Iface.class, handler);
     }
 
     @Override
