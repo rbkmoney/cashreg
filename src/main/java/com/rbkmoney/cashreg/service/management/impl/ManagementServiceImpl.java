@@ -22,8 +22,8 @@ import static com.rbkmoney.cashreg.utils.ProtoUtils.buildLastEventHistoryRange;
 @RequiredArgsConstructor
 public class ManagementServiceImpl implements ManagementService {
 
-    public static final int DEFAULT_TIMER = 1;
-    public static final int NETWORK_TIMEOUT = 10;
+    public static final int DEFAULT_TIMER_SEC = 1;
+    public static final int NETWORK_TIMEOUT_SEC = 10;
 
     private final MgChangeManagerMapper mgChangeManagerMapper;
     private final List<ManagementHandler> managementHandlers;
@@ -34,7 +34,7 @@ public class ManagementServiceImpl implements ManagementService {
                 .change(ChangeFactory.createStatusChangePending())
                 .complexAction(
                         buildComplexActionWithTimer(
-                                Timer.timeout(DEFAULT_TIMER),
+                                Timer.timeout(DEFAULT_TIMER_SEC),
                                 buildLastEventHistoryRange()
                         )
                 ).build();

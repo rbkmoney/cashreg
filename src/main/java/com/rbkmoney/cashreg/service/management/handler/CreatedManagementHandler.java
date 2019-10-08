@@ -8,7 +8,7 @@ import com.rbkmoney.machinegun.base.Timer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import static com.rbkmoney.cashreg.service.management.impl.ManagementServiceImpl.DEFAULT_TIMER;
+import static com.rbkmoney.cashreg.service.management.impl.ManagementServiceImpl.DEFAULT_TIMER_SEC;
 import static com.rbkmoney.cashreg.utils.ProtoUtils.buildComplexActionWithTimer;
 import static com.rbkmoney.cashreg.utils.ProtoUtils.buildLastEventHistoryRange;
 
@@ -27,7 +27,7 @@ public class CreatedManagementHandler implements ManagementHandler {
                 .change(ChangeFactory.createStatusChangePending())
                 .complexAction(
                         buildComplexActionWithTimer(
-                                Timer.timeout(DEFAULT_TIMER),
+                                Timer.timeout(DEFAULT_TIMER_SEC),
                                 buildLastEventHistoryRange())
                 )
                 .build();

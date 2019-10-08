@@ -15,7 +15,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import static com.rbkmoney.cashreg.service.management.impl.ManagementServiceImpl.NETWORK_TIMEOUT;
+import static com.rbkmoney.cashreg.service.management.impl.ManagementServiceImpl.NETWORK_TIMEOUT_SEC;
 import static com.rbkmoney.cashreg.utils.ProtoUtils.prepareCashRegContext;
 
 
@@ -41,7 +41,7 @@ public class CashRegProviderService implements CashRegProvider {
         String url = extractUrl(cashReg);
         Map<String, String> options = managementAggregate.aggregateOptions(cashReg.getShopId(), cashReg.getPartyId());
         CashRegContext context = prepareCashRegContext(cashReg, options);
-        return call(url, NETWORK_TIMEOUT, context);
+        return call(url, NETWORK_TIMEOUT_SEC, context);
     }
 
     private CashRegResult call(String url, Integer networkTimeout, CashRegContext context) {
