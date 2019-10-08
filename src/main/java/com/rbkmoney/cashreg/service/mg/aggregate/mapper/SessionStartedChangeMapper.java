@@ -11,7 +11,9 @@ public class SessionStartedChangeMapper implements ChangeMapper {
 
     @Override
     public boolean filter(Change change) {
-        return change.isSetSession() && change.getSession().getPayload().isSetStarted();
+        return change.isSetSession()
+                && change.getSession().isSetPayload()
+                && change.getSession().getPayload().isSetStarted();
     }
 
     @Override

@@ -2,17 +2,16 @@ package com.rbkmoney.cashreg.service.mg.aggregate.mapper;
 
 import com.rbkmoney.cashreg.CashRegApplication;
 import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory;
-import com.rbkmoney.damsel.cashreg.status.Failed;
+import com.rbkmoney.damsel.cashreg.CashRegInfo;
+import com.rbkmoney.damsel.cashreg.status.Delivered;
 import com.rbkmoney.damsel.cashreg.status.Pending;
 import com.rbkmoney.damsel.cashreg.status.Status;
 import com.rbkmoney.damsel.cashreg.type.Debit;
 import com.rbkmoney.damsel.cashreg.type.Type;
 import com.rbkmoney.damsel.cashreg_domain.AccountInfo;
 import com.rbkmoney.damsel.cashreg_domain.PaymentInfo;
-import com.rbkmoney.damsel.cashreg_processing.CashReg;
-import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
-import com.rbkmoney.damsel.cashreg_processing.Change;
-import com.rbkmoney.damsel.cashreg_processing.CreatedChange;
+import com.rbkmoney.damsel.cashreg_processing.*;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,7 @@ import static com.rbkmoney.cashreg.utils.CreateUtils.createPaymentInfo;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = DEFINED_PORT)
 @ContextConfiguration(classes = CashRegApplication.class)
@@ -55,10 +55,25 @@ public class MgChangeManagerMapperTest {
         changeList.add(change);
         changeList.add(ChangeFactory.createStatusChangeFailed());
 
+        SessionChange sessionChange = new SessionChange();
+        SessionChangePayload payload = new SessionChangePayload();
+        SessionFinished sessionFinished = new SessionFinished();
+        SessionResult sessionResult = new SessionResult();
+        SessionSucceeded sessionSucceeded = new SessionSucceeded();
+        sessionSucceeded.setInfo(new CashRegInfo().setDaemonCode("deamon_code"));
+        sessionResult.setSucceeded(sessionSucceeded);
+        sessionFinished.setResult(sessionResult);
+        payload.setFinished(sessionFinished);
+        sessionChange.setPayload(payload);
+
+
+
+        changeList.add(Change.session(sessionChange));
+
         CashReg cashReg = mgChangeManagerMapper.process(changeList);
 
         assertEquals(cashregId, cashReg.getId());
-        assertEquals(Status.failed(new Failed()), cashReg.getStatus());
+        assertEquals(Status.delivered(new Delivered()), cashReg.getStatus());
     }
 
     private Change prepareCreatedChange(CashRegParams params) {

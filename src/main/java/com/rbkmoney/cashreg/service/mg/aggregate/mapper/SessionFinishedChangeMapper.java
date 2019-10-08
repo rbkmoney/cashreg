@@ -14,7 +14,10 @@ public class SessionFinishedChangeMapper implements ChangeMapper {
 
     @Override
     public boolean filter(Change change) {
-        return change.isSetSession() && change.getSession().getPayload().isSetFinished();
+        return change.isSetSession()
+                && change.getSession().isSetPayload()
+                && change.getSession().getPayload().isSetFinished()
+                ;
     }
 
     @Override
