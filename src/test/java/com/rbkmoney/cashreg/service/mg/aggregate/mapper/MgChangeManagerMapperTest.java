@@ -60,13 +60,11 @@ public class MgChangeManagerMapperTest {
         SessionFinished sessionFinished = new SessionFinished();
         SessionResult sessionResult = new SessionResult();
         SessionSucceeded sessionSucceeded = new SessionSucceeded();
-        sessionSucceeded.setInfo(new CashRegInfo().setDaemonCode("deamon_code"));
+        sessionSucceeded.setInfo(new CashRegInfo().setDaemonCode("daemon_code"));
         sessionResult.setSucceeded(sessionSucceeded);
         sessionFinished.setResult(sessionResult);
         payload.setFinished(sessionFinished);
         sessionChange.setPayload(payload);
-
-
 
         changeList.add(Change.session(sessionChange));
 
