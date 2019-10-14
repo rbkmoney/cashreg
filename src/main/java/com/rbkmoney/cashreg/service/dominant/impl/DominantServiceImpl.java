@@ -37,7 +37,7 @@ public class DominantServiceImpl implements DominantService {
 
     @Override
     public PaymentInstitutionObject getPaymentInstitutionRef(PaymentInstitutionRef paymentInstitutionRef) {
-        log.info("Trying to get ProviderObject, paymentInstitutionRef='{}'", paymentInstitutionRef);
+        log.info("Trying to get PaymentInstitutionObject, paymentInstitutionRef='{}'", paymentInstitutionRef);
         VersionedObject versionedObject = getVersionedObjectFromReference(payment_institution(paymentInstitutionRef));
         PaymentInstitutionObject paymentInstitution = versionedObject.getObject().getPaymentInstitution();
         log.info("PaymentInstitution has been found, versionedObject='{}'", paymentInstitution, versionedObject);
@@ -46,7 +46,7 @@ public class DominantServiceImpl implements DominantService {
 
     @Override
     public ProxyObject getProxyObject(ProxyRef proxyRef) {
-        log.info("Trying to get ProviderObject, proxyRef='{}'", proxyRef);
+        log.info("Trying to get ProxyObject, proxyRef='{}'", proxyRef);
         VersionedObject versionedObject = getVersionedObjectFromReference(proxy(proxyRef));
         ProxyObject proxyObject = versionedObject.getObject().getProxy();
         log.info("ProxyObject has been found, versionedObject='{}'", proxyObject, versionedObject);
@@ -62,12 +62,13 @@ public class DominantServiceImpl implements DominantService {
         return terminalObject;
     }
 
+
     @Override
-    public ProviderObject getProviderObject(ProviderRef providerRef) {
-        log.info("Trying to get ProviderObject, providerRef='{}'", providerRef);
-        VersionedObject versionedObject = getVersionedObjectFromReference(provider(providerRef));
-        ProviderObject providerObject = versionedObject.getObject().getProvider();
-        log.info("ProviderObject has been found, versionedObject='{}'", providerObject, versionedObject);
+    public CashRegProviderObject getCashRegProviderObject(CashRegProviderRef providerRef) {
+        log.info("Trying to get CashRegProviderObject, providerRef='{}'", providerRef);
+        VersionedObject versionedObject = getVersionedObjectFromReference(cashreg_provider(providerRef));
+        CashRegProviderObject providerObject = versionedObject.getObject().getCashregProvider();
+        log.info("CashRegProviderObject has been found, versionedObject='{}'", providerObject, versionedObject);
         return providerObject;
     }
 

@@ -2,6 +2,7 @@ package com.rbkmoney.cashreg.handler.machinegun;
 
 import com.rbkmoney.cashreg.AbstractIntegrationTest;
 import com.rbkmoney.cashreg.utils.ProtoUtils;
+import com.rbkmoney.cashreg.utils.TestData;
 import com.rbkmoney.damsel.cashreg.status.Pending;
 import com.rbkmoney.damsel.cashreg.status.Status;
 import com.rbkmoney.damsel.cashreg_processing.Change;
@@ -44,8 +45,8 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
         SignalArgs signalArgs = new SignalArgs();
         signalArgs.setSignal(Signal.init(new InitSignal(Value.bin(Geck.toMsgPack(ProtoUtils.toValue(Collections.singletonList(change)))))));
         signalArgs.setMachine(new Machine()
-                .setId(cashregId)
-                .setNs(namespace)
+                .setId(TestData.CASHREG_ID)
+                .setNs(TestData.CASHREG_NAMESPACE)
                 .setHistory(new ArrayList<>())
                 .setHistoryRange(new HistoryRange()));
 
@@ -59,8 +60,8 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
         CallArgs callArgs = new CallArgs();
         callArgs.setArg(Value.bin(Geck.toMsgPack(ProtoUtils.toValue(Collections.singletonList(change)))));
         callArgs.setMachine(new Machine()
-                .setId(cashregId)
-                .setNs(namespace)
+                .setId(TestData.CASHREG_ID)
+                .setNs(TestData.CASHREG_NAMESPACE)
                 .setHistory(new ArrayList<>())
                 .setHistoryRange(new HistoryRange()));
         CallResult result = client.processCall(callArgs);

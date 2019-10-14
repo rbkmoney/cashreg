@@ -21,13 +21,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class AbstractIntegrationTest {
 
-    protected String cashregId = "cashreg_id";
-    protected String partyId = "party_id";
-    protected String shopId = "shop_id";
-    protected String namespace = "cashreg";
-
-    public final static String MG_IMAGE = "dr2.rbkmoney.com/rbkmoney/machinegun";
-    public final static String MG_TAG = "5b85e3c73041e5cbcfcc35c465cf14214163389b";
+    private final static String MG_IMAGE = "dr2.rbkmoney.com/rbkmoney/machinegun";
+    private final static String MG_TAG = "5b85e3c73041e5cbcfcc35c465cf14214163389b";
 
     @ClassRule
     public static GenericContainer machinegunContainer = new GenericContainer(MG_IMAGE + ":" + MG_TAG)

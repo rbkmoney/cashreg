@@ -11,7 +11,7 @@ public interface DominantService {
 
     TerminalObject getTerminalObject(TerminalRef terminalRef);
 
-    ProviderObject getProviderObject(ProviderRef providerRef);
+    CashRegProviderObject getCashRegProviderObject(CashRegProviderRef providerRef);
 
     VersionedObject getVersionedObjectFromReference(com.rbkmoney.damsel.domain.Reference reference);
 

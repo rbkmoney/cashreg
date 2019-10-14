@@ -39,7 +39,7 @@ public class CashRegProviderService implements CashRegProvider {
     @Override
     public CashRegResult register(CashReg cashReg) {
         String url = extractUrl(cashReg);
-        Map<String, String> options = managementAggregate.aggregateOptions(cashReg.getShopId(), cashReg.getPartyId());
+        Map<String, String> options = managementAggregate.aggregateOptions(cashReg.getCashregProviderRef());
         CashRegContext context = prepareCashRegContext(cashReg, options);
         return call(url, NETWORK_TIMEOUT_SEC, context);
     }
