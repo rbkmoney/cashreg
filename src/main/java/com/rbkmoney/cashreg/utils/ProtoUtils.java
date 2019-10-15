@@ -44,6 +44,7 @@ public class ProtoUtils {
 
     public static CashRegContext prepareCashRegContext(CashReg cashReg, Map<String, String> proxyOptions) {
         CashRegContext context = new CashRegContext();
+        context.setCashregId(cashReg.getId());
         context.setAccountInfo(cashReg.getAccountInfo());
         context.setOptions(proxyOptions);
         context.setSession(new Session().setType(cashReg.getType()));
