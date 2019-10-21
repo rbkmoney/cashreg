@@ -44,13 +44,13 @@ public class ManagementServiceImplTest {
 
     @Test
     public void init() {
-        SourceData sourceData = managementService.init();
+        SourceData sourceData = managementService.signalInit();
         assertTrue(sourceData.getChange().getStatusChanged().getStatus().isSetPending());
     }
 
     @Test
     public void timeout() {
-        SourceData sourceData = managementService.timeout(changes);
+        SourceData sourceData = managementService.signalTimeout(changes);
         assertTrue(sourceData.getChange().getSession().getPayload().isSetStarted());
     }
 
