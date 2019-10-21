@@ -9,6 +9,8 @@ import com.rbkmoney.geck.serializer.Geck;
 import com.rbkmoney.machinegun.base.Timer;
 import com.rbkmoney.machinegun.msgpack.Value;
 import com.rbkmoney.machinegun.stateproc.*;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -18,6 +20,7 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 @Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProtoUtils {
 
     public static ComplexAction buildComplexActionWithDeadline(Instant deadline, HistoryRange historyRange) {
