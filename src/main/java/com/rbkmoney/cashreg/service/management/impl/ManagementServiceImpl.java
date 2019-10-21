@@ -29,7 +29,7 @@ public class ManagementServiceImpl implements ManagementService {
     private final List<ManagementHandler> managementHandlers;
 
     @Override
-    public SourceData init() {
+    public SourceData signalInit() {
         return SourceData.builder()
                 .change(ChangeFactory.createStatusChangePending())
                 .complexAction(
@@ -41,7 +41,7 @@ public class ManagementServiceImpl implements ManagementService {
     }
 
     @Override
-    public SourceData timeout(List<Change> changes) {
+    public SourceData signalTimeout(List<Change> changes) {
         Change lastChange = getLastChange(changes);
         CashReg cashReg = mgChangeManagerMapper.process(changes);
         return managementHandlers.stream()

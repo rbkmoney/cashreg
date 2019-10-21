@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ManagementService {
 
-    SourceData init();
+    SourceData signalInit();
 
-    SourceData timeout(List<Change> changes);
+    SourceData signalTimeout(List<Change> changes);
 }

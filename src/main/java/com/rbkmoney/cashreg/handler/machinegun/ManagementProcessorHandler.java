@@ -38,7 +38,7 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
     protected SignalResultData<Change> processSignalInit(String namespace, String machineId, Value args) {
         log.info("Request processSignalInit() machineId: {} value: {}", machineId, args);
         List<Change> changes = ProtoUtils.toChangeList(args);
-        SourceData sourceData = managementService.init();
+        SourceData sourceData = managementService.signalInit();
         changes.add(sourceData.getChange());
         SignalResultData<Change> resultData = new SignalResultData<>(
                 ProtoUtils.toChangeList(toValue(changes)),
@@ -52,7 +52,7 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
     protected SignalResultData<Change> processSignalTimeout(String namespace, String machineId, List<TMachineEvent<Change>> tMachineEvents) {
         log.info("Request processSignalTimeout() machineId: {} list: {}", machineId, tMachineEvents);
         List<Change> changes = tMachineEvents.stream().map(TMachineEvent::getData).collect(Collectors.toList());
-        SourceData sourceData = managementService.timeout(changes);
+        SourceData sourceData = managementService.signalTimeout(changes);
         changes.add(sourceData.getChange());
         SignalResultData<Change> resultData = new SignalResultData<>(
                 toChangeList(toValue(changes)),

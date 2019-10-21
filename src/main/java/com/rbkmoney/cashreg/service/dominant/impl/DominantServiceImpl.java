@@ -26,7 +26,7 @@ public class DominantServiceImpl implements DominantService {
         log.info("Trying to get VersionedObject, reference='{}'", reference);
         try {
             VersionedObject versionedObject = checkoutObject(Reference.head(new Head()), reference);
-            log.info("VersionedObject has been found, reference='{}'", versionedObject, reference);
+            log.info("VersionedObject {} has been found, reference='{}'", versionedObject, reference);
             return versionedObject;
         } catch (VersionNotFound | ObjectNotFound ex) {
             throw new NotFoundException(String.format("Version not found, reference='%s'", reference), ex);
@@ -40,7 +40,7 @@ public class DominantServiceImpl implements DominantService {
         log.info("Trying to get PaymentInstitutionObject, paymentInstitutionRef='{}'", paymentInstitutionRef);
         VersionedObject versionedObject = getVersionedObjectFromReference(payment_institution(paymentInstitutionRef));
         PaymentInstitutionObject paymentInstitution = versionedObject.getObject().getPaymentInstitution();
-        log.info("PaymentInstitution has been found, versionedObject='{}'", paymentInstitution, versionedObject);
+        log.info("PaymentInstitution {} has been found, versionedObject='{}'", paymentInstitution, versionedObject);
         return paymentInstitution;
     }
 
@@ -58,7 +58,7 @@ public class DominantServiceImpl implements DominantService {
         log.info("Trying to get TerminalObject, terminalRef='{}'", terminalRef);
         VersionedObject versionedObject = getVersionedObjectFromReference(terminal(terminalRef));
         TerminalObject terminalObject = versionedObject.getObject().getTerminal();
-        log.info("TerminalObject has been found, versionedObject='{}'", terminalObject, versionedObject);
+        log.info("TerminalObject {} has been found, versionedObject='{}'", terminalObject, versionedObject);
         return terminalObject;
     }
 
