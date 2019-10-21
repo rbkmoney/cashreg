@@ -42,7 +42,7 @@ public class PartyManagementServiceImpl implements PartyManagementService {
                 .build();
     }
 
-    private Party getParty(String partyId, PartyRevisionParam partyRevisionParam) throws NotFoundException {
+    private Party getParty(String partyId, PartyRevisionParam partyRevisionParam) {
         log.info("Trying to get party, partyId='{}', partyRevisionParam='{}'", partyId, partyRevisionParam);
         Party party = partyCache.get(
                 new AbstractMap.SimpleEntry<>(partyId, partyRevisionParam),
@@ -68,7 +68,7 @@ public class PartyManagementServiceImpl implements PartyManagementService {
     }
 
     @Override
-    public Shop getShop(String partyId, String shopId) throws NotFoundException {
+    public Shop getShop(String partyId, String shopId) {
         log.info("Trying to get shop, partyId='{}', shopId='{}', ", partyId, shopId);
         PartyRevisionParam partyRevisionParam = PartyRevisionParam.revision(getPartyRevision(partyId));
         Party party = getParty(partyId, partyRevisionParam);
@@ -81,7 +81,7 @@ public class PartyManagementServiceImpl implements PartyManagementService {
     }
 
     @Override
-    public Contract getContract(String partyId, String contractId) throws NotFoundException {
+    public Contract getContract(String partyId, String contractId) {
         log.info("Trying to get contract, partyId='{}', contractId='{}'", partyId, contractId);
         PartyRevisionParam partyRevisionParam = revision(getPartyRevision(partyId));
         Party party = getParty(partyId, partyRevisionParam);
@@ -108,7 +108,7 @@ public class PartyManagementServiceImpl implements PartyManagementService {
     }
 
     @Override
-    public PaymentInstitutionRef getPaymentInstitutionRef(String partyId, String contractId) throws NotFoundException {
+    public PaymentInstitutionRef getPaymentInstitutionRef(String partyId, String contractId) {
         log.debug("Trying to get paymentInstitutionRef, partyId='{}', contractId='{}', partyRevisionParam='{}'", partyId, contractId);
         Contract contract = getContract(partyId, contractId);
 
