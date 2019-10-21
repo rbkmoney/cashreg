@@ -68,7 +68,7 @@ public class DominantServiceImpl implements DominantService {
         log.info("Trying to get CashRegProviderObject, providerRef='{}'", providerRef);
         VersionedObject versionedObject = getVersionedObjectFromReference(cashreg_provider(providerRef));
         CashRegProviderObject providerObject = versionedObject.getObject().getCashregProvider();
-        log.info("CashRegProviderObject has been found, versionedObject='{}'", providerObject, versionedObject);
+        log.info("CashRegProviderObject {} has been found, versionedObject='{}'", providerObject, versionedObject);
         return providerObject;
     }
 

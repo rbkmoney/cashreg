@@ -74,6 +74,10 @@ public class ProtoUtils {
     public static BinaryOperator<CashReg> mergeCashRegs() {
         return (cashReg1, cashReg2) -> {
 
+            if (cashReg2.getCashregProviderRef() != null) {
+                cashReg1.setCashregProviderRef(cashReg2.getCashregProviderRef());
+            }
+
             if (cashReg2.getId() != null) {
                 cashReg1.setId(cashReg2.getId());
             }
@@ -99,6 +103,12 @@ public class ProtoUtils {
             }
 
             cashReg1.setStatus(cashReg2.getStatus());
+            cashReg1.setPartyRevision(cashReg2.getPartyRevision());
+            cashReg1.setDomainRevision(cashReg2.getDomainRevision());
+
+            if (cashReg2.getCashregProviderRef() != null) {
+                cashReg1.setCashregProviderRef(cashReg2.getCashregProviderRef());
+            }
 
             if (cashReg2.getInfo() != null) {
                 cashReg1.setInfo(cashReg2.getInfo());

@@ -30,6 +30,7 @@ public class ManagementAggregator {
     public Change toCashRegCreatedChange(CashRegParams params) {
         CreatedChange created = new CreatedChange();
         CashReg cashReg = new CashReg();
+        cashReg.setCashregProviderRef(params.getCashregProviderRef());
         cashReg.setId(params.getId());
         cashReg.setPaymentInfo(params.getPaymentInfo());
         cashReg.setType(params.getType());
@@ -44,6 +45,9 @@ public class ManagementAggregator {
         Contract contract = partyManagementService.getContract(params.getPartyId(), shop.getContractId());
         accountInfo.setLegalEntity(prepareLegalEntity(contract, aggregateOptions));
         cashReg.setAccountInfo(accountInfo);
+        // TODO: domain revision
+        cashReg.setDomainRevision(1L);
+        cashReg.setPartyRevision(partyManagementService.getPartyRevision(params.getPartyId()));
 
         created.setCashreg(cashReg);
         return Change.created(created);
@@ -71,6 +75,7 @@ public class ManagementAggregator {
         russianLegalEntity.setEmail(proxyOptions.get(ExtraField.RUSSIAN_LEGAL_ENTITY_EMAIL.getField()));
         russianLegalEntity.setActualAddress(russianLegalEntityDomain.getActualAddress());
         russianLegalEntity.setInn(russianLegalEntityDomain.getInn());
+        russianLegalEntity.setRegisteredNumber(russianLegalEntityDomain.getRegisteredNumber());
         russianLegalEntity.setPostAddress(russianLegalEntityDomain.getPostAddress());
         russianLegalEntity.setRegisteredName(russianLegalEntityDomain.getRegisteredName());
         russianLegalEntity.setRepresentativeDocument(russianLegalEntityDomain.getRepresentativeDocument());
@@ -78,7 +83,11 @@ public class ManagementAggregator {
         russianLegalEntity.setRepresentativePosition(russianLegalEntityDomain.getRepresentativePosition());
 
         com.rbkmoney.damsel.cashreg_domain.RussianBankAccount russianBankAccount = new com.rbkmoney.damsel.cashreg_domain.RussianBankAccount();
-
+        RussianBankAccount russianBankAccountIncome = russianLegalEntityDomain.getRussianBankAccount();
+        russianBankAccount.setAccount(russianBankAccountIncome.getAccount());
+        russianBankAccount.setBankBik(russianBankAccountIncome.getBankBik());
+        russianBankAccount.setBankName(russianBankAccountIncome.getBankName());
+        russianBankAccount.setBankPostAccount(russianBankAccountIncome.getBankPostAccount());
         russianLegalEntity.setRussianBankAccount(russianBankAccount);
         russianLegalEntity.setTaxMode(extractTaxModeFromOptions(proxyOptions));
 

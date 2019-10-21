@@ -8,12 +8,12 @@ import com.rbkmoney.damsel.cashreg.type.Debit;
 import com.rbkmoney.damsel.cashreg.type.Type;
 import com.rbkmoney.damsel.cashreg_domain.AccountInfo;
 import com.rbkmoney.damsel.cashreg_domain.PaymentInfo;
+import com.rbkmoney.damsel.cashreg_domain.TaxMode;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import com.rbkmoney.damsel.cashreg_processing.CreatedChange;
-import com.rbkmoney.damsel.domain.Cash;
-import com.rbkmoney.damsel.domain.CurrencyRef;
+import com.rbkmoney.damsel.domain.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +40,7 @@ public class CreateUtils {
             String id, String partyId, String shopId,
             Type type, PaymentInfo paymentInfo) {
         return new CashRegParams()
+                .setCashregProviderRef(createCashRegProviderRef())
                 .setId(id)
                 .setPartyId(partyId)
                 .setShopId(shopId)
@@ -57,16 +58,50 @@ public class CreateUtils {
     public static Change createCreatedChange(CashRegParams params) {
         CreatedChange created = new CreatedChange();
         CashReg cashReg = new CashReg();
+        cashReg.setCashregProviderRef(createCashRegProviderRef());
         cashReg.setId(params.getId());
-        cashReg.setPaymentInfo(new PaymentInfo());
+        cashReg.setPaymentInfo(createPaymentInfo());
         cashReg.setType(Type.debit(new Debit()));
         cashReg.setShopId(params.getShopId());
         cashReg.setPartyId(params.getPartyId());
         cashReg.setStatus(Status.pending(new Pending()));
-        cashReg.setAccountInfo(new AccountInfo());
+        cashReg.setAccountInfo(createAccountInfo());
         created.setCashreg(cashReg);
         return Change.created(created);
     }
 
+    public static CashRegProviderRef createCashRegProviderRef(){
+        return new CashRegProviderRef().setId(1);
+    }
+
+    public static AccountInfo createAccountInfo() {
+
+        com.rbkmoney.damsel.cashreg_domain.LegalEntity legalEntity = new com.rbkmoney.damsel.cashreg_domain.LegalEntity();
+        com.rbkmoney.damsel.cashreg_domain.RussianLegalEntity russianLegalEntity = new com.rbkmoney.damsel.cashreg_domain.RussianLegalEntity();
+
+        russianLegalEntity.setActualAddress("ActualAddress");
+        russianLegalEntity.setInn("INN");
+        russianLegalEntity.setPostAddress("PostAddress");
+        russianLegalEntity.setRegisteredName("RegisteredName");
+        russianLegalEntity.setRepresentativeDocument("RepresentativeDocument");
+        russianLegalEntity.setRepresentativeFullName("RepresentativeFullName");
+        russianLegalEntity.setRepresentativePosition("RepresentativePosition");
+        russianLegalEntity.setRegisteredNumber("RegisteredNumber");
+
+        com.rbkmoney.damsel.cashreg_domain.RussianBankAccount russianBankAccount = new com.rbkmoney.damsel.cashreg_domain.RussianBankAccount();
+        russianBankAccount.setAccount("Account");
+        russianBankAccount.setBankName("BankName");
+        russianBankAccount.setBankPostAccount("BankPostAccount");
+        russianBankAccount.setBankBik("BankBik");
+        russianLegalEntity.setRussianBankAccount(russianBankAccount);
+        russianLegalEntity.setEmail(TestData.TEST_EMAIL);
+        russianLegalEntity.setTaxMode(TaxMode.osn);
+
+        legalEntity.setRussianLegalEntity(russianLegalEntity);
+
+        AccountInfo accountInfo = new AccountInfo();
+        accountInfo.setLegalEntity(legalEntity);
+        return accountInfo;
+    }
 
 }
