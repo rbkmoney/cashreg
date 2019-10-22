@@ -1,6 +1,7 @@
 package com.rbkmoney.cashreg.service.provider;
 
 import com.rbkmoney.cashreg.service.management.aggregate.ManagementAggregator;
+import com.rbkmoney.cashreg.utils.cashreg.creators.CashRegProviderCreators;
 import com.rbkmoney.damsel.cashreg.provider.CashRegContext;
 import com.rbkmoney.damsel.cashreg.provider.CashRegProviderSrv;
 import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
@@ -39,7 +40,9 @@ public class CashRegProviderService implements CashRegProvider {
     @Override
     public CashRegResult register(CashReg cashReg) {
         String url = extractUrl(cashReg);
-        Map<String, String> options = managementAggregate.aggregateOptions(cashReg.getCashregProviderRef());
+        Map<String, String> options = managementAggregate.aggregateOptions(
+                CashRegProviderCreators.createCashregProviderRef(cashReg.getCashregProviderId())
+        );
         CashRegContext context = prepareCashRegContext(cashReg, options);
         return call(url, NETWORK_TIMEOUT_SEC, context);
     }

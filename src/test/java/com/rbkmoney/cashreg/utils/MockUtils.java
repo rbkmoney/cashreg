@@ -42,7 +42,7 @@ public class MockUtils {
     public static void mockDominant(DominantService service) {
         doAnswer((Answer<CashRegProviderObject>) invocation -> {
             CashRegProviderObject providerObject = new CashRegProviderObject();
-            providerObject.setRef(new CashRegProviderRef());
+            providerObject.setRef(new CashRegProviderRef().setId(1));
 
             CashRegProvider provider = new CashRegProvider();
             provider.setName(TestData.PROVIDER_NAME);

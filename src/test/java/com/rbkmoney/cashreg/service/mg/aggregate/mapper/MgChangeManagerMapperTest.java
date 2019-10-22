@@ -57,7 +57,7 @@ public class MgChangeManagerMapperTest {
 
         CashReg cashReg = mgChangeManagerMapper.process(changeList);
 
-        assertEquals(TestData.CASHREG_ID, cashReg.getId());
+        assertEquals(TestData.CASHREG_ID, cashReg.getCashregId());
         assertEquals(Status.delivered(new Delivered()), cashReg.getStatus());
     }
 

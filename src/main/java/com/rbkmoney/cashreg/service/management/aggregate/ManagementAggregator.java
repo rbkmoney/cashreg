@@ -3,6 +3,7 @@ package com.rbkmoney.cashreg.service.management.aggregate;
 import com.rbkmoney.cashreg.service.dominant.DominantService;
 import com.rbkmoney.cashreg.service.management.model.ExtraField;
 import com.rbkmoney.cashreg.service.pm.PartyManagementService;
+import com.rbkmoney.cashreg.utils.cashreg.creators.CashRegProviderCreators;
 import com.rbkmoney.damsel.cashreg.status.Pending;
 import com.rbkmoney.damsel.cashreg.status.Status;
 import com.rbkmoney.damsel.cashreg_domain.AccountInfo;
@@ -30,8 +31,8 @@ public class ManagementAggregator {
     public Change toCashRegCreatedChange(CashRegParams params) {
         CreatedChange created = new CreatedChange();
         CashReg cashReg = new CashReg();
-        cashReg.setCashregProviderRef(params.getCashregProviderRef());
-        cashReg.setId(params.getId());
+        cashReg.setCashregProviderId(params.getCashregProviderId());
+        cashReg.setCashregId(params.getCashregId());
         cashReg.setPaymentInfo(params.getPaymentInfo());
         cashReg.setType(params.getType());
         cashReg.setShopId(params.getShopId());
@@ -39,7 +40,10 @@ public class ManagementAggregator {
         cashReg.setStatus(Status.pending(new Pending()));
 
         Shop shop = partyManagementService.getShop(params.getShopId(), params.getPartyId());
-        CashRegProviderObject providerObject = dominantService.getCashRegProviderObject(params.getCashregProviderRef());
+
+        CashRegProviderObject providerObject = dominantService.getCashRegProviderObject(
+                CashRegProviderCreators.createCashregProviderRef(cashReg.getCashregProviderId())
+        );
         Map<String, String> aggregateOptions = aggregateOptions(providerObject);
         AccountInfo accountInfo = new AccountInfo();
         Contract contract = partyManagementService.getContract(params.getPartyId(), shop.getContractId());
@@ -96,7 +100,9 @@ public class ManagementAggregator {
     }
 
     public ProxyObject extractProxyObject(CashReg cashReg) {
-        CashRegProviderObject providerObject = dominantService.getCashRegProviderObject(cashReg.getCashregProviderRef());
+        CashRegProviderObject providerObject = dominantService.getCashRegProviderObject(
+                CashRegProviderCreators.createCashregProviderRef(cashReg.getCashregProviderId())
+        );
         return extractProxyObject(providerObject.getData().getProxy().getRef());
     }
 

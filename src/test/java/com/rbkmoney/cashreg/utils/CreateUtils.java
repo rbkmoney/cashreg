@@ -40,8 +40,8 @@ public class CreateUtils {
             String id, String partyId, String shopId,
             Type type, PaymentInfo paymentInfo) {
         return new CashRegParams()
-                .setCashregProviderRef(createCashRegProviderRef())
-                .setId(id)
+                .setCashregProviderId(TestData.CASHREG_CASHREG_PROVIDER_ID)
+                .setCashregId(id)
                 .setPartyId(partyId)
                 .setShopId(shopId)
                 .setType(type)
@@ -58,8 +58,8 @@ public class CreateUtils {
     public static Change createCreatedChange(CashRegParams params) {
         CreatedChange created = new CreatedChange();
         CashReg cashReg = new CashReg();
-        cashReg.setCashregProviderRef(createCashRegProviderRef());
-        cashReg.setId(params.getId());
+        cashReg.setCashregProviderId(TestData.CASHREG_CASHREG_PROVIDER_ID);
+        cashReg.setCashregId(params.getCashregId());
         cashReg.setPaymentInfo(createPaymentInfo());
         cashReg.setType(Type.debit(new Debit()));
         cashReg.setShopId(params.getShopId());
@@ -68,10 +68,6 @@ public class CreateUtils {
         cashReg.setAccountInfo(createAccountInfo());
         created.setCashreg(cashReg);
         return Change.created(created);
-    }
-
-    public static CashRegProviderRef createCashRegProviderRef(){
-        return new CashRegProviderRef().setId(1);
     }
 
     public static AccountInfo createAccountInfo() {

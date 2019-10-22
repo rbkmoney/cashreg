@@ -58,7 +58,7 @@ public class CashRegServerManagementHandlerTest extends AbstractIntegrationTest 
     public void create() throws TException {
         CashRegParams cashRegParams = createDefaultCashRegParams();
         managementClient.create(cashRegParams);
-        CashReg cashReg = managementClient.get(cashRegParams.getId());
+        CashReg cashReg = managementClient.get(cashRegParams.getCashregId());
         assertTrue(cashReg.getStatus().isSetPending());
     }
 

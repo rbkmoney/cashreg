@@ -29,7 +29,7 @@ public class CashRegServerManagementHandler implements ManagementSrv.Iface {
     @Override
     public void create(CashRegParams cashRegParams) {
         Change change = managementAggregate.toCashRegCreatedChange(cashRegParams);
-        automatonClient.start(cashRegParams.getId(), ProtoUtils.toValue(Collections.singletonList(change)));
+        automatonClient.start(cashRegParams.getCashregId(), ProtoUtils.toValue(Collections.singletonList(change)));
     }
 
     @Override
