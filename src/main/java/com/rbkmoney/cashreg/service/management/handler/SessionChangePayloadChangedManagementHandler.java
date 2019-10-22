@@ -7,9 +7,10 @@ import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class SessionChangePayloadChangedManagementHandler implements ManagementHandler {

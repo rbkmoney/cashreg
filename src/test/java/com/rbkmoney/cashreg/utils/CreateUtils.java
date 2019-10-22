@@ -66,6 +66,8 @@ public class CreateUtils {
         cashReg.setPartyId(params.getPartyId());
         cashReg.setStatus(Status.pending(new Pending()));
         cashReg.setAccountInfo(createAccountInfo());
+        cashReg.setDomainRevision(1);
+        cashReg.setPartyRevision(1);
         created.setCashreg(cashReg);
         return Change.created(created);
     }

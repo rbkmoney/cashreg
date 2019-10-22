@@ -8,6 +8,8 @@ import com.rbkmoney.damsel.cashreg_processing.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChangeFactory {
 
@@ -32,11 +34,16 @@ public class ChangeFactory {
     public static Change createSessionChangeStarted() {
         SessionChangePayload sessionChangePayload = new SessionChangePayload();
         sessionChangePayload.setStarted(new SessionStarted());
-        return createSessionChange(sessionChangePayload);
+        String sessionId = UUID.randomUUID().toString();
+        return createSessionChange(sessionId, sessionChangePayload);
     }
 
     public static Change createSessionChange(SessionChangePayload payload) {
         return Change.session(new SessionChange().setPayload(payload));
+    }
+
+    public static Change createSessionChange(String sessionId, SessionChangePayload payload) {
+        return Change.session(new SessionChange().setId(sessionId).setPayload(payload));
     }
 
 }

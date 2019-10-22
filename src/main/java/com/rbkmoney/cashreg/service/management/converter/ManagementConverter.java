@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 import static com.rbkmoney.cashreg.utils.ProtoUtils.*;
 import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory.createSessionChange;
 
@@ -24,7 +26,10 @@ public class ManagementConverter implements Converter<CashRegResult, SourceData>
         SessionAdapterStateChanged sessionAdapterStateChanged = new SessionAdapterStateChanged();
         sessionChangePayload.setSessionAdapterStateChanged(sessionAdapterStateChanged);
 
-        sessionAdapterStateChanged.setState(com.rbkmoney.damsel.msgpack.Value.bin(result.getState()));
+        if (result.getState() != null) {
+            sessionAdapterStateChanged.setState(com.rbkmoney.damsel.msgpack.Value.bin(result.getState()));
+        }
+
         ComplexAction complexAction = new ComplexAction();
         if (result.getIntent().isSetSleep()) {
             sessionChangePayload.setSessionAdapterStateChanged(sessionAdapterStateChanged);
@@ -38,8 +43,9 @@ public class ManagementConverter implements Converter<CashRegResult, SourceData>
             sessionChangePayload.setFinished(prepareSessionFinished(result));
         }
 
+        String sessionId = UUID.randomUUID().toString();
         return SourceData.builder()
-                .change(createSessionChange(sessionChangePayload))
+                .change(createSessionChange(sessionId, sessionChangePayload))
                 .complexAction(complexAction)
                 .build();
     }

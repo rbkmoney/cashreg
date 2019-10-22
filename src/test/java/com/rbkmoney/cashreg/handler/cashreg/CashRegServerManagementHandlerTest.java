@@ -13,7 +13,6 @@ import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Spy;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
 
@@ -38,9 +37,6 @@ public class CashRegServerManagementHandlerTest extends AbstractIntegrationTest 
     @MockBean
     public DominantService dominantService;
 
-    @Spy
-    public com.rbkmoney.cashreg.service.provider.CashRegProvider cashRegProvider;
-
     private ManagementSrv.Iface managementClient;
 
     @Before
@@ -51,7 +47,6 @@ public class CashRegServerManagementHandlerTest extends AbstractIntegrationTest 
         MockUtils.mockDominant(dominantService);
         MockUtils.mockPartyManagement(partyManagementService);
         MockUtils.mockAutomatonClient(automatonClient);
-        MockUtils.mockCashRegProvider(cashRegProvider);
     }
 
     @Test

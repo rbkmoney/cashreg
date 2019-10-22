@@ -9,6 +9,7 @@ import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.domain.ProxyObject;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
 import org.springframework.stereotype.Component;
 
@@ -19,23 +20,12 @@ import java.util.Map;
 import static com.rbkmoney.cashreg.service.management.impl.ManagementServiceImpl.NETWORK_TIMEOUT_SEC;
 import static com.rbkmoney.cashreg.utils.ProtoUtils.prepareCashRegContext;
 
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CashRegProviderService implements CashRegProvider {
 
     private final ManagementAggregator managementAggregate;
-
-    private CashRegProviderSrv.Iface cashRegProviderSrv(String url, Integer networkTimeout) {
-        try {
-            return new THSpawnClientBuilder()
-                    .withAddress(new URI(url))
-                    .withNetworkTimeout(networkTimeout)
-                    .build(CashRegProviderSrv.Iface.class);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("Can't connect provider");
-        }
-    }
 
     @Override
     public CashRegResult register(CashReg cashReg) {
@@ -60,6 +50,17 @@ public class CashRegProviderService implements CashRegProvider {
     private String extractUrl(CashReg cashReg) {
         ProxyObject proxyObject = managementAggregate.extractProxyObject(cashReg);
         return proxyObject.getData().getUrl();
+    }
+
+    private CashRegProviderSrv.Iface cashRegProviderSrv(String url, Integer networkTimeout) {
+        try {
+            return new THSpawnClientBuilder()
+                    .withAddress(new URI(url))
+                    .withNetworkTimeout(networkTimeout)
+                    .build(CashRegProviderSrv.Iface.class);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Can't connect provider");
+        }
     }
 
 }
