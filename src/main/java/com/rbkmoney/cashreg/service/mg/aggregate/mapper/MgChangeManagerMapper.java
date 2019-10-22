@@ -26,5 +26,4 @@ public class MgChangeManagerMapper {
         return changes.stream().map(this::handle).reduce(new CashReg(), ProtoUtils.mergeCashRegs());
     }
 
-
 }

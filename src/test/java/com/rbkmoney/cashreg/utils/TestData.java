@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class TestData {
 
+    public static final String CASHREG_RECEIPT_ID = "cashreg_receipt_id";
+
     public static final String CASHREG_NAMESPACE = "cashreg";
     public static final String CASHREG_CASHREG_PROVIDER_REF = "cashreg_provider_ref";
     public static final String CASHREG_ID = "cashreg_id";

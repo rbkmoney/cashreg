@@ -2,11 +2,14 @@ package com.rbkmoney.cashreg.utils;
 
 import com.rbkmoney.cashreg.service.dominant.DominantService;
 import com.rbkmoney.cashreg.service.pm.PartyManagementService;
+import com.rbkmoney.damsel.cashreg.CashRegInfo;
+import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
+import com.rbkmoney.damsel.cashreg.provider.FinishIntent;
+import com.rbkmoney.damsel.cashreg.provider.FinishStatus;
+import com.rbkmoney.damsel.cashreg.provider.Success;
 import com.rbkmoney.damsel.cashreg.status.Pending;
 import com.rbkmoney.damsel.cashreg.status.Status;
-import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
-import com.rbkmoney.damsel.cashreg_processing.Change;
-import com.rbkmoney.damsel.cashreg_processing.StatusChange;
+import com.rbkmoney.damsel.cashreg_processing.*;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.machinarium.client.AutomatonClient;
 import com.rbkmoney.machinarium.domain.TMachineEvent;
@@ -22,6 +25,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 
 public class MockUtils {
+
+    public static void mockCashRegProvider(com.rbkmoney.cashreg.service.provider.CashRegProvider provider) {
+        doAnswer((Answer<CashRegResult>) invocation -> {
+            CashRegResult regResult = new CashRegResult();
+
+            CashRegInfo cashregInfo = new CashRegInfo();
+            cashregInfo.setReceiptId(TestData.CASHREG_RECEIPT_ID);
+            regResult.setCashregInfo(cashregInfo);
+
+            regResult.setIntent(com.rbkmoney.damsel.cashreg.provider.Intent.finish(new FinishIntent().setStatus(FinishStatus.success(new Success()))));
+            return regResult;
+        }).when(provider).register(any());
+    }
 
     public static void mockDominant(DominantService service) {
         doAnswer((Answer<CashRegProviderObject>) invocation -> {
@@ -80,6 +96,9 @@ public class MockUtils {
 
             Change pendingChange = Change.status_changed(new StatusChange().setStatus(Status.pending(new Pending())));
             list.add(new TMachineEvent<>(2, Instant.now(), pendingChange));
+
+            Change sessionChange = Change.session(new SessionChange().setId("session_change_id").setPayload(SessionChangePayload.started(new SessionStarted())));
+            list.add(new TMachineEvent<>(3, Instant.now(), sessionChange));
 
             return list;
         }).when(client).getEvents(any(), any());
