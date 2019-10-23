@@ -1,5 +1,7 @@
 package com.rbkmoney.cashreg.service.provider;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.rbkmoney.cashreg.service.management.aggregate.ManagementAggregator;
 import com.rbkmoney.cashreg.utils.cashreg.creators.CashRegProviderCreators;
 import com.rbkmoney.damsel.cashreg.provider.CashRegContext;
@@ -8,9 +10,10 @@ import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.domain.ProxyObject;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -22,10 +25,21 @@ import static com.rbkmoney.cashreg.utils.ProtoUtils.prepareCashRegContext;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class CashRegProviderService implements CashRegProvider {
 
     private final ManagementAggregator managementAggregate;
+    private final Cache<String, CashRegProviderSrv.Iface> providerCache;
+
+    @Autowired
+    public CashRegProviderService(
+            ManagementAggregator managementAggregate,
+            @Value("${cache.maxSize}") long cacheMaximumSize
+    ) {
+        this.managementAggregate = managementAggregate;
+        this.providerCache = Caffeine.newBuilder()
+                .maximumSize(cacheMaximumSize)
+                .build();
+    }
 
     @Override
     public CashRegResult register(CashReg cashReg) {
@@ -39,7 +53,12 @@ public class CashRegProviderService implements CashRegProvider {
     }
 
     private CashRegResult call(String url, Integer networkTimeout, CashRegContext context) {
-        CashRegProviderSrv.Iface provider = cashRegProviderSrv(url, networkTimeout);
+
+        CashRegProviderSrv.Iface provider = providerCache.getIfPresent(url);
+        if (provider == null) {
+            provider = cashRegProviderSrv(url, networkTimeout);
+        }
+
         try {
             return provider.register(context);
         } catch (TException e) {
