@@ -1,6 +1,7 @@
 package com.rbkmoney.cashreg.handler.machinegun;
 
 import com.rbkmoney.cashreg.domain.SourceData;
+import com.rbkmoney.cashreg.service.exception.UnsupportedMethodException;
 import com.rbkmoney.cashreg.service.management.ManagementService;
 import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.damsel.cashreg_processing.Change;
@@ -9,11 +10,9 @@ import com.rbkmoney.machinarium.domain.SignalResultData;
 import com.rbkmoney.machinarium.domain.TMachineEvent;
 import com.rbkmoney.machinarium.handler.AbstractProcessorHandler;
 import com.rbkmoney.machinegun.msgpack.Value;
-import com.rbkmoney.machinegun.stateproc.ComplexAction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,14 +63,7 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
 
     @Override
     protected CallResultData<Change> processCall(String namespace, String machineId, Value args, List<TMachineEvent<Change>> tMachineEvents) {
-        return new CallResultData<>(getLastEvent(tMachineEvents), Collections.emptyList(), new ComplexAction());
-    }
-
-    private Change getLastEvent(List<TMachineEvent<Change>> tMachineEvents) {
-        if (tMachineEvents.isEmpty()) {
-            return null;
-        }
-        return tMachineEvents.get(tMachineEvents.size() - 1).getData();
+        throw new UnsupportedMethodException("UnsupportedMethod");
     }
 
 }
