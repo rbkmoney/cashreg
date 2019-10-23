@@ -16,6 +16,7 @@ import com.rbkmoney.geck.serializer.Geck;
 import com.rbkmoney.machinarium.client.AutomatonClient;
 import com.rbkmoney.machinegun.msgpack.Value;
 import com.rbkmoney.machinegun.stateproc.*;
+import com.rbkmoney.woody.api.flow.error.WRuntimeException;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import org.apache.thrift.TException;
 import org.jetbrains.annotations.NotNull;
@@ -80,7 +81,7 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
         assertTrue(result.getAction().getTimer().isSetSetTimer());
     }
 
-    @Test
+    @Test(expected = WRuntimeException.class)
     public void processCall() throws TException {
         Change change = Change.status_changed(new StatusChange().setStatus(Status.pending(new Pending())));
         CallArgs callArgs = new CallArgs();
@@ -90,8 +91,7 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
                 .setNs(TestData.CASHREG_NAMESPACE)
                 .setHistory(new ArrayList<>())
                 .setHistoryRange(new HistoryRange()));
-        CallResult result = client.processCall(callArgs);
-        assertTrue(result.isSetAction());
+        client.processCall(callArgs);
     }
 
     @Test
