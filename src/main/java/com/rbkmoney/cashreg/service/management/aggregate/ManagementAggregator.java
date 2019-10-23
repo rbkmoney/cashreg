@@ -1,6 +1,7 @@
 package com.rbkmoney.cashreg.service.management.aggregate;
 
 import com.rbkmoney.cashreg.service.dominant.DominantService;
+import com.rbkmoney.cashreg.service.dominant.model.ResponseDominantWrapper;
 import com.rbkmoney.cashreg.service.management.model.ExtraField;
 import com.rbkmoney.cashreg.service.pm.PartyManagementService;
 import com.rbkmoney.cashreg.utils.cashreg.creators.CashRegProviderCreators;
@@ -39,35 +40,41 @@ public class ManagementAggregator {
         cashReg.setPartyId(params.getPartyId());
         cashReg.setStatus(Status.pending(new Pending()));
 
-        Shop shop = partyManagementService.getShop(params.getShopId(), params.getPartyId());
+        Long partyRevision = partyManagementService.getPartyRevision(params.getPartyId());
+        Long domainRevision = null;
 
-        CashRegProviderObject providerObject = dominantService.getCashRegProviderObject(
-                CashRegProviderCreators.createCashregProviderRef(cashReg.getCashregProviderId())
+        Shop shop = partyManagementService.getShop(params.getShopId(), params.getPartyId(), partyRevision);
+
+        ResponseDominantWrapper<CashRegProviderObject> providerObject = dominantService.getCashRegProviderObject(
+                CashRegProviderCreators.createCashregProviderRef(cashReg.getCashregProviderId()),
+                domainRevision
         );
+        domainRevision = providerObject.getRevisionVersion();
+
         Map<String, String> aggregateOptions = aggregateOptions(providerObject);
         AccountInfo accountInfo = new AccountInfo();
-        Contract contract = partyManagementService.getContract(params.getPartyId(), shop.getContractId());
+        Contract contract = partyManagementService.getContract(params.getPartyId(), shop.getContractId(), partyRevision);
         accountInfo.setLegalEntity(prepareLegalEntity(contract, aggregateOptions));
         cashReg.setAccountInfo(accountInfo);
         // TODO: domain revision
         cashReg.setDomainRevision(1L);
-        cashReg.setPartyRevision(partyManagementService.getPartyRevision(params.getPartyId()));
+        cashReg.setPartyRevision(partyRevision);
 
         created.setCashreg(cashReg);
         return Change.created(created);
     }
 
-    private Map<String, String> aggregateOptions(CashRegProviderObject providerObject) {
-        Proxy proxy = providerObject.getData().getProxy();
-        ProxyObject proxyObject = dominantService.getProxyObject(proxy.getRef());
-        Map<String, String> proxyOptions = proxyObject.getData().getOptions();
+    private Map<String, String> aggregateOptions(ResponseDominantWrapper<CashRegProviderObject> wrapperProviderObject) {
+        Proxy proxy = wrapperProviderObject.getResponse().getData().getProxy();
+        ResponseDominantWrapper<ProxyObject> wrapperProxyObject = dominantService.getProxyObject(proxy.getRef(), wrapperProviderObject.getRevisionVersion());
+        Map<String, String> proxyOptions = wrapperProxyObject.getResponse().getData().getOptions();
         proxyOptions.putAll(proxy.getAdditional());
         return proxyOptions;
     }
 
-    public Map<String, String> aggregateOptions(com.rbkmoney.damsel.domain.CashRegProviderRef providerRef) {
-        CashRegProviderObject providerObject = dominantService.getCashRegProviderObject(providerRef);
-        return aggregateOptions(providerObject);
+    public Map<String, String> aggregateOptions(com.rbkmoney.damsel.domain.CashRegProviderRef providerRef, Long domainRevision) {
+        ResponseDominantWrapper<CashRegProviderObject> wrapperProviderObject = dominantService.getCashRegProviderObject(providerRef, domainRevision);
+        return aggregateOptions(wrapperProviderObject);
     }
 
     private com.rbkmoney.damsel.cashreg_domain.LegalEntity prepareLegalEntity(Contract contract, Map<String, String> proxyOptions) {
@@ -100,18 +107,19 @@ public class ManagementAggregator {
     }
 
     public ProxyObject extractProxyObject(CashReg cashReg) {
-        CashRegProviderObject providerObject = dominantService.getCashRegProviderObject(
-                CashRegProviderCreators.createCashregProviderRef(cashReg.getCashregProviderId())
+        ResponseDominantWrapper<CashRegProviderObject> wrapperProviderObject = dominantService.getCashRegProviderObject(
+                CashRegProviderCreators.createCashregProviderRef(cashReg.getCashregProviderId()),
+                cashReg.getDomainRevision()
         );
-        return extractProxyObject(providerObject.getData().getProxy().getRef());
+        return extractProxyObject(wrapperProviderObject.getResponse().getData().getProxy().getRef(), wrapperProviderObject.getRevisionVersion());
     }
 
-    private ProxyObject extractProxyObject(ProxyRef proxyRef) {
-        ProxyObject object = dominantService.getProxyObject(proxyRef);
-        if (!object.isSetData()) {
+    private ProxyObject extractProxyObject(ProxyRef proxyRef, Long revisionVersion) {
+        ResponseDominantWrapper<ProxyObject> object = dominantService.getProxyObject(proxyRef, revisionVersion);
+        if (!object.getResponse().isSetData()) {
             throw new IllegalStateException("ProxyObject not found; proxyRef: " + proxyRef);
         }
-        return object;
+        return object.getResponse();
     }
 
 }

@@ -31,7 +31,8 @@ public class CashRegProviderService implements CashRegProvider {
     public CashRegResult register(CashReg cashReg) {
         String url = extractUrl(cashReg);
         Map<String, String> options = managementAggregate.aggregateOptions(
-                CashRegProviderCreators.createCashregProviderRef(cashReg.getCashregProviderId())
+                CashRegProviderCreators.createCashregProviderRef(cashReg.getCashregProviderId()),
+                cashReg.getDomainRevision()
         );
         CashRegContext context = prepareCashRegContext(cashReg, options);
         return call(url, NETWORK_TIMEOUT_SEC, context);

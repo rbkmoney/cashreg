@@ -1,6 +1,7 @@
 package com.rbkmoney.cashreg.utils;
 
 import com.rbkmoney.cashreg.service.dominant.DominantService;
+import com.rbkmoney.cashreg.service.dominant.model.ResponseDominantWrapper;
 import com.rbkmoney.cashreg.service.pm.PartyManagementService;
 import com.rbkmoney.damsel.cashreg.CashRegInfo;
 import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
@@ -40,7 +41,7 @@ public class MockUtils {
     }
 
     public static void mockDominant(DominantService service) {
-        doAnswer((Answer<CashRegProviderObject>) invocation -> {
+        doAnswer((Answer<ResponseDominantWrapper<CashRegProviderObject>>) invocation -> {
             CashRegProviderObject providerObject = new CashRegProviderObject();
             providerObject.setRef(new CashRegProviderRef().setId(1));
 
@@ -54,34 +55,44 @@ public class MockUtils {
             provider.setProxy(proxy);
             providerObject.setData(provider);
 
-            return providerObject;
-        }).when(service).getCashRegProviderObject(any());
+            ResponseDominantWrapper<CashRegProviderObject> responseDominantWrapper = new ResponseDominantWrapper<>();
+            responseDominantWrapper.setResponse(providerObject);
+            responseDominantWrapper.setRevisionVersion(1L);
+            return responseDominantWrapper;
+        }).when(service).getCashRegProviderObject(any(), any());
 
-        doAnswer((Answer<ProxyObject>) invocation -> {
-            ProxyObject object = new ProxyObject();
-            object.setRef(new ProxyRef());
+        doAnswer((Answer<ResponseDominantWrapper<ProxyObject>>) invocation -> {
+            ProxyObject proxyObject = new ProxyObject();
+            proxyObject.setRef(new ProxyRef());
 
             ProxyDefinition proxyDefinition = new ProxyDefinition();
             proxyDefinition.setName(TestData.PROXY_NAME);
             proxyDefinition.setDescription(TestData.PROXY_DESCRIPTION);
             proxyDefinition.setOptions(TestData.prepareOptions());
             proxyDefinition.setUrl(TestData.PROXY_URL);
-            object.setData(proxyDefinition);
-            return object;
-        }).when(service).getProxyObject(any());
+            proxyObject.setData(proxyDefinition);
 
-        doAnswer((Answer<TerminalObject>) invocation -> {
-            TerminalObject object = new TerminalObject();
-            object.setRef(new TerminalRef().setId(1));
+            ResponseDominantWrapper<ProxyObject> responseDominantWrapper = new ResponseDominantWrapper<>();
+            responseDominantWrapper.setResponse(proxyObject);
+            responseDominantWrapper.setRevisionVersion(1L);
+            return responseDominantWrapper;
+        }).when(service).getProxyObject(any(), any());
+
+        doAnswer((Answer<ResponseDominantWrapper<TerminalObject>>) invocation -> {
+            TerminalObject terminalObject = new TerminalObject();
+            terminalObject.setRef(new TerminalRef().setId(1));
             Terminal terminal = new Terminal();
             terminal.setName(TestData.TERMINAL_NAME);
             terminal.setDescription(TestData.TERMINAL_DESCRIPTION);
             terminal.setOptions(TestData.prepareOptions());
             terminal.setRiskCoverage(RiskScore.low);
             terminal.setTerms(new PaymentsProvisionTerms());
-            object.setData(terminal);
-            return object;
-        }).when(service).getTerminalObject(any());
+            terminalObject.setData(terminal);
+            ResponseDominantWrapper<TerminalObject> responseDominantWrapper = new ResponseDominantWrapper<>();
+            responseDominantWrapper.setResponse(terminalObject);
+            responseDominantWrapper.setRevisionVersion(1L);
+            return responseDominantWrapper;
+        }).when(service).getTerminalObject(any(), any());
 
     }
 
@@ -134,13 +145,13 @@ public class MockUtils {
             contract.setContractor(contractor);
 
             return contract;
-        }).when(service).getContract(any(), any());
+        }).when(service).getContract(any(), any(), any());
 
         doAnswer((Answer<Shop>) invocation -> {
             Shop shop = new Shop();
             shop.setContractId(TestData.SHOP_CONTRACT_ID);
             return shop;
-        }).when(service).getShop(any(), any());
+        }).when(service).getShop(any(), any(), any());
 
     }
 

@@ -1,6 +1,7 @@
 package com.rbkmoney.cashreg.service.dominant.impl;
 
 import com.rbkmoney.cashreg.service.dominant.DominantService;
+import com.rbkmoney.cashreg.service.dominant.model.ResponseDominantWrapper;
 import com.rbkmoney.cashreg.service.exception.NotFoundException;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.domain_config.Reference;
@@ -22,12 +23,21 @@ public class DominantServiceImpl implements DominantService {
     private final RetryTemplate retryTemplate;
 
     @Override
-    public VersionedObject getVersionedObjectFromReference(com.rbkmoney.damsel.domain.Reference reference) {
+    public ResponseDominantWrapper<VersionedObject> getVersionedObjectFromReference(com.rbkmoney.damsel.domain.Reference reference, Long revisionVersion) {
         log.info("Trying to get VersionedObject, reference='{}'", reference);
         try {
-            VersionedObject versionedObject = checkoutObject(Reference.head(new Head()), reference);
+            Reference referenceRevision;
+            if (revisionVersion == null) {
+                referenceRevision = Reference.head(new Head());
+            } else {
+                referenceRevision = Reference.version(revisionVersion);
+            }
+            VersionedObject versionedObject = checkoutObject(referenceRevision, reference);
             log.info("VersionedObject {} has been found, reference='{}'", versionedObject, reference);
-            return versionedObject;
+            ResponseDominantWrapper<VersionedObject> response = new ResponseDominantWrapper<>();
+            response.setResponse(versionedObject);
+            response.setRevisionVersion(versionedObject.getVersion());
+            return response;
         } catch (VersionNotFound | ObjectNotFound ex) {
             throw new NotFoundException(String.format("Version not found, reference='%s'", reference), ex);
         } catch (TException ex) {
@@ -36,30 +46,39 @@ public class DominantServiceImpl implements DominantService {
     }
 
     @Override
-    public ProxyObject getProxyObject(ProxyRef proxyRef) {
+    public ResponseDominantWrapper<ProxyObject> getProxyObject(ProxyRef proxyRef, Long revisionVersion) {
         log.info("Trying to get ProxyObject, proxyRef='{}'", proxyRef);
-        VersionedObject versionedObject = getVersionedObjectFromReference(proxy(proxyRef));
-        ProxyObject proxyObject = versionedObject.getObject().getProxy();
-        log.info("ProxyObject has been found, versionedObject='{}'", proxyObject, versionedObject);
-        return proxyObject;
+        ResponseDominantWrapper<VersionedObject> versionedObjectWrapper = getVersionedObjectFromReference(proxy(proxyRef), revisionVersion);
+        ProxyObject proxyObject = versionedObjectWrapper.getResponse().getObject().getProxy();
+        log.info("ProxyObject has been found, versionedObjectWrapper='{}'", proxyObject, versionedObjectWrapper);
+        ResponseDominantWrapper<ProxyObject> response = new ResponseDominantWrapper<>();
+        response.setResponse(proxyObject);
+        response.setRevisionVersion(versionedObjectWrapper.getRevisionVersion());
+        return response;
     }
 
     @Override
-    public TerminalObject getTerminalObject(TerminalRef terminalRef) {
+    public ResponseDominantWrapper<TerminalObject> getTerminalObject(TerminalRef terminalRef, Long revisionVersion) {
         log.info("Trying to get TerminalObject, terminalRef='{}'", terminalRef);
-        VersionedObject versionedObject = getVersionedObjectFromReference(terminal(terminalRef));
-        TerminalObject terminalObject = versionedObject.getObject().getTerminal();
-        log.info("TerminalObject {} has been found, versionedObject='{}'", terminalObject, versionedObject);
-        return terminalObject;
+        ResponseDominantWrapper<VersionedObject> versionedObjectWrapper = getVersionedObjectFromReference(terminal(terminalRef), revisionVersion);
+        TerminalObject terminalObject = versionedObjectWrapper.getResponse().getObject().getTerminal();
+        log.info("TerminalObject {} has been found, versionedObjectWrapper='{}'", terminalObject, versionedObjectWrapper);
+        ResponseDominantWrapper<TerminalObject> response = new ResponseDominantWrapper<>();
+        response.setResponse(terminalObject);
+        response.setRevisionVersion(versionedObjectWrapper.getRevisionVersion());
+        return response;
     }
 
     @Override
-    public CashRegProviderObject getCashRegProviderObject(CashRegProviderRef providerRef) {
+    public ResponseDominantWrapper<CashRegProviderObject> getCashRegProviderObject(CashRegProviderRef providerRef, Long revisionVersion) {
         log.info("Trying to get CashRegProviderObject, providerRef='{}'", providerRef);
-        VersionedObject versionedObject = getVersionedObjectFromReference(cashreg_provider(providerRef));
-        CashRegProviderObject providerObject = versionedObject.getObject().getCashregProvider();
-        log.info("CashRegProviderObject {} has been found, versionedObject='{}'", providerObject, versionedObject);
-        return providerObject;
+        ResponseDominantWrapper<VersionedObject> versionedObjectWrapper = getVersionedObjectFromReference(cashreg_provider(providerRef), revisionVersion);
+        CashRegProviderObject providerObject = versionedObjectWrapper.getResponse().getObject().getCashregProvider();
+        log.info("CashRegProviderObject {} has been found, versionedObjectWrapper='{}'", providerObject, versionedObjectWrapper);
+        ResponseDominantWrapper<CashRegProviderObject> response = new ResponseDominantWrapper<>();
+        response.setResponse(providerObject);
+        response.setRevisionVersion(versionedObjectWrapper.getRevisionVersion());
+        return response;
     }
 
     private VersionedObject checkoutObject(Reference revisionReference, com.rbkmoney.damsel.domain.Reference reference) throws TException {
