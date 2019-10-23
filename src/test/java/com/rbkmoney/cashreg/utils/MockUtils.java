@@ -15,6 +15,7 @@ import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.machinarium.client.AutomatonClient;
 import com.rbkmoney.machinarium.domain.TMachineEvent;
 import com.rbkmoney.machinegun.msgpack.Value;
+import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
@@ -99,20 +100,24 @@ public class MockUtils {
     public static void mockAutomatonClient(AutomatonClient<Value, Change> client) {
         Mockito.doNothing().when(client).start(any(), any());
 
-        doAnswer((Answer<List<TMachineEvent<Change>>>) invocation -> {
-            List<TMachineEvent<Change>> list = new ArrayList<>();
+        List<TMachineEvent<Change>> list = createtMachineEvents();
+        doAnswer((Answer<List<TMachineEvent<Change>>>) invocation -> list).when(client).getEvents(any(), any());
+        doAnswer((Answer<List<TMachineEvent<Change>>>) invocation -> list).when(client).getEvents(any());
+    }
 
-            CashRegParams cashRegParams = CreateUtils.createDefaultCashRegParams();
-            list.add(new TMachineEvent<>(1, Instant.now(), CreateUtils.createCreatedChange(cashRegParams)));
+    @NotNull
+    private static List<TMachineEvent<Change>> createtMachineEvents() {
+        List<TMachineEvent<Change>> list = new ArrayList<>();
 
-            Change pendingChange = Change.status_changed(new StatusChange().setStatus(Status.pending(new Pending())));
-            list.add(new TMachineEvent<>(2, Instant.now(), pendingChange));
+        CashRegParams cashRegParams = CreateUtils.createDefaultCashRegParams();
+        list.add(new TMachineEvent<>(1, Instant.now(), CreateUtils.createCreatedChange(cashRegParams)));
 
-            Change sessionChange = Change.session(new SessionChange().setId("session_change_id").setPayload(SessionChangePayload.started(new SessionStarted())));
-            list.add(new TMachineEvent<>(3, Instant.now(), sessionChange));
+        Change pendingChange = Change.status_changed(new StatusChange().setStatus(Status.pending(new Pending())));
+        list.add(new TMachineEvent<>(2, Instant.now(), pendingChange));
 
-            return list;
-        }).when(client).getEvents(any(), any());
+        Change sessionChange = Change.session(new SessionChange().setId("session_change_id").setPayload(SessionChangePayload.started(new SessionStarted())));
+        list.add(new TMachineEvent<>(3, Instant.now(), sessionChange));
+        return list;
     }
 
     public static void mockPartyManagement(PartyManagementService service) {
