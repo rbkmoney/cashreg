@@ -34,7 +34,7 @@ public class CashRegServerManagementHandler implements ManagementSrv.Iface {
 
     @Override
     public CashReg get(String cashRegID) {
-        List<Change> changes = automatonClient.getEvents(cashRegID, new HistoryRange()).stream().map(TMachineEvent::getData).collect(Collectors.toList());
+        List<Change> changes = automatonClient.getEvents(cashRegID).stream().map(TMachineEvent::getData).collect(Collectors.toList());
         return mgChangeManagerMapper.process(changes);
     }
 
