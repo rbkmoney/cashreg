@@ -23,7 +23,7 @@ public class MgChangeManagerMapper {
     }
 
     public CashReg process(List<Change> changes) {
-        return changes.stream().map(this::handle).reduce(new CashReg(), ProtoUtils.mergeCashRegs());
+        return changes.stream().map(this::handle).reduce(new CashReg(), ProtoUtils::mergeCashRegs);
     }
 
 }

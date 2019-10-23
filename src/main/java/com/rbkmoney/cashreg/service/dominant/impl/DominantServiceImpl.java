@@ -53,7 +53,6 @@ public class DominantServiceImpl implements DominantService {
         return terminalObject;
     }
 
-
     @Override
     public CashRegProviderObject getCashRegProviderObject(CashRegProviderRef providerRef) {
         log.info("Trying to get CashRegProviderObject, providerRef='{}'", providerRef);

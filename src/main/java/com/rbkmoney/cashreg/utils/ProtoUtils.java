@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 @Component
@@ -74,47 +73,45 @@ public class ProtoUtils {
         return value.getArr().stream().map(v -> Geck.msgPackToTBase(v.getBin(), Change.class)).collect(Collectors.toList());
     }
 
-    public static BinaryOperator<CashReg> mergeCashRegs() {
-        return (cashReg1, cashReg2) -> {
+    public static CashReg mergeCashRegs(CashReg cashReg1, CashReg cashReg2) {
 
-            if (cashReg2.getCashregProviderId() != null) {
-                cashReg1.setCashregProviderId(cashReg2.getCashregProviderId());
-            }
+        if (cashReg2.getCashregProviderId() != null) {
+            cashReg1.setCashregProviderId(cashReg2.getCashregProviderId());
+        }
 
-            if (cashReg2.getCashregId() != null) {
-                cashReg1.setCashregId(cashReg2.getCashregId());
-            }
+        if (cashReg2.getCashregId() != null) {
+            cashReg1.setCashregId(cashReg2.getCashregId());
+        }
 
-            if (cashReg2.getPartyId() != null) {
-                cashReg1.setPartyId(cashReg2.getPartyId());
-            }
+        if (cashReg2.getPartyId() != null) {
+            cashReg1.setPartyId(cashReg2.getPartyId());
+        }
 
-            if (cashReg2.getShopId() != null) {
-                cashReg1.setShopId(cashReg2.getShopId());
-            }
+        if (cashReg2.getShopId() != null) {
+            cashReg1.setShopId(cashReg2.getShopId());
+        }
 
-            if (cashReg2.getAccountInfo() != null) {
-                cashReg1.setAccountInfo(cashReg2.getAccountInfo());
-            }
+        if (cashReg2.getAccountInfo() != null) {
+            cashReg1.setAccountInfo(cashReg2.getAccountInfo());
+        }
 
-            if (cashReg2.getPaymentInfo() != null) {
-                cashReg1.setPaymentInfo(cashReg2.getPaymentInfo());
-            }
+        if (cashReg2.getPaymentInfo() != null) {
+            cashReg1.setPaymentInfo(cashReg2.getPaymentInfo());
+        }
 
-            if (cashReg2.getType() != null) {
-                cashReg1.setType(cashReg2.getType());
-            }
+        if (cashReg2.getType() != null) {
+            cashReg1.setType(cashReg2.getType());
+        }
 
-            cashReg1.setStatus(cashReg2.getStatus());
-            cashReg1.setPartyRevision(cashReg2.getPartyRevision());
-            cashReg1.setDomainRevision(cashReg2.getDomainRevision());
+        cashReg1.setStatus(cashReg2.getStatus());
+        cashReg1.setPartyRevision(cashReg2.getPartyRevision());
+        cashReg1.setDomainRevision(cashReg2.getDomainRevision());
 
-            if (cashReg2.getInfo() != null) {
-                cashReg1.setInfo(cashReg2.getInfo());
-            }
+        if (cashReg2.getInfo() != null) {
+            cashReg1.setInfo(cashReg2.getInfo());
+        }
 
-            return cashReg1;
-        };
+        return cashReg1;
     }
 
 }
