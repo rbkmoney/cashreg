@@ -35,7 +35,7 @@ public class CashRegServerManagementHandlerTest extends AbstractIntegrationTest 
     private PartyManagementService partyManagementService;
 
     @MockBean
-    public DominantService dominantService;
+    private DominantService dominantService;
 
     private ManagementSrv.Iface managementClient;
 
@@ -58,14 +58,8 @@ public class CashRegServerManagementHandlerTest extends AbstractIntegrationTest 
     }
 
     @Test
-    public void get() throws TException {
-        CashReg cashReg = managementClient.get(TestData.CASHREG_ID);
-        assertTrue(cashReg.getStatus().isSetPending());
-    }
-
-    @Test
     public void getEvents() throws TException {
-        EventRange eventRange = new EventRange().setLimit(1).setAfter(1L);
+        EventRange eventRange = new EventRange().setLimit(3).setAfter(1L);
         List<Event> eventList = managementClient.getEvents(TestData.CASHREG_ID, eventRange);
         assertTrue(eventList.size() > 0);
         assertTrue(eventList.get(1).getChange().getStatusChanged().getStatus().isSetPending());

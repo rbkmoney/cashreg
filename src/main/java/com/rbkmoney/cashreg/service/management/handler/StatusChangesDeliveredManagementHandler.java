@@ -15,6 +15,8 @@ import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory.createSt
 @RequiredArgsConstructor
 public class StatusChangesDeliveredManagementHandler implements ManagementHandler {
 
+    private final String HANDLER_NAME = this.getClass().getSimpleName();
+
     @Override
     public boolean filter(Change change) {
         return change.isSetStatusChanged()
@@ -23,10 +25,13 @@ public class StatusChangesDeliveredManagementHandler implements ManagementHandle
 
     @Override
     public SourceData handle(Change change, CashReg cashReg) {
-        return SourceData.builder()
+        log.info("Start {}", HANDLER_NAME);
+        SourceData sourceData = SourceData.builder()
                 .change(createStatusChangeDelivered())
                 .complexAction(new ComplexAction())
                 .build();
+        log.info("Finish {}, sourceData {}", HANDLER_NAME, sourceData);
+        return sourceData;
     }
 
 }

@@ -36,15 +36,6 @@ public class DominantServiceImpl implements DominantService {
     }
 
     @Override
-    public PaymentInstitutionObject getPaymentInstitutionRef(PaymentInstitutionRef paymentInstitutionRef) {
-        log.info("Trying to get PaymentInstitutionObject, paymentInstitutionRef='{}'", paymentInstitutionRef);
-        VersionedObject versionedObject = getVersionedObjectFromReference(payment_institution(paymentInstitutionRef));
-        PaymentInstitutionObject paymentInstitution = versionedObject.getObject().getPaymentInstitution();
-        log.info("PaymentInstitution {} has been found, versionedObject='{}'", paymentInstitution, versionedObject);
-        return paymentInstitution;
-    }
-
-    @Override
     public ProxyObject getProxyObject(ProxyRef proxyRef) {
         log.info("Trying to get ProxyObject, proxyRef='{}'", proxyRef);
         VersionedObject versionedObject = getVersionedObjectFromReference(proxy(proxyRef));

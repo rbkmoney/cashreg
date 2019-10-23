@@ -18,6 +18,8 @@ import static com.rbkmoney.cashreg.utils.ProtoUtils.buildLastEventHistoryRange;
 @RequiredArgsConstructor
 public class CreatedManagementHandler implements ManagementHandler {
 
+    private final String HANDLER_NAME = this.getClass().getSimpleName();
+
     @Override
     public boolean filter(Change change) {
         return change.isSetCreated();

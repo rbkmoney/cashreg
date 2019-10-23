@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SessionChangePayloadFinishedSucceededManagementHandler implements ManagementHandler {
 
+    private final String HANDLER_NAME = this.getClass().getSimpleName();
+
     @Override
     public boolean filter(Change change) {
         return change.isSetSession()
@@ -25,10 +27,13 @@ public class SessionChangePayloadFinishedSucceededManagementHandler implements M
 
     @Override
     public SourceData handle(Change change, CashReg cashReg) {
-        return SourceData.builder()
+        log.info("Start {}", HANDLER_NAME);
+        SourceData sourceData = SourceData.builder()
                 .change(ChangeFactory.createStatusChangeDelivered())
                 .complexAction(new ComplexAction())
                 .build();
+        log.info("Finish {}, sourceData {}", HANDLER_NAME, sourceData);
+        return sourceData;
     }
 
 }

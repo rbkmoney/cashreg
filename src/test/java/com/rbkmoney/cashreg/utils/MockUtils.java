@@ -142,10 +142,6 @@ public class MockUtils {
             return shop;
         }).when(service).getShop(any(), any());
 
-        doAnswer((Answer<PaymentInstitutionRef>) invocation -> {
-            return new PaymentInstitutionRef();
-        }).when(service).getPaymentInstitutionRef(any(), any());
-
     }
 
 }

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StatusChangesFailedManagementHandler implements ManagementHandler {
 
+    private final String HANDLER_NAME = this.getClass().getSimpleName();
+
     @Override
     public boolean filter(Change change) {
         return change.isSetStatusChanged()
@@ -22,9 +24,12 @@ public class StatusChangesFailedManagementHandler implements ManagementHandler {
 
     @Override
     public SourceData handle(Change change, CashReg cashReg) {
-        return SourceData.builder()
+        log.info("Start {}", HANDLER_NAME);
+        SourceData sourceData = SourceData.builder()
                 .change(ChangeFactory.createStatusChangeFailed())
                 .complexAction(new ComplexAction())
                 .build();
+        log.info("Finish {}, sourceData {}", HANDLER_NAME, sourceData);
+        return sourceData;
     }
 }

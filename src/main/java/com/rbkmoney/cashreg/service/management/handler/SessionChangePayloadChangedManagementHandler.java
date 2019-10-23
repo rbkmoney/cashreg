@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SessionChangePayloadChangedManagementHandler implements ManagementHandler {
 
+    private final String HANDLER_NAME = this.getClass().getSimpleName();
     private final CashRegProviderService providerService;
     private final ManagementConverter managementConverter;
 
@@ -27,7 +28,9 @@ public class SessionChangePayloadChangedManagementHandler implements ManagementH
 
     @Override
     public SourceData handle(Change change, CashReg cashReg) {
+        log.info("Start {}", HANDLER_NAME);
         CashRegResult result = providerService.register(cashReg);
+        log.info("Finish {}, result {}", HANDLER_NAME, result);
         return managementConverter.convert(result);
     }
 

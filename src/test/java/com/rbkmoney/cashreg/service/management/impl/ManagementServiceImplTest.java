@@ -8,7 +8,6 @@ import com.rbkmoney.damsel.cashreg.status.Status;
 import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 import com.rbkmoney.damsel.cashreg_processing.StatusChange;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,24 +31,20 @@ public class ManagementServiceImplTest {
     @Autowired
     private ManagementServiceImpl managementService;
 
-    private List<Change> changes = new ArrayList<>();
-
-    @Before
-    public void setup() {
-        Change pendingChange = Change.status_changed(new StatusChange().setStatus(Status.pending(new Pending())));
-        CashRegParams params = CreateUtils.createDefaultCashRegParams();
-        changes.add(CreateUtils.createCreatedChange(params));
-        changes.add(pendingChange);
-    }
-
     @Test
-    public void init() {
+    public void singnalInit() {
         SourceData sourceData = managementService.signalInit();
         assertTrue(sourceData.getChange().getStatusChanged().getStatus().isSetPending());
     }
 
     @Test
-    public void timeout() {
+    public void singnalTimeout() {
+        List<Change> changes = new ArrayList<>();
+        Change pendingChange = Change.status_changed(new StatusChange().setStatus(Status.pending(new Pending())));
+        CashRegParams params = CreateUtils.createDefaultCashRegParams();
+        changes.add(CreateUtils.createCreatedChange(params));
+        changes.add(pendingChange);
+
         SourceData sourceData = managementService.signalTimeout(changes);
         assertTrue(sourceData.getChange().getSession().getPayload().isSetStarted());
     }
