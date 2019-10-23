@@ -43,12 +43,9 @@ public class PartyManagementServiceImpl implements PartyManagementService {
 
     private Party getParty(String partyId, PartyRevisionParam partyRevisionParam) {
         log.info("Trying to get party, partyId='{}', partyRevisionParam='{}'", partyId, partyRevisionParam);
-        AbstractMap.SimpleEntry<String, PartyRevisionParam> key = new AbstractMap.SimpleEntry<>(partyId, partyRevisionParam);
-        Party party = partyCache.getIfPresent(key);
-        if (party == null) {
-            party = callCheckout(partyId, partyRevisionParam);
-            partyCache.put(key, party);
-        }
+        Party party = partyCache.get(
+                new AbstractMap.SimpleEntry<>(partyId, partyRevisionParam),
+                key -> callCheckout(partyId, partyRevisionParam));
         log.info("Party has been found, partyId='{}', partyRevisionParam='{}'", partyId, partyRevisionParam);
         return party;
     }
