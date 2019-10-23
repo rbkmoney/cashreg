@@ -53,13 +53,7 @@ public class CashRegProviderService implements CashRegProvider {
     }
 
     private CashRegResult call(String url, Integer networkTimeout, CashRegContext context) {
-
-        CashRegProviderSrv.Iface provider = providerCache.getIfPresent(url);
-        if (provider == null) {
-            provider = cashRegProviderSrv(url, networkTimeout);
-            providerCache.put(url, provider);
-        }
-
+        CashRegProviderSrv.Iface provider = providerCache.get(url, key -> cashRegProviderSrv(url, networkTimeout));
         try {
             return provider.register(context);
         } catch (TException e) {
