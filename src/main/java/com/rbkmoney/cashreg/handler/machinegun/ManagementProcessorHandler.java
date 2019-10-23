@@ -66,11 +66,4 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
         throw new UnsupportedMethodException("UnsupportedMethod");
     }
 
-    private Change getLastEvent(List<TMachineEvent<Change>> tMachineEvents) {
-        if (tMachineEvents.isEmpty()) {
-            return null;
-        }
-        return tMachineEvents.get(tMachineEvents.size() - 1).getData();
-    }
-
 }

@@ -27,7 +27,8 @@ public class CreatedManagementHandler implements ManagementHandler {
 
     @Override
     public SourceData handle(Change change, CashReg cashReg) {
-        return SourceData.builder()
+        log.debug("Start {}", HANDLER_NAME);
+        SourceData sourceData = SourceData.builder()
                 .change(ChangeFactory.createStatusChangePending())
                 .complexAction(
                         buildComplexActionWithTimer(
@@ -35,5 +36,7 @@ public class CreatedManagementHandler implements ManagementHandler {
                                 buildLastEventHistoryRange())
                 )
                 .build();
+        log.debug("Finish {}, sourceData {}", HANDLER_NAME, sourceData);
+        return sourceData;
     }
 }

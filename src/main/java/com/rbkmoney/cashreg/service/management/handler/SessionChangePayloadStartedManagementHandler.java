@@ -28,9 +28,9 @@ public class SessionChangePayloadStartedManagementHandler implements ManagementH
 
     @Override
     public SourceData handle(Change change, CashReg cashReg) {
-        log.info("Start {}", HANDLER_NAME);
+        log.debug("Start {}", HANDLER_NAME);
         CashRegResult result = providerService.register(cashReg);
-        log.info("Finish {}, result {}", HANDLER_NAME, result);
+        log.debug("Finish {}, result {}", HANDLER_NAME, result);
         return managementConverter.convert(result);
     }
 

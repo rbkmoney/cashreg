@@ -56,8 +56,7 @@ public class ManagementAggregator {
         Contract contract = partyManagementService.getContract(params.getPartyId(), shop.getContractId(), partyRevision);
         accountInfo.setLegalEntity(prepareLegalEntity(contract, aggregateOptions));
         cashReg.setAccountInfo(accountInfo);
-        // TODO: domain revision
-        cashReg.setDomainRevision(1L);
+        cashReg.setDomainRevision(domainRevision);
         cashReg.setPartyRevision(partyRevision);
 
         created.setCashreg(cashReg);

@@ -79,22 +79,6 @@ public class MockUtils {
             return responseDominantWrapper;
         }).when(service).getProxyObject(any(), any());
 
-        doAnswer((Answer<ResponseDominantWrapper<TerminalObject>>) invocation -> {
-            TerminalObject terminalObject = new TerminalObject();
-            terminalObject.setRef(new TerminalRef().setId(1));
-            Terminal terminal = new Terminal();
-            terminal.setName(TestData.TERMINAL_NAME);
-            terminal.setDescription(TestData.TERMINAL_DESCRIPTION);
-            terminal.setOptions(TestData.prepareOptions());
-            terminal.setRiskCoverage(RiskScore.low);
-            terminal.setTerms(new PaymentsProvisionTerms());
-            terminalObject.setData(terminal);
-            ResponseDominantWrapper<TerminalObject> responseDominantWrapper = new ResponseDominantWrapper<>();
-            responseDominantWrapper.setResponse(terminalObject);
-            responseDominantWrapper.setRevisionVersion(1L);
-            return responseDominantWrapper;
-        }).when(service).getTerminalObject(any(), any());
-
     }
 
     public static void mockAutomatonClient(AutomatonClient<Value, Change> client) {

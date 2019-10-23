@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.AbstractMap;
 import java.util.Map;
-import java.util.function.Function;
 
 import static com.rbkmoney.damsel.payment_processing.PartyRevisionParam.revision;
 
@@ -44,9 +43,12 @@ public class PartyManagementServiceImpl implements PartyManagementService {
 
     private Party getParty(String partyId, PartyRevisionParam partyRevisionParam) {
         log.info("Trying to get party, partyId='{}', partyRevisionParam='{}'", partyId, partyRevisionParam);
-        Party party = partyCache.get(
-                new AbstractMap.SimpleEntry<>(partyId, partyRevisionParam),
-                callCheckout(partyId, partyRevisionParam));
+        AbstractMap.SimpleEntry<String, PartyRevisionParam> key = new AbstractMap.SimpleEntry<>(partyId, partyRevisionParam);
+        Party party = partyCache.getIfPresent(key);
+        if (party == null) {
+            party = callCheckout(partyId, partyRevisionParam);
+            partyCache.put(key, party);
+        }
         log.info("Party has been found, partyId='{}', partyRevisionParam='{}'", partyId, partyRevisionParam);
         return party;
     }
@@ -91,24 +93,22 @@ public class PartyManagementServiceImpl implements PartyManagementService {
         }
     }
 
-    private Function<Map.Entry<String, PartyRevisionParam>, Party> callCheckout(String partyId, PartyRevisionParam partyRevisionParam) {
-        return key -> {
-            try {
-                return partyManagementClient.checkout(userInfo, partyId, partyRevisionParam);
-            } catch (PartyNotFound ex) {
-                throw new NotFoundException(
-                        String.format("Party not found, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex
-                );
-            } catch (InvalidPartyRevision ex) {
-                throw new NotFoundException(
-                        String.format("Invalid party revision, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex
-                );
-            } catch (TException ex) {
-                throw new RuntimeException(
-                        String.format("Failed to get party, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex
-                );
-            }
-        };
+    private Party callCheckout(String partyId, PartyRevisionParam partyRevisionParam) {
+        try {
+            return partyManagementClient.checkout(userInfo, partyId, partyRevisionParam);
+        } catch (PartyNotFound ex) {
+            throw new NotFoundException(
+                    String.format("Party not found, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex
+            );
+        } catch (InvalidPartyRevision ex) {
+            throw new NotFoundException(
+                    String.format("Invalid party revision, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex
+            );
+        } catch (TException ex) {
+            throw new RuntimeException(
+                    String.format("Failed to get party, partyId='%s', partyRevisionParam='%s'", partyId, partyRevisionParam), ex
+            );
+        }
     }
 
 }

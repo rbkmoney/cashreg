@@ -57,6 +57,7 @@ public class CashRegProviderService implements CashRegProvider {
         CashRegProviderSrv.Iface provider = providerCache.getIfPresent(url);
         if (provider == null) {
             provider = cashRegProviderSrv(url, networkTimeout);
+            providerCache.put(url, provider);
         }
 
         try {

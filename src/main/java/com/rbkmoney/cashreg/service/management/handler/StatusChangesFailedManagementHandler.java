@@ -24,12 +24,12 @@ public class StatusChangesFailedManagementHandler implements ManagementHandler {
 
     @Override
     public SourceData handle(Change change, CashReg cashReg) {
-        log.info("Start {}", HANDLER_NAME);
+        log.debug("Start {}", HANDLER_NAME);
         SourceData sourceData = SourceData.builder()
                 .change(ChangeFactory.createStatusChangeFailed())
                 .complexAction(new ComplexAction())
                 .build();
-        log.info("Finish {}, sourceData {}", HANDLER_NAME, sourceData);
+        log.debug("Finish {}, sourceData {}", HANDLER_NAME, sourceData);
         return sourceData;
     }
 }
