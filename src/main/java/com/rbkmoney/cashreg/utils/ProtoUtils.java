@@ -13,7 +13,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,10 +20,6 @@ import java.util.stream.Collectors;
 @Component
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProtoUtils {
-
-    public static ComplexAction buildComplexActionWithDeadline(Instant deadline, HistoryRange historyRange) {
-        return buildComplexActionWithTimer(Timer.deadline(deadline.toString()), historyRange);
-    }
 
     public static ComplexAction buildComplexActionWithTimer(Timer timer, HistoryRange historyRange) {
         SetTimerAction setTimerAction = new SetTimerAction().setTimer(timer).setRange(historyRange);
