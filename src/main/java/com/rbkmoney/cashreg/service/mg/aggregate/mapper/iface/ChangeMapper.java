@@ -1,4 +1,4 @@
-package com.rbkmoney.cashreg.service.mg.aggregate.mapper;
+package com.rbkmoney.cashreg.service.mg.aggregate.mapper.iface;
 
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;

@@ -2,7 +2,7 @@ package com.rbkmoney.cashreg.service.management.impl;
 
 import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.management.ManagementService;
-import com.rbkmoney.cashreg.service.management.handler.ManagementHandler;
+import com.rbkmoney.cashreg.service.management.handler.iface.ManagementHandler;
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.MgChangeManagerMapper;
 import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;

@@ -1,4 +1,4 @@
-package com.rbkmoney.cashreg.service.management.handler;
+package com.rbkmoney.cashreg.service.management.handler.iface;
 
 import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
