@@ -1,6 +1,6 @@
 package com.rbkmoney.cashreg.service.management.handler;
 
-import com.rbkmoney.cashreg.configuration.properties.ManagementType;
+import com.rbkmoney.cashreg.configuration.properties.FilterPathProperties;
 import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.management.converter.ManagementConverter;
 import com.rbkmoney.cashreg.service.management.handler.iface.AbstractManagementHandler;
@@ -20,11 +20,11 @@ public class SessionChangePayloadChangedManagementHandler extends AbstractManage
     private final ManagementConverter managementConverter;
 
     public SessionChangePayloadChangedManagementHandler(
-            ManagementType managementType,
+            FilterPathProperties filterPathProperties,
             CashRegProviderService providerService,
             ManagementConverter managementConverter
     ) {
-        super(managementType.getSessionAdapterStateChanged());
+        super(filterPathProperties.getSessionAdapterStateChanged());
         this.providerService = providerService;
         this.managementConverter = managementConverter;
     }

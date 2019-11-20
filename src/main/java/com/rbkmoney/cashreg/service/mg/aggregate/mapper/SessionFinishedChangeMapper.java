@@ -1,6 +1,6 @@
 package com.rbkmoney.cashreg.service.mg.aggregate.mapper;
 
-import com.rbkmoney.cashreg.configuration.properties.ManagementType;
+import com.rbkmoney.cashreg.configuration.properties.FilterPathProperties;
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.iface.AbstractChangeMapper;
 import com.rbkmoney.damsel.cashreg.status.Delivered;
 import com.rbkmoney.damsel.cashreg.status.Failed;
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SessionFinishedChangeMapper extends AbstractChangeMapper {
 
-    public SessionFinishedChangeMapper(ManagementType managementType) {
-        super(managementType.getSessionPayloadFinished());
+    public SessionFinishedChangeMapper(FilterPathProperties filterPathProperties) {
+        super(filterPathProperties.getSessionPayloadFinished());
     }
 
     @Override

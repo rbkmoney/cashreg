@@ -1,6 +1,6 @@
 package com.rbkmoney.cashreg.service.management.handler;
 
-import com.rbkmoney.cashreg.configuration.properties.ManagementType;
+import com.rbkmoney.cashreg.configuration.properties.FilterPathProperties;
 import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.management.handler.iface.AbstractManagementHandler;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
@@ -17,8 +17,8 @@ public class StatusChangesDeliveredManagementHandler extends AbstractManagementH
 
     private final String HANDLER_NAME = this.getClass().getSimpleName();
 
-    public StatusChangesDeliveredManagementHandler(ManagementType managementType) {
-        super(managementType.getStatusChangedStatusDelivered());
+    public StatusChangesDeliveredManagementHandler(FilterPathProperties filterPathProperties) {
+        super(filterPathProperties.getStatusChangedStatusDelivered());
     }
 
     @Override

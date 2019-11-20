@@ -1,6 +1,6 @@
 package com.rbkmoney.cashreg.service.management.handler;
 
-import com.rbkmoney.cashreg.configuration.properties.ManagementType;
+import com.rbkmoney.cashreg.configuration.properties.FilterPathProperties;
 import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.management.handler.iface.AbstractManagementHandler;
 import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory;
@@ -16,8 +16,8 @@ public class SessionChangePayloadFinishedFailedManagementHandler extends Abstrac
 
     private final String HANDLER_NAME = this.getClass().getSimpleName();
 
-    public SessionChangePayloadFinishedFailedManagementHandler(ManagementType managementType) {
-        super(managementType.getSessionPayloadFinishedResultFailed());
+    public SessionChangePayloadFinishedFailedManagementHandler(FilterPathProperties filterPathProperties) {
+        super(filterPathProperties.getSessionPayloadFinishedResultFailed());
     }
 
     @Override

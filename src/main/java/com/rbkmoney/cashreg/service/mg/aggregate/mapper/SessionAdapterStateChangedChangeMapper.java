@@ -1,6 +1,6 @@
 package com.rbkmoney.cashreg.service.mg.aggregate.mapper;
 
-import com.rbkmoney.cashreg.configuration.properties.ManagementType;
+import com.rbkmoney.cashreg.configuration.properties.FilterPathProperties;
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.iface.AbstractChangeMapper;
 import com.rbkmoney.damsel.cashreg.status.Pending;
 import com.rbkmoney.damsel.cashreg.status.Status;
@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SessionAdapterStateChangedChangeMapper extends AbstractChangeMapper {
 
-    public SessionAdapterStateChangedChangeMapper(ManagementType managementType) {
-        super(managementType.getSessionAdapterStateChanged());
+    public SessionAdapterStateChangedChangeMapper(FilterPathProperties filterPathProperties) {
+        super(filterPathProperties.getSessionAdapterStateChanged());
     }
 
     @Override

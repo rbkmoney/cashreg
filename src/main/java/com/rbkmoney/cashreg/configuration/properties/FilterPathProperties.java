@@ -13,7 +13,7 @@ import javax.validation.constraints.NotEmpty;
 @Validated
 @Configuration
 @ConfigurationProperties("change.path")
-public class ManagementType {
+public class FilterPathProperties {
 
     @NotEmpty
     private String created;

@@ -1,6 +1,6 @@
 package com.rbkmoney.cashreg.service.management.handler;
 
-import com.rbkmoney.cashreg.configuration.properties.ManagementType;
+import com.rbkmoney.cashreg.configuration.properties.FilterPathProperties;
 import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.management.handler.iface.AbstractManagementHandler;
 import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory;
@@ -16,8 +16,8 @@ public class StatusChangesFailedManagementHandler extends AbstractManagementHand
 
     private final String HANDLER_NAME = this.getClass().getSimpleName();
 
-    public StatusChangesFailedManagementHandler(ManagementType managementType) {
-        super(managementType.getStatusChangedStatusFailed());
+    public StatusChangesFailedManagementHandler(FilterPathProperties filterPathProperties) {
+        super(filterPathProperties.getStatusChangedStatusFailed());
     }
 
     @Override

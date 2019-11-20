@@ -1,6 +1,6 @@
 package com.rbkmoney.cashreg.service.management.handler;
 
-import com.rbkmoney.cashreg.configuration.properties.ManagementType;
+import com.rbkmoney.cashreg.configuration.properties.FilterPathProperties;
 import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.management.handler.iface.AbstractManagementHandler;
 import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory;
@@ -20,8 +20,8 @@ public class CreatedManagementHandler extends AbstractManagementHandler {
 
     private final String HANDLER_NAME = this.getClass().getSimpleName();
 
-    public CreatedManagementHandler(ManagementType managementType) {
-        super(managementType.getCreated());
+    public CreatedManagementHandler(FilterPathProperties filterPathProperties) {
+        super(filterPathProperties.getCreated());
     }
 
     @Override
