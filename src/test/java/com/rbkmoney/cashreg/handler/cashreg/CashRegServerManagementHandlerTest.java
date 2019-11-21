@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,6 +24,7 @@ import java.util.List;
 import static com.rbkmoney.cashreg.utils.CreateUtils.createDefaultCashRegParams;
 import static junit.framework.TestCase.assertTrue;
 
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class CashRegServerManagementHandlerTest extends AbstractIntegrationTest {
 
     @LocalServerPort

@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertTrue;
 
-
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
 
     @LocalServerPort
