@@ -1,9 +1,9 @@
 package com.rbkmoney.cashreg.service.management.handler;
 
-import com.rbkmoney.cashreg.configuration.properties.FilterPathProperties;
 import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.management.converter.ManagementConverter;
-import com.rbkmoney.cashreg.service.management.handler.iface.AbstractManagementHandler;
+import com.rbkmoney.cashreg.service.management.handler.iface.ManagementHandler;
+import com.rbkmoney.cashreg.service.mg.aggregate.mapper.ChangeType;
 import com.rbkmoney.cashreg.service.provider.CashRegProviderService;
 import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
@@ -13,18 +13,16 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class SessionChangePayloadStartedManagementHandler extends AbstractManagementHandler {
+public class SessionChangePayloadStartedManagementHandler implements ManagementHandler {
 
     private final String HANDLER_NAME = this.getClass().getSimpleName();
     private final CashRegProviderService providerService;
     private final ManagementConverter managementConverter;
 
     public SessionChangePayloadStartedManagementHandler(
-            FilterPathProperties filterPathProperties,
             CashRegProviderService providerService,
             ManagementConverter managementConverter
     ) {
-        super(filterPathProperties.getSessionPayloadStarted());
         this.providerService = providerService;
         this.managementConverter = managementConverter;
     }
@@ -35,6 +33,11 @@ public class SessionChangePayloadStartedManagementHandler extends AbstractManage
         CashRegResult result = providerService.register(cashReg);
         log.debug("Finish {}, result {}", HANDLER_NAME, result);
         return managementConverter.convert(result);
+    }
+
+    @Override
+    public ChangeType getChangeType() {
+        return ChangeType.SESSION_PAYLOAD_STARTED;
     }
 
 }

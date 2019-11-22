@@ -1,6 +1,6 @@
 package com.rbkmoney.cashreg.service.mg.aggregate.mapper;
 
-import com.rbkmoney.cashreg.service.mg.aggregate.mapper.iface.ChangeMapper;
+import com.rbkmoney.cashreg.service.mg.aggregate.mapper.iface.Mapper;
 import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MgChangeManagerMapper {
 
-    private final List<ChangeMapper> changeMappers;
+    private final List<Mapper> changeMappers;
 
     public CashReg handle(Change change) {
         return changeMappers.stream()

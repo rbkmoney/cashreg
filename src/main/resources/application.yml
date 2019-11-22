@@ -2,19 +2,19 @@ spring:
   application:
     name: @name@
     description: @description@
----
+
 management:
   metrics:
     export:
       statsd:
         flavor: etsy
----
+
 server:
   port: @server.port@
----
+
 retry-policy:
   maxAttempts: -1
----
+
 service:
   mg:
     automaton:
@@ -27,19 +27,6 @@ service:
   dominant:
     url: http://dominant:8022/v1/domain/repository_client
     networkTimeout: 5000
----
+
 cache:
   maxSize: 100
----
-change:
-  path:
-    created: "created"
-    status_changed: "status_changed"
-    session_payload_started: "session.payload.started"
-    session_payload_finished: "session.payload.finished"
-    session_adapter_state_changed: "session.payload.session_adapter_state_changed"
-    session_payload_finished_result_failed: "session.payload.finished.result.failed"
-    session_payload_finished_result_succeeded: "session.payload.finished.result.succeeded"
-    status_changed_status_failed: "status_changed.status.failed"
-    status_changed_status_delivered: "status_changed.status.delivered"
-    status_changed_status_pending: "status_changed.status.pending"

@@ -1,7 +1,6 @@
 package com.rbkmoney.cashreg.service.mg.aggregate.mapper;
 
-import com.rbkmoney.cashreg.configuration.properties.FilterPathProperties;
-import com.rbkmoney.cashreg.service.mg.aggregate.mapper.iface.AbstractChangeMapper;
+import com.rbkmoney.cashreg.service.mg.aggregate.mapper.iface.Mapper;
 import com.rbkmoney.damsel.cashreg.status.Delivered;
 import com.rbkmoney.damsel.cashreg.status.Failed;
 import com.rbkmoney.damsel.cashreg.status.Status;
@@ -12,11 +11,7 @@ import com.rbkmoney.damsel.cashreg_processing.SessionResult;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SessionFinishedChangeMapper extends AbstractChangeMapper {
-
-    public SessionFinishedChangeMapper(FilterPathProperties filterPathProperties) {
-        super(filterPathProperties.getSessionPayloadFinished());
-    }
+public class SessionFinishedChangeMapper implements Mapper {
 
     @Override
     public CashReg map(Change change) {
@@ -31,5 +26,10 @@ public class SessionFinishedChangeMapper extends AbstractChangeMapper {
             cashReg.setStatus(Status.delivered(new Delivered()));
         }
         return cashReg;
+    }
+
+    @Override
+    public ChangeType getChangeType() {
+        return ChangeType.SESSION_PAYLOAD_FINISHED;
     }
 }

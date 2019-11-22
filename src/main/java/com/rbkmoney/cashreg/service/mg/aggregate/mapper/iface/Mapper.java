@@ -1,17 +1,16 @@
-package com.rbkmoney.cashreg.service.management.handler.iface;
+package com.rbkmoney.cashreg.service.mg.aggregate.mapper.iface;
 
-import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.ChangeType;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
 
-public interface ManagementHandler {
+public interface Mapper {
 
-    default boolean filter(Change change, CashReg cashReg) {
+    default boolean filter(Change change) {
         return getChangeType().getFilter().match(change);
     }
 
-    SourceData handle(Change change, CashReg cashReg);
+    CashReg map(Change change);
 
     ChangeType getChangeType();
 

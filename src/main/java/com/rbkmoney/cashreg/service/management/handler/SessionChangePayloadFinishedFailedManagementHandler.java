@@ -1,8 +1,8 @@
 package com.rbkmoney.cashreg.service.management.handler;
 
-import com.rbkmoney.cashreg.configuration.properties.FilterPathProperties;
 import com.rbkmoney.cashreg.domain.SourceData;
-import com.rbkmoney.cashreg.service.management.handler.iface.AbstractManagementHandler;
+import com.rbkmoney.cashreg.service.management.handler.iface.ManagementHandler;
+import com.rbkmoney.cashreg.service.mg.aggregate.mapper.ChangeType;
 import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
@@ -12,13 +12,9 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class SessionChangePayloadFinishedFailedManagementHandler extends AbstractManagementHandler {
+public class SessionChangePayloadFinishedFailedManagementHandler implements ManagementHandler {
 
     private final String HANDLER_NAME = this.getClass().getSimpleName();
-
-    public SessionChangePayloadFinishedFailedManagementHandler(FilterPathProperties filterPathProperties) {
-        super(filterPathProperties.getSessionPayloadFinishedResultFailed());
-    }
 
     @Override
     public SourceData handle(Change change, CashReg cashReg) {
@@ -29,6 +25,12 @@ public class SessionChangePayloadFinishedFailedManagementHandler extends Abstrac
                 .build();
         log.debug("Finish {}, sourceData {}", HANDLER_NAME, sourceData);
         return sourceData;
+    }
+
+
+    @Override
+    public ChangeType getChangeType() {
+        return ChangeType.SESSION_PAYLOAD_FINISHED_RESULT_FAILED;
     }
 
 }

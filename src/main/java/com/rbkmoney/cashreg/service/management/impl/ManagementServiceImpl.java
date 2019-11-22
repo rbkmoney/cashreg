@@ -45,7 +45,7 @@ public class ManagementServiceImpl implements ManagementService {
         Change lastChange = getLastChange(changes);
         CashReg cashReg = mgChangeManagerMapper.process(changes);
         return managementHandlers.stream()
-                .filter(handler -> handler.filter(lastChange))
+                .filter(handler -> handler.filter(lastChange, cashReg))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Can't found handler"))
                 .handle(lastChange, cashReg);
