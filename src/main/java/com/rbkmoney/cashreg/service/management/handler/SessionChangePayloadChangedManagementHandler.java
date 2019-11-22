@@ -8,24 +8,18 @@ import com.rbkmoney.cashreg.service.provider.CashRegProviderService;
 import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
 import com.rbkmoney.damsel.cashreg_processing.CashReg;
 import com.rbkmoney.damsel.cashreg_processing.Change;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class SessionChangePayloadChangedManagementHandler implements ManagementHandler {
 
     private final String HANDLER_NAME = this.getClass().getSimpleName();
     private final CashRegProviderService providerService;
     private final ManagementConverter managementConverter;
-
-    public SessionChangePayloadChangedManagementHandler(
-            CashRegProviderService providerService,
-            ManagementConverter managementConverter
-    ) {
-        this.providerService = providerService;
-        this.managementConverter = managementConverter;
-    }
 
     @Override
     public SourceData handle(Change change, CashReg cashReg) {
