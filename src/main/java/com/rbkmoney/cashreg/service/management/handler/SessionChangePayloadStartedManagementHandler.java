@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SessionChangePayloadStartedManagementHandler implements ManagementHandler {
 
-    private final String HANDLER_NAME = this.getClass().getSimpleName();
+    private String HANDLER_NAME = this.getClass().getSimpleName();
     private final CashRegProviderService providerService;
     private final ManagementConverter managementConverter;
 
