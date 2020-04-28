@@ -4,13 +4,15 @@ import com.rbkmoney.cashreg.service.management.aggregate.ManagementAggregator;
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.MgChangeManagerMapper;
 import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.damsel.cashreg.base.EventRange;
-import com.rbkmoney.damsel.cashreg_processing.*;
+import com.rbkmoney.damsel.cashreg.processing.*;
+import com.rbkmoney.damsel.cashreg.receipt.ReceiptNotFound;
 import com.rbkmoney.machinarium.client.AutomatonClient;
 import com.rbkmoney.machinarium.domain.TMachineEvent;
 import com.rbkmoney.machinegun.msgpack.Value;
 import com.rbkmoney.machinegun.stateproc.HistoryRange;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.thrift.TException;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -27,25 +29,25 @@ public class CashRegServerManagementHandler implements ManagementSrv.Iface {
     private final MgChangeManagerMapper mgChangeManagerMapper;
 
     @Override
-    public void create(CashRegParams cashRegParams) {
-        Change change = managementAggregate.toCashRegCreatedChange(cashRegParams);
-        automatonClient.start(cashRegParams.getCashregId(), ProtoUtils.toValue(Collections.singletonList(change)));
+    public void create(ReceiptParams receiptParams) throws ReceiptNotFound, TException {
+        Change change = managementAggregate.toCashRegCreatedChange(receiptParams);
+        automatonClient.start(receiptParams.getReceiptId(), ProtoUtils.toValue(Collections.singletonList(change)));
     }
 
     @Override
-    public CashReg get(String cashRegID) {
-        List<Change> changes = automatonClient.getEvents(cashRegID).stream().map(TMachineEvent::getData).collect(Collectors.toList());
+    public Receipt get(String receiptID) throws ReceiptNotFound, TException {
+        List<Change> changes = automatonClient.getEvents(receiptID).stream().map(TMachineEvent::getData).collect(Collectors.toList());
         return mgChangeManagerMapper.process(changes);
     }
 
     @Override
-    public List<Event> getEvents(String cashRegID, EventRange eventRange) {
+    public List<Event> getEvents(String receiptID, EventRange eventRange) throws ReceiptNotFound, TException {
         HistoryRange historyRange = new HistoryRange();
         if (eventRange.isSetAfter()) {
             historyRange.setAfter(eventRange.getAfter());
         }
         historyRange.setLimit(eventRange.getLimit());
-        return automatonClient.getEvents(cashRegID, historyRange).stream()
+        return automatonClient.getEvents(receiptID, historyRange).stream()
                 .map(event -> new Event(
                                 event.getId(),
                                 event.getCreatedAt().toString(),

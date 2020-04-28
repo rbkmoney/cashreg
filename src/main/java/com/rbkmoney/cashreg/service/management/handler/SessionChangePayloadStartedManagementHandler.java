@@ -5,9 +5,9 @@ import com.rbkmoney.cashreg.service.management.converter.ManagementConverter;
 import com.rbkmoney.cashreg.service.management.handler.iface.ManagementHandler;
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.ChangeType;
 import com.rbkmoney.cashreg.service.provider.CashRegProviderService;
-import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
-import com.rbkmoney.damsel.cashreg_processing.CashReg;
-import com.rbkmoney.damsel.cashreg_processing.Change;
+import com.rbkmoney.damsel.cashreg.adapter.CashregResult;
+import com.rbkmoney.damsel.cashreg.processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Receipt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,9 +22,9 @@ public class SessionChangePayloadStartedManagementHandler implements ManagementH
     private final ManagementConverter managementConverter;
 
     @Override
-    public SourceData handle(Change change, CashReg cashReg) {
+    public SourceData handle(Change change, Receipt receipt) {
         log.debug("Start {}", HANDLER_NAME);
-        CashRegResult result = providerService.register(cashReg);
+        CashregResult result = providerService.register(receipt);
         log.debug("Finish {}, result {}", HANDLER_NAME, result);
         return managementConverter.convert(result);
     }

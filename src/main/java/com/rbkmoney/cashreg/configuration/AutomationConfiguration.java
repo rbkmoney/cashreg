@@ -1,6 +1,6 @@
 package com.rbkmoney.cashreg.configuration;
 
-import com.rbkmoney.damsel.cashreg_processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Change;
 import com.rbkmoney.machinarium.client.AutomatonClient;
 import com.rbkmoney.machinarium.client.TBaseAutomatonClient;
 import com.rbkmoney.machinegun.stateproc.AutomatonSrv;

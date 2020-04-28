@@ -4,10 +4,10 @@ import com.rbkmoney.cashreg.CashRegApplication;
 import com.rbkmoney.cashreg.utils.CreateUtils;
 import com.rbkmoney.cashreg.utils.TestData;
 import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory;
-import com.rbkmoney.damsel.cashreg.CashRegInfo;
-import com.rbkmoney.damsel.cashreg.status.Delivered;
-import com.rbkmoney.damsel.cashreg.status.Status;
-import com.rbkmoney.damsel.cashreg_processing.*;
+import com.rbkmoney.damsel.cashreg.processing.*;
+import com.rbkmoney.damsel.cashreg.receipt.ReceiptInfo;
+import com.rbkmoney.damsel.cashreg.receipt.status.Delivered;
+import com.rbkmoney.damsel.cashreg.receipt.status.Status;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,7 +35,7 @@ public class MgChangeManagerMapperTest {
 
     @Test
     public void testMgChangeManagerMapperProcess() {
-        CashRegParams params = CreateUtils.createDefaultCashRegParams();
+        ReceiptParams params = CreateUtils.createDefaultReceiptParams();
 
         List<Change> changeList = new ArrayList<>();
         Change change = CreateUtils.createCreatedChange(params);
@@ -47,7 +47,7 @@ public class MgChangeManagerMapperTest {
         SessionFinished sessionFinished = new SessionFinished();
         SessionResult sessionResult = new SessionResult();
         SessionSucceeded sessionSucceeded = new SessionSucceeded();
-        sessionSucceeded.setInfo(new CashRegInfo().setDaemonCode("daemon_code"));
+        sessionSucceeded.setInfo(new ReceiptInfo().setDaemonCode("daemon_code"));
         sessionResult.setSucceeded(sessionSucceeded);
         sessionFinished.setResult(sessionResult);
         payload.setFinished(sessionFinished);
@@ -55,10 +55,10 @@ public class MgChangeManagerMapperTest {
 
         changeList.add(Change.session(sessionChange));
 
-        CashReg cashReg = mgChangeManagerMapper.process(changeList);
+        Receipt receipt = mgChangeManagerMapper.process(changeList);
 
-        assertEquals(TestData.CASHREG_ID, cashReg.getCashregId());
-        assertEquals(Status.delivered(new Delivered()), cashReg.getStatus());
+        assertEquals(TestData.RECEIPT_ID, receipt.getReceiptId());
+        assertEquals(Status.delivered(new Delivered()), receipt.getStatus());
     }
 
 }

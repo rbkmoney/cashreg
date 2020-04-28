@@ -1,9 +1,9 @@
 package com.rbkmoney.cashreg.service.management.converter;
 
 import com.rbkmoney.cashreg.domain.SourceData;
-import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
-import com.rbkmoney.damsel.cashreg.provider.FinishIntent;
-import com.rbkmoney.damsel.cashreg_processing.*;
+import com.rbkmoney.damsel.cashreg.adapter.CashregResult;
+import com.rbkmoney.damsel.cashreg.adapter.FinishIntent;
+import com.rbkmoney.damsel.cashreg.processing.*;
 import com.rbkmoney.machinegun.stateproc.ComplexAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +18,10 @@ import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory.createSe
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ManagementConverter implements Converter<CashRegResult, SourceData> {
+public class ManagementConverter implements Converter<CashregResult, SourceData> {
 
     @Override
-    public SourceData convert(CashRegResult result) {
+    public SourceData convert(CashregResult result) {
         SessionChangePayload sessionChangePayload = new SessionChangePayload();
         SessionAdapterStateChanged sessionAdapterStateChanged = new SessionAdapterStateChanged();
         sessionChangePayload.setSessionAdapterStateChanged(sessionAdapterStateChanged);
@@ -50,7 +50,7 @@ public class ManagementConverter implements Converter<CashRegResult, SourceData>
                 .build();
     }
 
-    private SessionFinished prepareSessionFinished(CashRegResult result) {
+    private SessionFinished prepareSessionFinished(CashregResult result) {
         FinishIntent finishIntent = result.getIntent().getFinish();
         SessionFinished sessionFinished = new SessionFinished();
         SessionResult sessionResult = new SessionResult();
@@ -63,7 +63,7 @@ public class ManagementConverter implements Converter<CashRegResult, SourceData>
         return sessionFinished;
     }
 
-    private void prepareSessionFailed(CashRegResult result, SessionFinished sessionFinished, SessionResult sessionResult) {
+    private void prepareSessionFailed(CashregResult result, SessionFinished sessionFinished, SessionResult sessionResult) {
         com.rbkmoney.damsel.domain.Failure failure = result.getIntent().getFinish().getStatus().getFailure();
         sessionResult.setFailed(new SessionFailed().setFailure(
                 new com.rbkmoney.damsel.cashreg.base.Failure()
@@ -74,10 +74,10 @@ public class ManagementConverter implements Converter<CashRegResult, SourceData>
         sessionFinished.setResult(sessionResult);
     }
 
-    private void prepareSessionSucceeded(CashRegResult result, SessionFinished sessionFinished, SessionResult sessionResult) {
+    private void prepareSessionSucceeded(CashregResult result, SessionFinished sessionFinished, SessionResult sessionResult) {
         sessionResult.setSucceeded(
                 new SessionSucceeded()
-                        .setInfo(result.getCashregInfo())
+                        .setInfo(result.getInfo())
         );
         sessionFinished.setResult(sessionResult);
     }

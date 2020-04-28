@@ -1,8 +1,9 @@
 package com.rbkmoney.cashreg.handler.cashreg;
 
-import com.rbkmoney.damsel.cashreg_processing.Change;
-import com.rbkmoney.damsel.cashreg_processing.RepairScenario;
-import com.rbkmoney.damsel.cashreg_processing.RepairerSrv;
+
+import com.rbkmoney.damsel.cashreg.processing.Change;
+import com.rbkmoney.damsel.cashreg.repairer.RepairScenario;
+import com.rbkmoney.damsel.cashreg.repairer.RepairerSrv;
 import com.rbkmoney.machinarium.client.AutomatonClient;
 import com.rbkmoney.machinegun.msgpack.Value;
 import lombok.RequiredArgsConstructor;

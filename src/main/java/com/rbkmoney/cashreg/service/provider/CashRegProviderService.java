@@ -1,13 +1,14 @@
 package com.rbkmoney.cashreg.service.provider;
 
+
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.rbkmoney.cashreg.service.management.aggregate.ManagementAggregator;
 import com.rbkmoney.cashreg.utils.cashreg.creators.CashRegProviderCreators;
-import com.rbkmoney.damsel.cashreg.provider.CashRegContext;
-import com.rbkmoney.damsel.cashreg.provider.CashRegProviderSrv;
-import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
-import com.rbkmoney.damsel.cashreg_processing.CashReg;
+import com.rbkmoney.damsel.cashreg.adapter.CashregAdapterSrv;
+import com.rbkmoney.damsel.cashreg.adapter.CashregContext;
+import com.rbkmoney.damsel.cashreg.adapter.CashregResult;
+import com.rbkmoney.damsel.cashreg.processing.Receipt;
 import com.rbkmoney.damsel.domain.ProxyObject;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ import static com.rbkmoney.cashreg.utils.ProtoUtils.prepareCashRegContext;
 public class CashRegProviderService implements CashRegProvider {
 
     private final ManagementAggregator managementAggregate;
-    private final Cache<String, CashRegProviderSrv.Iface> providerCache;
+    private final Cache<String, CashregAdapterSrv.Iface> providerCache;
 
     @Autowired
     public CashRegProviderService(
@@ -42,18 +43,18 @@ public class CashRegProviderService implements CashRegProvider {
     }
 
     @Override
-    public CashRegResult register(CashReg cashReg) {
-        String url = extractUrl(cashReg);
+    public CashregResult register(Receipt receipt) {
+        String url = extractUrl(receipt);
         Map<String, String> options = managementAggregate.aggregateOptions(
-                CashRegProviderCreators.createCashregProviderRef(cashReg.getCashregProviderId()),
-                cashReg.getDomainRevision()
+                CashRegProviderCreators.createCashregProviderRef(receipt.getCashregProvider().getProviderId()),
+                receipt.getDomainRevision()
         );
-        CashRegContext context = prepareCashRegContext(cashReg, options);
+        CashregContext context = prepareCashRegContext(receipt, options);
         return call(url, NETWORK_TIMEOUT_SEC, context);
     }
 
-    private CashRegResult call(String url, Integer networkTimeout, CashRegContext context) {
-        CashRegProviderSrv.Iface provider = providerCache.get(url, key -> cashRegProviderSrv(url, networkTimeout));
+    private CashregResult call(String url, Integer networkTimeout, CashregContext context) {
+        CashregAdapterSrv.Iface provider = providerCache.get(url, key -> cashRegProviderSrv(url, networkTimeout));
         try {
             return provider.register(context);
         } catch (TException e) {
@@ -62,17 +63,17 @@ public class CashRegProviderService implements CashRegProvider {
         }
     }
 
-    private String extractUrl(CashReg cashReg) {
-        ProxyObject proxyObject = managementAggregate.extractProxyObject(cashReg);
+    private String extractUrl(Receipt receipt) {
+        ProxyObject proxyObject = managementAggregate.extractProxyObject(receipt);
         return proxyObject.getData().getUrl();
     }
 
-    private CashRegProviderSrv.Iface cashRegProviderSrv(String url, Integer networkTimeout) {
+    private CashregAdapterSrv.Iface cashRegProviderSrv(String url, Integer networkTimeout) {
         try {
             return new THSpawnClientBuilder()
                     .withAddress(new URI(url))
                     .withNetworkTimeout(networkTimeout)
-                    .build(CashRegProviderSrv.Iface.class);
+                    .build(CashregAdapterSrv.Iface.class);
         } catch (URISyntaxException e) {
             throw new RuntimeException("Can't connect provider");
         }

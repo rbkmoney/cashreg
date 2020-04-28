@@ -2,8 +2,8 @@ package com.rbkmoney.cashreg.service.mg.aggregate.mapper;
 
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.iface.Mapper;
 import com.rbkmoney.cashreg.utils.ProtoUtils;
-import com.rbkmoney.damsel.cashreg_processing.CashReg;
-import com.rbkmoney.damsel.cashreg_processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Receipt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ public class MgChangeManagerMapper {
 
     private final List<Mapper> changeMappers;
 
-    public CashReg handle(Change change) {
+    public Receipt handle(Change change) {
         return changeMappers.stream()
                 .filter(mapper -> mapper.filter(change))
                 .findFirst()
@@ -23,8 +23,8 @@ public class MgChangeManagerMapper {
                 .map(change);
     }
 
-    public CashReg process(List<Change> changes) {
-        return changes.stream().map(this::handle).reduce(new CashReg(), ProtoUtils::mergeCashRegs);
+    public Receipt process(List<Change> changes) {
+        return changes.stream().map(this::handle).reduce(new Receipt(), ProtoUtils::mergeCashRegs);
     }
 
 }

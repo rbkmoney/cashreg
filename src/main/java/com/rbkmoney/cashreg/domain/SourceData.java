@@ -1,12 +1,11 @@
 package com.rbkmoney.cashreg.domain;
 
-import com.rbkmoney.damsel.cashreg_processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Change;
 import com.rbkmoney.machinegun.stateproc.ComplexAction;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
 
 @Getter
 @Setter

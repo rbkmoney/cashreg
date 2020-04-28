@@ -1,7 +1,7 @@
 package com.rbkmoney.cashreg.endpoint;
 
 import com.rbkmoney.cashreg.handler.cashreg.CashRegServerRepairerHandler;
-import com.rbkmoney.damsel.cashreg_processing.RepairerSrv;
+import com.rbkmoney.damsel.cashreg.repairer.RepairerSrv;
 import com.rbkmoney.woody.thrift.impl.http.THServiceBuilder;
 import lombok.RequiredArgsConstructor;
 

@@ -1,8 +1,8 @@
 package com.rbkmoney.cashreg.service.mg.aggregate.mapper.iface;
 
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.ChangeType;
-import com.rbkmoney.damsel.cashreg_processing.CashReg;
-import com.rbkmoney.damsel.cashreg_processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Receipt;
 
 public interface Mapper {
 
@@ -10,7 +10,7 @@ public interface Mapper {
         return getChangeType().getFilter().match(change);
     }
 
-    CashReg map(Change change);
+    Receipt map(Change change);
 
     ChangeType getChangeType();
 

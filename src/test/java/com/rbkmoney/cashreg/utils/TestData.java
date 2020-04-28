@@ -11,7 +11,7 @@ public class TestData {
 
     public static final String CASHREG_NAMESPACE = "cashreg";
     public static final String CASHREG_CASHREG_PROVIDER_ID = "1905";
-    public static final String CASHREG_ID = "cashreg_id";
+    public static final String RECEIPT_ID = "receipt_id";
     public static final String PARTY_ID = "party_id";
     public static final String SHOP_ID = "shop_id";
     public static final String TEST_EMAIL = "test@test.ru";

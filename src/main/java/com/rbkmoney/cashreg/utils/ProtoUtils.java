@@ -1,10 +1,10 @@
 package com.rbkmoney.cashreg.utils;
 
-import com.rbkmoney.damsel.cashreg.provider.CashRegContext;
-import com.rbkmoney.damsel.cashreg.provider.Session;
-import com.rbkmoney.damsel.cashreg.provider.SourceCreation;
-import com.rbkmoney.damsel.cashreg_processing.CashReg;
-import com.rbkmoney.damsel.cashreg_processing.Change;
+import com.rbkmoney.damsel.cashreg.adapter.CashregContext;
+import com.rbkmoney.damsel.cashreg.adapter.Session;
+import com.rbkmoney.damsel.cashreg.adapter.SourceCreation;
+import com.rbkmoney.damsel.cashreg.processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Receipt;
 import com.rbkmoney.geck.serializer.Geck;
 import com.rbkmoney.machinegun.base.Timer;
 import com.rbkmoney.machinegun.msgpack.Value;
@@ -33,19 +33,19 @@ public class ProtoUtils {
         return historyRange;
     }
 
-    private static SourceCreation prepareSourceCreation(CashReg cashreg) {
+    private static SourceCreation prepareSourceCreation(Receipt receipt) {
         SourceCreation sourceCreation = new SourceCreation();
-        sourceCreation.setPayment(cashreg.getPaymentInfo());
+        sourceCreation.setPayment(receipt.getPaymentInfo());
         return sourceCreation;
     }
 
-    public static CashRegContext prepareCashRegContext(CashReg cashReg, Map<String, String> proxyOptions) {
-        CashRegContext context = new CashRegContext();
-        context.setCashregId(cashReg.getCashregId());
-        context.setAccountInfo(cashReg.getAccountInfo());
+    public static CashregContext prepareCashRegContext(Receipt receipt, Map<String, String> proxyOptions) {
+        CashregContext context = new CashregContext();
+        context.setCashregId(receipt.getReceiptId());
+        context.setAccountInfo(receipt.getAccountInfo());
         context.setOptions(proxyOptions);
-        context.setSession(new Session().setType(cashReg.getType()));
-        context.setSourceCreation(prepareSourceCreation(cashReg));
+        context.setSession(new Session().setType(receipt.getType()));
+        context.setSourceCreation(prepareSourceCreation(receipt));
         return context;
     }
 
@@ -68,14 +68,14 @@ public class ProtoUtils {
         return value.getArr().stream().map(v -> Geck.msgPackToTBase(v.getBin(), Change.class)).collect(Collectors.toList());
     }
 
-    public static CashReg mergeCashRegs(CashReg cashReg1, CashReg cashReg2) {
+    public static Receipt mergeCashRegs(Receipt cashReg1, Receipt cashReg2) {
 
-        if (cashReg2.getCashregProviderId() != null) {
-            cashReg1.setCashregProviderId(cashReg2.getCashregProviderId());
+        if (cashReg2.getCashregProvider() != null) {
+            cashReg1.setCashregProvider(cashReg2.getCashregProvider());
         }
 
-        if (cashReg2.getCashregId() != null) {
-            cashReg1.setCashregId(cashReg2.getCashregId());
+        if (cashReg2.getReceiptId() != null) {
+            cashReg1.setReceiptId(cashReg2.getReceiptId());
         }
 
         if (cashReg2.getPartyId() != null) {

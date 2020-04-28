@@ -6,7 +6,7 @@ import com.rbkmoney.cashreg.service.pm.PartyManagementService;
 import com.rbkmoney.cashreg.utils.MockUtils;
 import com.rbkmoney.cashreg.utils.TestData;
 import com.rbkmoney.damsel.cashreg.base.EventRange;
-import com.rbkmoney.damsel.cashreg_processing.*;
+import com.rbkmoney.damsel.cashreg.processing.*;
 import com.rbkmoney.machinarium.client.AutomatonClient;
 import com.rbkmoney.machinegun.msgpack.Value;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
@@ -21,7 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import static com.rbkmoney.cashreg.utils.CreateUtils.createDefaultCashRegParams;
+import static com.rbkmoney.cashreg.utils.CreateUtils.createDefaultReceiptParams;
 import static junit.framework.TestCase.assertTrue;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -53,16 +53,16 @@ public class CashRegServerManagementHandlerTest extends AbstractIntegrationTest 
 
     @Test
     public void create() throws TException {
-        CashRegParams cashRegParams = createDefaultCashRegParams();
-        managementClient.create(cashRegParams);
-        CashReg cashReg = managementClient.get(cashRegParams.getCashregId());
-        assertTrue(cashReg.getStatus().isSetPending());
+        ReceiptParams receiptParams = createDefaultReceiptParams();
+        managementClient.create(receiptParams);
+        Receipt receipt = managementClient.get(receiptParams.getReceiptId());
+        assertTrue(receipt.getStatus().isSetPending());
     }
 
     @Test
     public void getEvents() throws TException {
         EventRange eventRange = new EventRange().setLimit(3).setAfter(1L);
-        List<Event> eventList = managementClient.getEvents(TestData.CASHREG_ID, eventRange);
+        List<Event> eventList = managementClient.getEvents(TestData.RECEIPT_ID, eventRange);
         assertTrue(eventList.size() > 0);
         assertTrue(eventList.get(1).getChange().getStatusChanged().getStatus().isSetPending());
     }

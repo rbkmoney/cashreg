@@ -5,8 +5,8 @@ import com.rbkmoney.cashreg.service.management.ManagementService;
 import com.rbkmoney.cashreg.service.management.handler.iface.ManagementHandler;
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.MgChangeManagerMapper;
 import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory;
-import com.rbkmoney.damsel.cashreg_processing.CashReg;
-import com.rbkmoney.damsel.cashreg_processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Receipt;
 import com.rbkmoney.machinegun.base.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,12 +43,12 @@ public class ManagementServiceImpl implements ManagementService {
     @Override
     public SourceData signalTimeout(List<Change> changes) {
         Change lastChange = getLastChange(changes);
-        CashReg cashReg = mgChangeManagerMapper.process(changes);
+        Receipt receipt = mgChangeManagerMapper.process(changes);
         return managementHandlers.stream()
-                .filter(handler -> handler.filter(lastChange, cashReg))
+                .filter(handler -> handler.filter(lastChange, receipt))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Can't found handler"))
-                .handle(lastChange, cashReg);
+                .handle(lastChange, receipt);
     }
 
     private Change getLastChange(List<Change> changes) {

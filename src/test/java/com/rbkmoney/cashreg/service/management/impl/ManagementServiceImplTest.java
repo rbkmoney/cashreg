@@ -3,11 +3,11 @@ package com.rbkmoney.cashreg.service.management.impl;
 import com.rbkmoney.cashreg.CashRegApplication;
 import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.utils.CreateUtils;
-import com.rbkmoney.damsel.cashreg.status.Pending;
-import com.rbkmoney.damsel.cashreg.status.Status;
-import com.rbkmoney.damsel.cashreg_processing.CashRegParams;
-import com.rbkmoney.damsel.cashreg_processing.Change;
-import com.rbkmoney.damsel.cashreg_processing.StatusChange;
+import com.rbkmoney.damsel.cashreg.processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.ReceiptParams;
+import com.rbkmoney.damsel.cashreg.processing.StatusChange;
+import com.rbkmoney.damsel.cashreg.receipt.status.Pending;
+import com.rbkmoney.damsel.cashreg.receipt.status.Status;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class ManagementServiceImplTest {
     public void singnalTimeout() {
         List<Change> changes = new ArrayList<>();
         Change pendingChange = Change.status_changed(new StatusChange().setStatus(Status.pending(new Pending())));
-        CashRegParams params = CreateUtils.createDefaultCashRegParams();
+        ReceiptParams params = CreateUtils.createDefaultReceiptParams();
         changes.add(CreateUtils.createCreatedChange(params));
         changes.add(pendingChange);
 

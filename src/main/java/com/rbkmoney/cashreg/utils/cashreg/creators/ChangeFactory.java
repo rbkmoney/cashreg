@@ -1,10 +1,10 @@
 package com.rbkmoney.cashreg.utils.cashreg.creators;
 
-import com.rbkmoney.damsel.cashreg.status.Delivered;
-import com.rbkmoney.damsel.cashreg.status.Failed;
-import com.rbkmoney.damsel.cashreg.status.Pending;
-import com.rbkmoney.damsel.cashreg.status.Status;
-import com.rbkmoney.damsel.cashreg_processing.*;
+import com.rbkmoney.damsel.cashreg.processing.*;
+import com.rbkmoney.damsel.cashreg.receipt.status.Delivered;
+import com.rbkmoney.damsel.cashreg.receipt.status.Failed;
+import com.rbkmoney.damsel.cashreg.receipt.status.Pending;
+import com.rbkmoney.damsel.cashreg.receipt.status.Status;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

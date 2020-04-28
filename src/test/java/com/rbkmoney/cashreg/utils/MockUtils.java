@@ -3,14 +3,12 @@ package com.rbkmoney.cashreg.utils;
 import com.rbkmoney.cashreg.service.dominant.DominantService;
 import com.rbkmoney.cashreg.service.dominant.model.ResponseDominantWrapper;
 import com.rbkmoney.cashreg.service.pm.PartyManagementService;
-import com.rbkmoney.damsel.cashreg.CashRegInfo;
-import com.rbkmoney.damsel.cashreg.provider.CashRegResult;
-import com.rbkmoney.damsel.cashreg.provider.FinishIntent;
-import com.rbkmoney.damsel.cashreg.provider.FinishStatus;
-import com.rbkmoney.damsel.cashreg.provider.Success;
-import com.rbkmoney.damsel.cashreg.status.Pending;
-import com.rbkmoney.damsel.cashreg.status.Status;
-import com.rbkmoney.damsel.cashreg_processing.*;
+import com.rbkmoney.damsel.cashreg.adapter.*;
+import com.rbkmoney.damsel.cashreg.processing.*;
+import com.rbkmoney.damsel.cashreg.receipt.ReceiptInfo;
+import com.rbkmoney.damsel.cashreg.receipt.status.Pending;
+import com.rbkmoney.damsel.cashreg.receipt.status.Status;
+import com.rbkmoney.damsel.domain.CashRegisterProvider;
 import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.machinarium.client.AutomatonClient;
 import com.rbkmoney.machinarium.domain.TMachineEvent;
@@ -29,38 +27,47 @@ import static org.mockito.Mockito.doAnswer;
 public class MockUtils {
 
     public static void mockCashRegProvider(com.rbkmoney.cashreg.service.provider.CashRegProvider provider) {
-        doAnswer((Answer<CashRegResult>) invocation -> {
-            CashRegResult regResult = new CashRegResult();
+        doAnswer((Answer<CashregResult>) invocation -> {
+            CashregResult regResult = new CashregResult();
 
-            CashRegInfo cashregInfo = new CashRegInfo();
+            ReceiptInfo cashregInfo = new ReceiptInfo();
             cashregInfo.setReceiptId(TestData.CASHREG_RECEIPT_ID);
-            regResult.setCashregInfo(cashregInfo);
+            regResult.setInfo(cashregInfo);
 
-            regResult.setIntent(com.rbkmoney.damsel.cashreg.provider.Intent.finish(new FinishIntent().setStatus(FinishStatus.success(new Success()))));
+            regResult.setIntent(Intent.finish(new FinishIntent().setStatus(FinishStatus.success(new Success()))));
             return regResult;
         }).when(provider).register(any());
     }
 
     public static void mockDominant(DominantService service) {
-        doAnswer((Answer<ResponseDominantWrapper<CashRegProviderObject>>) invocation -> {
-            CashRegProviderObject providerObject = new CashRegProviderObject();
-            providerObject.setRef(new CashRegProviderRef().setId(1));
+        doAnswer((Answer<ResponseDominantWrapper<CashRegisterProviderObject>>) invocation -> {
+            CashRegisterProviderObject providerObject = new CashRegisterProviderObject();
+            providerObject.setRef(new CashRegisterProviderRef().setId(1));
 
-            CashRegProvider provider = new CashRegProvider();
+            CashRegisterProvider provider = new CashRegisterProvider();
             provider.setName(TestData.PROVIDER_NAME);
             provider.setDescription(TestData.PROVIDER_DESCRIPTION);
 
             Proxy proxy = new Proxy();
             proxy.setAdditional(TestData.prepareOptions());
             proxy.setRef(new ProxyRef());
-            provider.setProxy(proxy);
+
+            // TODO: list, more params
+            List<CashRegisterProviderParameter> parameters = new ArrayList<>();
+            CashRegisterProviderParameter parameter = new CashRegisterProviderParameter();
+            parameter.setDescription("description");
+            parameter.setId("id");
+            parameter.setType(CashRegisterProviderParameterType.url_type(new CashRegisterProviderParameterUrl()));
+            parameters.add(parameter);
+
+            provider.setParamsSchema(parameters);
             providerObject.setData(provider);
 
-            ResponseDominantWrapper<CashRegProviderObject> responseDominantWrapper = new ResponseDominantWrapper<>();
+            ResponseDominantWrapper<CashRegisterProviderObject> responseDominantWrapper = new ResponseDominantWrapper<>();
             responseDominantWrapper.setResponse(providerObject);
             responseDominantWrapper.setRevisionVersion(1L);
             return responseDominantWrapper;
-        }).when(service).getCashRegProviderObject(any(), any());
+        }).when(service).getCashRegisterProviderObject(any(), any());
 
         doAnswer((Answer<ResponseDominantWrapper<ProxyObject>>) invocation -> {
             ProxyObject proxyObject = new ProxyObject();
@@ -93,7 +100,7 @@ public class MockUtils {
     private static List<TMachineEvent<Change>> createtMachineEvents() {
         List<TMachineEvent<Change>> list = new ArrayList<>();
 
-        CashRegParams cashRegParams = CreateUtils.createDefaultCashRegParams();
+        ReceiptParams cashRegParams = CreateUtils.createDefaultReceiptParams();
         list.add(new TMachineEvent<>(1, Instant.now(), CreateUtils.createCreatedChange(cashRegParams)));
 
         Change pendingChange = Change.status_changed(new StatusChange().setStatus(Status.pending(new Pending())));

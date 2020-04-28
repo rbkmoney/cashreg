@@ -1,7 +1,7 @@
 package com.rbkmoney.cashreg.service.management;
 
 import com.rbkmoney.cashreg.domain.SourceData;
-import com.rbkmoney.damsel.cashreg_processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Change;
 
 import java.util.List;
 

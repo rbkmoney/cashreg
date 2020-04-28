@@ -35,12 +35,12 @@ public class DominantServiceImpl implements DominantService {
     }
 
     @Override
-    public ResponseDominantWrapper<CashRegProviderObject> getCashRegProviderObject(CashRegProviderRef providerRef, Long revisionVersion) {
+    public ResponseDominantWrapper<CashRegisterProviderObject> getCashRegisterProviderObject(CashRegisterProviderRef providerRef, Long revisionVersion) {
         log.info("Trying to get CashRegProviderObject, providerRef='{}'", providerRef);
-        ResponseDominantWrapper<VersionedObject> versionedObjectWrapper = getVersionedObjectFromReference(cashreg_provider(providerRef), revisionVersion);
-        CashRegProviderObject providerObject = versionedObjectWrapper.getResponse().getObject().getCashregProvider();
+        ResponseDominantWrapper<VersionedObject> versionedObjectWrapper = getVersionedObjectFromReference(cash_register_provider(providerRef), revisionVersion);
+        CashRegisterProviderObject providerObject = versionedObjectWrapper.getResponse().getObject().getCashRegisterProvider();
         log.info("CashRegProviderObject {} has been found, versionedObjectWrapper='{}'", providerObject, versionedObjectWrapper);
-        ResponseDominantWrapper<CashRegProviderObject> response = new ResponseDominantWrapper<>();
+        ResponseDominantWrapper<CashRegisterProviderObject> response = new ResponseDominantWrapper<>();
         response.setResponse(providerObject);
         response.setRevisionVersion(versionedObjectWrapper.getRevisionVersion());
         return response;

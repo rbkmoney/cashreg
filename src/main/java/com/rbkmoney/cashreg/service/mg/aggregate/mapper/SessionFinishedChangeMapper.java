@@ -1,31 +1,31 @@
 package com.rbkmoney.cashreg.service.mg.aggregate.mapper;
 
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.iface.Mapper;
-import com.rbkmoney.damsel.cashreg.status.Delivered;
-import com.rbkmoney.damsel.cashreg.status.Failed;
-import com.rbkmoney.damsel.cashreg.status.Status;
-import com.rbkmoney.damsel.cashreg_processing.CashReg;
-import com.rbkmoney.damsel.cashreg_processing.Change;
-import com.rbkmoney.damsel.cashreg_processing.SessionFinished;
-import com.rbkmoney.damsel.cashreg_processing.SessionResult;
+import com.rbkmoney.damsel.cashreg.processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Receipt;
+import com.rbkmoney.damsel.cashreg.processing.SessionFinished;
+import com.rbkmoney.damsel.cashreg.processing.SessionResult;
+import com.rbkmoney.damsel.cashreg.receipt.status.Delivered;
+import com.rbkmoney.damsel.cashreg.receipt.status.Failed;
+import com.rbkmoney.damsel.cashreg.receipt.status.Status;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SessionFinishedChangeMapper implements Mapper {
 
     @Override
-    public CashReg map(Change change) {
+    public Receipt map(Change change) {
         SessionFinished sessionFinished = change.getSession().getPayload().getFinished();
         SessionResult sessionResult = sessionFinished.getResult();
-        CashReg cashReg = new CashReg();
+        Receipt receipt = new Receipt();
 
         if (sessionResult.isSetFailed()) {
-            cashReg.setStatus(Status.failed(new Failed()));
+            receipt.setStatus(Status.failed(new Failed()));
         } else {
-            cashReg.setInfo(sessionResult.getSucceeded().getInfo());
-            cashReg.setStatus(Status.delivered(new Delivered()));
+            receipt.setInfo(sessionResult.getSucceeded().getInfo());
+            receipt.setStatus(Status.delivered(new Delivered()));
         }
-        return cashReg;
+        return receipt;
     }
 
     @Override

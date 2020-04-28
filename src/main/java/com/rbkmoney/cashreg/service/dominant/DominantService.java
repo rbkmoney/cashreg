@@ -7,6 +7,6 @@ public interface DominantService {
 
     ResponseDominantWrapper<ProxyObject> getProxyObject(ProxyRef proxyRef, Long revisionVersion);
 
-    ResponseDominantWrapper<CashRegProviderObject> getCashRegProviderObject(CashRegProviderRef providerRef, Long revisionVersion);
+    ResponseDominantWrapper<CashRegisterProviderObject> getCashRegisterProviderObject(CashRegisterProviderRef providerRef, Long revisionVersion);
 
 }

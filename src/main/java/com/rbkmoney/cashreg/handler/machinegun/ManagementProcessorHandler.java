@@ -4,7 +4,7 @@ import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.exception.UnsupportedMethodException;
 import com.rbkmoney.cashreg.service.management.ManagementService;
 import com.rbkmoney.cashreg.utils.ProtoUtils;
-import com.rbkmoney.damsel.cashreg_processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.Change;
 import com.rbkmoney.machinarium.domain.CallResultData;
 import com.rbkmoney.machinarium.domain.SignalResultData;
 import com.rbkmoney.machinarium.domain.TMachineEvent;

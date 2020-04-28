@@ -1,11 +1,11 @@
 package com.rbkmoney.cashreg.utils.cashreg.creators;
 
-import com.rbkmoney.damsel.domain.CashRegProviderRef;
+import com.rbkmoney.damsel.domain.CashRegisterProviderRef;
 
 public class CashRegProviderCreators {
 
-    public static CashRegProviderRef createCashregProviderRef(String providerRef) {
-        return new CashRegProviderRef().setId(Integer.parseInt(providerRef));
+    public static CashRegisterProviderRef createCashregProviderRef(String providerRef) {
+        return new CashRegisterProviderRef().setId(Integer.parseInt(providerRef));
     }
 
 }

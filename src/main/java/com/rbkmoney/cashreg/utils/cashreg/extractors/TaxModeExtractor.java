@@ -1,7 +1,7 @@
 package com.rbkmoney.cashreg.utils.cashreg.extractors;
 
 import com.rbkmoney.cashreg.service.management.model.ExtraField;
-import com.rbkmoney.damsel.cashreg_domain.TaxMode;
+import com.rbkmoney.damsel.cashreg.domain.TaxMode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

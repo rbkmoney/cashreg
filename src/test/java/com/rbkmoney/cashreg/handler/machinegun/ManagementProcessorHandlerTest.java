@@ -8,10 +8,10 @@ import com.rbkmoney.cashreg.utils.CreateUtils;
 import com.rbkmoney.cashreg.utils.MockUtils;
 import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.cashreg.utils.TestData;
-import com.rbkmoney.damsel.cashreg.status.Pending;
-import com.rbkmoney.damsel.cashreg.status.Status;
-import com.rbkmoney.damsel.cashreg_processing.Change;
-import com.rbkmoney.damsel.cashreg_processing.StatusChange;
+import com.rbkmoney.damsel.cashreg.processing.Change;
+import com.rbkmoney.damsel.cashreg.processing.StatusChange;
+import com.rbkmoney.damsel.cashreg.receipt.status.Pending;
+import com.rbkmoney.damsel.cashreg.receipt.status.Status;
 import com.rbkmoney.geck.serializer.Geck;
 import com.rbkmoney.machinarium.client.AutomatonClient;
 import com.rbkmoney.machinegun.msgpack.Value;
@@ -88,7 +88,7 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
         CallArgs callArgs = new CallArgs();
         callArgs.setArg(Value.bin(Geck.toMsgPack(ProtoUtils.toValue(Collections.singletonList(change)))));
         callArgs.setMachine(new Machine()
-                .setId(TestData.CASHREG_ID)
+                .setId(TestData.RECEIPT_ID)
                 .setNs(TestData.CASHREG_NAMESPACE)
                 .setHistory(new ArrayList<>())
                 .setHistoryRange(new HistoryRange()));
@@ -99,7 +99,7 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
     public void testFlow() throws TException {
         // Created
         List<Change> changeList = new ArrayList<>();
-        Change createdChange = CreateUtils.createCreatedChange(CreateUtils.createDefaultCashRegParams());
+        Change createdChange = CreateUtils.createCreatedChange(CreateUtils.createDefaultReceiptParams());
         changeList.add(createdChange);
 
         SignalArgs signalArgs = new SignalArgs();
@@ -139,7 +139,7 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
 
     private void prepareMachineEvents(SignalArgs signalArgs, List<Event> events) {
         signalArgs.setMachine(new Machine()
-                .setId(TestData.CASHREG_ID)
+                .setId(TestData.RECEIPT_ID)
                 .setNs(TestData.CASHREG_NAMESPACE)
                 .setHistory(events)
                 .setHistoryRange(new HistoryRange()));

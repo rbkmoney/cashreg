@@ -31,17 +31,19 @@
         <geck.version>0.6.9</geck.version>
         <lombok.version>1.18.4</lombok.version>
         <testcontainers.version>1.10.2</testcontainers.version>
-        <damsel.version>1.346-36765b1</damsel.version>
+        <damsel.version>1.402-140a2a6</damsel.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <machinarium.version>0.2.6</machinarium.version>
+        <cashreg-proto.version>1.13-1-f4f401b</cashreg-proto.version>
+        <!--<cashreg-proto.version>1.13-f4f401b</cashreg-proto.version>-->
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>cashreg-proto</artifactId>
-            <version>1.9-9c79023</version>
+            <version>${cashreg-proto.version}</version>
         </dependency>
 
         <!--Thrirdparty libs-->
