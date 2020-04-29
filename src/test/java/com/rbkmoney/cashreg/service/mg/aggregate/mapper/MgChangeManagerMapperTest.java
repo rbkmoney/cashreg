@@ -35,25 +35,22 @@ public class MgChangeManagerMapperTest {
 
     @Test
     public void testMgChangeManagerMapperProcess() {
+        SessionSucceeded sessionSucceeded = new SessionSucceeded()
+                .setInfo(new ReceiptInfo().setDaemonCode("daemon_code"));
+
+        SessionResult sessionResult = new SessionResult();
+        sessionResult.setSucceeded(sessionSucceeded);
+
+        SessionChangePayload payload = new SessionChangePayload();
+        payload.setFinished(new SessionFinished().setResult(sessionResult));
+
         ReceiptParams params = CreateUtils.createDefaultReceiptParams();
 
         List<Change> changeList = new ArrayList<>();
         Change change = CreateUtils.createCreatedChange(params);
         changeList.add(change);
         changeList.add(ChangeFactory.createStatusChangeFailed());
-
-        SessionChange sessionChange = new SessionChange();
-        SessionChangePayload payload = new SessionChangePayload();
-        SessionFinished sessionFinished = new SessionFinished();
-        SessionResult sessionResult = new SessionResult();
-        SessionSucceeded sessionSucceeded = new SessionSucceeded();
-        sessionSucceeded.setInfo(new ReceiptInfo().setDaemonCode("daemon_code"));
-        sessionResult.setSucceeded(sessionSucceeded);
-        sessionFinished.setResult(sessionResult);
-        payload.setFinished(sessionFinished);
-        sessionChange.setPayload(payload);
-
-        changeList.add(Change.session(sessionChange));
+        changeList.add(Change.session(new SessionChange().setPayload(payload)));
 
         Receipt receipt = mgChangeManagerMapper.process(changeList);
 

@@ -1,7 +1,10 @@
 package com.rbkmoney.cashreg.utils;
 
 import com.rbkmoney.damsel.cashreg.domain.AccountInfo;
+import com.rbkmoney.damsel.cashreg.domain.LegalEntity;
 import com.rbkmoney.damsel.cashreg.domain.PaymentInfo;
+import com.rbkmoney.damsel.cashreg.domain.RussianBankAccount;
+import com.rbkmoney.damsel.cashreg.domain.RussianLegalEntity;
 import com.rbkmoney.damsel.cashreg.domain.TaxMode;
 import com.rbkmoney.damsel.cashreg.processing.*;
 import com.rbkmoney.damsel.cashreg.receipt.Cart;
@@ -21,16 +24,16 @@ import java.util.List;
 public class CreateUtils {
 
     public static PaymentInfo createPaymentInfo() {
-        PaymentInfo paymentInfo = new PaymentInfo();
-
-        Cash cash = new Cash();
-        cash.setAmount(100L);
-        cash.setCurrency(new CurrencyRef().setSymbolicCode("RUR"));
-        paymentInfo.setCash(cash);
-
         Cart cart = new Cart();
         List<ItemsLine> lines = new ArrayList<>();
         cart.setLines(lines);
+
+        Cash cash = new Cash()
+                .setAmount(100L)
+                .setCurrency(new CurrencyRef().setSymbolicCode("RUR"));
+
+        PaymentInfo paymentInfo = new PaymentInfo();
+        paymentInfo.setCash(cash);
         paymentInfo.setCart(cart);
         paymentInfo.setEmail(TestData.TEST_EMAIL);
         return paymentInfo;
@@ -38,7 +41,8 @@ public class CreateUtils {
 
     public static ReceiptParams createReceipParams(
             String id, String partyId, String shopId,
-            Type type, PaymentInfo paymentInfo) {
+            Type type, PaymentInfo paymentInfo
+    ) {
 
         List<CashRegisterProvider> providers = createProviders();
         return new ReceiptParams()
@@ -90,27 +94,26 @@ public class CreateUtils {
     }
 
     public static AccountInfo createAccountInfo() {
-        com.rbkmoney.damsel.cashreg.domain.LegalEntity legalEntity = new com.rbkmoney.damsel.cashreg.domain.LegalEntity();
-        com.rbkmoney.damsel.cashreg.domain.RussianLegalEntity russianLegalEntity = new com.rbkmoney.damsel.cashreg.domain.RussianLegalEntity();
+        RussianBankAccount russianBankAccount = new RussianBankAccount()
+                .setAccount("Account")
+                .setBankName("BankName")
+                .setBankPostAccount("BankPostAccount")
+                .setBankBik("BankBik");
 
-        russianLegalEntity.setActualAddress("ActualAddress");
-        russianLegalEntity.setInn("INN");
-        russianLegalEntity.setPostAddress("PostAddress");
-        russianLegalEntity.setRegisteredName("RegisteredName");
-        russianLegalEntity.setRepresentativeDocument("RepresentativeDocument");
-        russianLegalEntity.setRepresentativeFullName("RepresentativeFullName");
-        russianLegalEntity.setRepresentativePosition("RepresentativePosition");
-        russianLegalEntity.setRegisteredNumber("RegisteredNumber");
+        RussianLegalEntity russianLegalEntity = new RussianLegalEntity()
+                .setActualAddress("ActualAddress")
+                .setInn("INN")
+                .setPostAddress("PostAddress")
+                .setRegisteredName("RegisteredName")
+                .setRepresentativeDocument("RepresentativeDocument")
+                .setRepresentativeFullName("RepresentativeFullName")
+                .setRepresentativePosition("RepresentativePosition")
+                .setRegisteredNumber("RegisteredNumber")
+                .setRussianBankAccount(russianBankAccount)
+                .setEmail(TestData.TEST_EMAIL)
+                .setTaxMode(TaxMode.osn);
 
-        com.rbkmoney.damsel.cashreg.domain.RussianBankAccount russianBankAccount = new com.rbkmoney.damsel.cashreg.domain.RussianBankAccount();
-        russianBankAccount.setAccount("Account");
-        russianBankAccount.setBankName("BankName");
-        russianBankAccount.setBankPostAccount("BankPostAccount");
-        russianBankAccount.setBankBik("BankBik");
-        russianLegalEntity.setRussianBankAccount(russianBankAccount);
-        russianLegalEntity.setEmail(TestData.TEST_EMAIL);
-        russianLegalEntity.setTaxMode(TaxMode.osn);
-
+        LegalEntity legalEntity = new LegalEntity();
         legalEntity.setRussianLegalEntity(russianLegalEntity);
 
         AccountInfo accountInfo = new AccountInfo();
