@@ -60,6 +60,7 @@ public class CreateUtils {
 
         CashRegisterProvider provider = new CashRegisterProvider();
         provider.setProviderId(TestData.CASHREG_PROVIDER_ID);
+        provider.setProviderParams(new HashMap<>());
         providers.add(provider);
         return providers;
     }

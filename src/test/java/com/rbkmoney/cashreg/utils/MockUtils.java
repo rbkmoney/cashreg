@@ -44,13 +44,14 @@ public class MockUtils {
             CashRegisterProviderObject providerObject = new CashRegisterProviderObject();
             providerObject.setRef(new CashRegisterProviderRef().setId(1));
 
-            CashRegisterProvider provider = new CashRegisterProvider();
-            provider.setName(TestData.PROVIDER_NAME);
-            provider.setDescription(TestData.PROVIDER_DESCRIPTION);
-
             Proxy proxy = new Proxy();
             proxy.setAdditional(TestData.prepareOptions());
             proxy.setRef(new ProxyRef());
+
+            CashRegisterProvider provider = new CashRegisterProvider();
+            provider.setName(TestData.PROVIDER_NAME);
+            provider.setDescription(TestData.PROVIDER_DESCRIPTION);
+            provider.setProxy(proxy);
 
             // TODO: list, more params
             List<CashRegisterProviderParameter> parameters = new ArrayList<>();
@@ -62,6 +63,7 @@ public class MockUtils {
 
             provider.setParamsSchema(parameters);
             providerObject.setData(provider);
+
 
             ResponseDominantWrapper<CashRegisterProviderObject> responseDominantWrapper = new ResponseDominantWrapper<>();
             responseDominantWrapper.setResponse(providerObject);
