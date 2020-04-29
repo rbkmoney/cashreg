@@ -20,7 +20,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 public abstract class AbstractIntegrationTest {
 
     private final static String MG_IMAGE = "dr2.rbkmoney.com/rbkmoney/machinegun";
-    private final static String MG_TAG = "5b85e3c73041e5cbcfcc35c465cf14214163389b";
+    private final static String MG_TAG = "bbac92b2956bf8eb696616308aa465c55ff5fa72";
 
     @ClassRule
     public static GenericContainer machinegunContainer = new GenericContainer(MG_IMAGE + ":" + MG_TAG)
