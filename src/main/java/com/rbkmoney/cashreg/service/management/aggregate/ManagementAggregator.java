@@ -32,38 +32,36 @@ public class ManagementAggregator {
 
     public Change toCashRegCreatedChange(ReceiptParams params) {
         CreatedChange created = new CreatedChange();
-        Receipt receipt = new Receipt();
+
+        Long domainRevision = null;
+        Long partyRevision = partyManagementService.getPartyRevision(params.getPartyId());
+        Shop shop = partyManagementService.getShop(params.getShopId(), params.getPartyId(), partyRevision);
 
         // TODO: select provider, but now get first in list
         CashRegisterProvider cashRegisterProvider = params.getProviders().get(0);
-
-
-        receipt.setCashregProvider(cashRegisterProvider);
-        receipt.setReceiptId(params.getReceiptId());
-        receipt.setPaymentInfo(params.getPaymentInfo());
-        receipt.setType(params.getType());
-        receipt.setShopId(params.getShopId());
-        receipt.setPartyId(params.getPartyId());
-        receipt.setStatus(Status.pending(new Pending()));
-
-        Long partyRevision = partyManagementService.getPartyRevision(params.getPartyId());
-        Long domainRevision = null;
-
-        Shop shop = partyManagementService.getShop(params.getShopId(), params.getPartyId(), partyRevision);
-
         ResponseDominantWrapper<CashRegisterProviderObject> providerObject = dominantService.getCashRegisterProviderObject(
                 CashRegProviderCreators.createCashregProviderRef(cashRegisterProvider.getProviderId()),
                 domainRevision
         );
-        domainRevision = providerObject.getRevisionVersion();
 
+        domainRevision = providerObject.getRevisionVersion();
         Map<String, String> aggregateOptions = aggregateOptions(providerObject);
-        AccountInfo accountInfo = new AccountInfo();
         Contract contract = partyManagementService.getContract(params.getPartyId(), shop.getContractId(), partyRevision);
+
+        AccountInfo accountInfo = new AccountInfo();
         accountInfo.setLegalEntity(prepareLegalEntity(contract, aggregateOptions));
-        receipt.setAccountInfo(accountInfo);
-        receipt.setDomainRevision(domainRevision);
-        receipt.setPartyRevision(partyRevision);
+
+        Receipt receipt = new Receipt()
+                .setCashregProvider(cashRegisterProvider)
+                .setReceiptId(params.getReceiptId())
+                .setPaymentInfo(params.getPaymentInfo())
+                .setType(params.getType())
+                .setShopId(params.getShopId())
+                .setPartyId(params.getPartyId())
+                .setStatus(Status.pending(new Pending()))
+                .setAccountInfo(accountInfo)
+                .setDomainRevision(domainRevision)
+                .setPartyRevision(partyRevision);
 
         created.setReceipt(receipt);
         return Change.created(created);
@@ -85,28 +83,28 @@ public class ManagementAggregator {
     private com.rbkmoney.damsel.cashreg.domain.LegalEntity prepareLegalEntity(Contract contract, Map<String, String> proxyOptions) {
         com.rbkmoney.damsel.domain.RussianLegalEntity russianLegalEntityDomain = contract.getContractor().getLegalEntity().getRussianLegalEntity();
 
-        com.rbkmoney.damsel.cashreg.domain.LegalEntity legalEntity = new com.rbkmoney.damsel.cashreg.domain.LegalEntity();
-        com.rbkmoney.damsel.cashreg.domain.RussianLegalEntity russianLegalEntity = new com.rbkmoney.damsel.cashreg.domain.RussianLegalEntity();
+        com.rbkmoney.damsel.cashreg.domain.RussianLegalEntity russianLegalEntity = new com.rbkmoney.damsel.cashreg.domain.RussianLegalEntity()
+                .setEmail(proxyOptions.get(ExtraField.RUSSIAN_LEGAL_ENTITY_EMAIL.getField()))
+                .setActualAddress(russianLegalEntityDomain.getActualAddress())
+                .setInn(russianLegalEntityDomain.getInn())
+                .setRegisteredNumber(russianLegalEntityDomain.getRegisteredNumber())
+                .setPostAddress(russianLegalEntityDomain.getPostAddress())
+                .setRegisteredName(russianLegalEntityDomain.getRegisteredName())
+                .setRepresentativeDocument(russianLegalEntityDomain.getRepresentativeDocument())
+                .setRepresentativeFullName(russianLegalEntityDomain.getRepresentativeFullName())
+                .setRepresentativePosition(russianLegalEntityDomain.getRepresentativePosition());
 
-        russianLegalEntity.setEmail(proxyOptions.get(ExtraField.RUSSIAN_LEGAL_ENTITY_EMAIL.getField()));
-        russianLegalEntity.setActualAddress(russianLegalEntityDomain.getActualAddress());
-        russianLegalEntity.setInn(russianLegalEntityDomain.getInn());
-        russianLegalEntity.setRegisteredNumber(russianLegalEntityDomain.getRegisteredNumber());
-        russianLegalEntity.setPostAddress(russianLegalEntityDomain.getPostAddress());
-        russianLegalEntity.setRegisteredName(russianLegalEntityDomain.getRegisteredName());
-        russianLegalEntity.setRepresentativeDocument(russianLegalEntityDomain.getRepresentativeDocument());
-        russianLegalEntity.setRepresentativeFullName(russianLegalEntityDomain.getRepresentativeFullName());
-        russianLegalEntity.setRepresentativePosition(russianLegalEntityDomain.getRepresentativePosition());
-
-        com.rbkmoney.damsel.cashreg.domain.RussianBankAccount russianBankAccount = new com.rbkmoney.damsel.cashreg.domain.RussianBankAccount();
         RussianBankAccount russianBankAccountIncome = russianLegalEntityDomain.getRussianBankAccount();
-        russianBankAccount.setAccount(russianBankAccountIncome.getAccount());
-        russianBankAccount.setBankBik(russianBankAccountIncome.getBankBik());
-        russianBankAccount.setBankName(russianBankAccountIncome.getBankName());
-        russianBankAccount.setBankPostAccount(russianBankAccountIncome.getBankPostAccount());
+        com.rbkmoney.damsel.cashreg.domain.RussianBankAccount russianBankAccount = new com.rbkmoney.damsel.cashreg.domain.RussianBankAccount()
+                .setAccount(russianBankAccountIncome.getAccount())
+                .setBankBik(russianBankAccountIncome.getBankBik())
+                .setBankName(russianBankAccountIncome.getBankName())
+                .setBankPostAccount(russianBankAccountIncome.getBankPostAccount());
+
         russianLegalEntity.setRussianBankAccount(russianBankAccount);
         russianLegalEntity.setTaxMode(extractTaxModeFromOptions(proxyOptions));
 
+        com.rbkmoney.damsel.cashreg.domain.LegalEntity legalEntity = new com.rbkmoney.damsel.cashreg.domain.LegalEntity();
         legalEntity.setRussianLegalEntity(russianLegalEntity);
         return legalEntity;
     }

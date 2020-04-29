@@ -55,7 +55,7 @@ public class CreateUtils {
         List<CashRegisterProvider> providers = new ArrayList<>();
 
         CashRegisterProvider provider = new CashRegisterProvider();
-        provider.setProviderId(TestData.CASHREG_CASHREG_PROVIDER_ID);
+        provider.setProviderId(TestData.CASHREG_PROVIDER_ID);
         providers.add(provider);
         return providers;
     }
@@ -68,23 +68,23 @@ public class CreateUtils {
     }
 
     public static Change createCreatedChange(ReceiptParams params) {
+        CashRegisterProvider cashRegisterProvider = new CashRegisterProvider()
+                .setProviderId(TestData.CASHREG_PROVIDER_ID)
+                .setProviderParams(new HashMap<>());
+
+        Receipt receipt = new Receipt()
+                .setCashregProvider(cashRegisterProvider)
+                .setReceiptId(params.getReceiptId())
+                .setPaymentInfo(createPaymentInfo())
+                .setType(Type.debit(new Debit()))
+                .setShopId(params.getShopId())
+                .setPartyId(params.getPartyId())
+                .setStatus(Status.pending(new Pending()))
+                .setAccountInfo(createAccountInfo())
+                .setDomainRevision(1)
+                .setPartyRevision(1);
+
         CreatedChange created = new CreatedChange();
-        Receipt receipt = new Receipt();
-
-        CashRegisterProvider cashRegisterProvider = new CashRegisterProvider();
-        cashRegisterProvider.setProviderId(TestData.CASHREG_CASHREG_PROVIDER_ID);
-        cashRegisterProvider.setProviderParams(new HashMap<>());
-
-        receipt.setCashregProvider(cashRegisterProvider);
-        receipt.setReceiptId(params.getReceiptId());
-        receipt.setPaymentInfo(createPaymentInfo());
-        receipt.setType(Type.debit(new Debit()));
-        receipt.setShopId(params.getShopId());
-        receipt.setPartyId(params.getPartyId());
-        receipt.setStatus(Status.pending(new Pending()));
-        receipt.setAccountInfo(createAccountInfo());
-        receipt.setDomainRevision(1);
-        receipt.setPartyRevision(1);
         created.setReceipt(receipt);
         return Change.created(created);
     }

@@ -24,7 +24,7 @@ public class MgChangeManagerMapper {
     }
 
     public Receipt process(List<Change> changes) {
-        return changes.stream().map(this::handle).reduce(new Receipt(), ProtoUtils::mergeCashRegs);
+        return changes.stream().map(this::handle).reduce(new Receipt(), ProtoUtils::mergeReceipts);
     }
 
 }

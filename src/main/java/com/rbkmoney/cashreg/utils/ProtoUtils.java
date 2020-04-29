@@ -40,13 +40,12 @@ public class ProtoUtils {
     }
 
     public static CashregContext prepareCashRegContext(Receipt receipt, Map<String, String> proxyOptions) {
-        CashregContext context = new CashregContext();
-        context.setCashregId(receipt.getReceiptId());
-        context.setAccountInfo(receipt.getAccountInfo());
-        context.setOptions(proxyOptions);
-        context.setSession(new Session().setType(receipt.getType()));
-        context.setSourceCreation(prepareSourceCreation(receipt));
-        return context;
+        return new CashregContext()
+                .setCashregId(receipt.getReceiptId())
+                .setAccountInfo(receipt.getAccountInfo())
+                .setOptions(proxyOptions)
+                .setSession(new Session().setType(receipt.getType()))
+                .setSourceCreation(prepareSourceCreation(receipt));
     }
 
     public static com.rbkmoney.machinegun.base.Timer prepareTimer(com.rbkmoney.damsel.cashreg.base.Timer incomingTimer) {
@@ -68,45 +67,45 @@ public class ProtoUtils {
         return value.getArr().stream().map(v -> Geck.msgPackToTBase(v.getBin(), Change.class)).collect(Collectors.toList());
     }
 
-    public static Receipt mergeCashRegs(Receipt cashReg1, Receipt cashReg2) {
+    public static Receipt mergeReceipts(Receipt receipt1, Receipt receipt2) {
 
-        if (cashReg2.getCashregProvider() != null) {
-            cashReg1.setCashregProvider(cashReg2.getCashregProvider());
+        if (receipt2.getCashregProvider() != null) {
+            receipt1.setCashregProvider(receipt2.getCashregProvider());
         }
 
-        if (cashReg2.getReceiptId() != null) {
-            cashReg1.setReceiptId(cashReg2.getReceiptId());
+        if (receipt2.getReceiptId() != null) {
+            receipt1.setReceiptId(receipt2.getReceiptId());
         }
 
-        if (cashReg2.getPartyId() != null) {
-            cashReg1.setPartyId(cashReg2.getPartyId());
+        if (receipt2.getPartyId() != null) {
+            receipt1.setPartyId(receipt2.getPartyId());
         }
 
-        if (cashReg2.getShopId() != null) {
-            cashReg1.setShopId(cashReg2.getShopId());
+        if (receipt2.getShopId() != null) {
+            receipt1.setShopId(receipt2.getShopId());
         }
 
-        if (cashReg2.getAccountInfo() != null) {
-            cashReg1.setAccountInfo(cashReg2.getAccountInfo());
+        if (receipt2.getAccountInfo() != null) {
+            receipt1.setAccountInfo(receipt2.getAccountInfo());
         }
 
-        if (cashReg2.getPaymentInfo() != null) {
-            cashReg1.setPaymentInfo(cashReg2.getPaymentInfo());
+        if (receipt2.getPaymentInfo() != null) {
+            receipt1.setPaymentInfo(receipt2.getPaymentInfo());
         }
 
-        if (cashReg2.getType() != null) {
-            cashReg1.setType(cashReg2.getType());
+        if (receipt2.getType() != null) {
+            receipt1.setType(receipt2.getType());
         }
 
-        cashReg1.setStatus(cashReg2.getStatus());
-        cashReg1.setPartyRevision(cashReg2.getPartyRevision());
-        cashReg1.setDomainRevision(cashReg2.getDomainRevision());
+        receipt1.setStatus(receipt2.getStatus());
+        receipt1.setPartyRevision(receipt2.getPartyRevision());
+        receipt1.setDomainRevision(receipt2.getDomainRevision());
 
-        if (cashReg2.getInfo() != null) {
-            cashReg1.setInfo(cashReg2.getInfo());
+        if (receipt2.getInfo() != null) {
+            receipt1.setInfo(receipt2.getInfo());
         }
 
-        return cashReg1;
+        return receipt1;
     }
 
 }
