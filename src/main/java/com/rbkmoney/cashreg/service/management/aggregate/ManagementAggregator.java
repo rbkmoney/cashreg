@@ -35,7 +35,7 @@ public class ManagementAggregator {
 
         Long domainRevision = null;
         Long partyRevision = partyManagementService.getPartyRevision(params.getPartyId());
-        Shop shop = partyManagementService.getShop(params.getShopId(), params.getPartyId(), partyRevision);
+        Shop shop = partyManagementService.getShop(params.getPartyId(), params.getShopId(), partyRevision);
 
         // TODO: select provider, but now get first in list
         CashRegisterProvider cashRegisterProvider = params.getProviders().get(0);
