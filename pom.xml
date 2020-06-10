@@ -7,12 +7,12 @@
     <parent>
         <groupId>com.rbkmoney</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.1.RELEASE</version>
+        <version>2.3.0.RELEASE</version>
         <relativePath/>
     </parent>
 
     <artifactId>cashreg</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
 
     <name>cashreg</name>
@@ -31,7 +31,7 @@
         <geck.version>0.6.9</geck.version>
         <lombok.version>1.18.4</lombok.version>
         <testcontainers.version>1.10.2</testcontainers.version>
-        <damsel.version>1.402-140a2a6</damsel.version>
+        <damsel.version>1.420-7ef2435</damsel.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <machinarium.version>0.2.6</machinarium.version>
@@ -64,10 +64,11 @@
             <artifactId>caffeine</artifactId>
             <version>2.6.2</version>
         </dependency>
+
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpclient.version}</version>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>${javax-validation.version}</version>
         </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
