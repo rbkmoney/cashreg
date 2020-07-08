@@ -31,7 +31,7 @@
         <geck.version>0.6.9</geck.version>
         <lombok.version>1.18.4</lombok.version>
         <testcontainers.version>1.10.2</testcontainers.version>
-        <damsel.version>1.420-7ef2435</damsel.version>
+        <damsel.version>1.430-a1072d0</damsel.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <machinarium.version>0.2.6</machinarium.version>

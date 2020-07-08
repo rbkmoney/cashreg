@@ -54,11 +54,11 @@ public class MockUtils {
             provider.setProxy(proxy);
 
             // TODO: list, more params
-            List<CashRegisterProviderParameter> parameters = new ArrayList<>();
-            CashRegisterProviderParameter parameter = new CashRegisterProviderParameter();
+            List<ProviderParameter> parameters = new ArrayList<>();
+            ProviderParameter parameter = new ProviderParameter();
             parameter.setDescription("description");
             parameter.setId("id");
-            parameter.setType(CashRegisterProviderParameterType.url_type(new CashRegisterProviderParameterUrl()));
+            parameter.setType(ProviderParameterType.url_type(new ProviderParameterUrl()));
             parameters.add(parameter);
 
             provider.setParamsSchema(parameters);
