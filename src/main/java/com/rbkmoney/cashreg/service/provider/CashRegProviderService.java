@@ -1,6 +1,5 @@
 package com.rbkmoney.cashreg.service.provider;
 
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.rbkmoney.cashreg.service.management.aggregate.ManagementAggregator;

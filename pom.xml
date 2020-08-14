@@ -7,12 +7,12 @@
     <parent>
         <groupId>com.rbkmoney</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.0.RELEASE-2</version>
+        <version>2.3.2.RELEASE</version>
         <relativePath/>
     </parent>
 
     <artifactId>cashreg</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>jar</packaging>
 
     <name>cashreg</name>
@@ -26,16 +26,16 @@
         <project.maintainer>Anatoly Cherkasov &lt;a.cherkasov@rbkmoney.com&gt;</project.maintainer>
         <dockerfile.base.service.tag>c0d0900ec19c907d866f8360031a836049985110</dockerfile.base.service.tag>
         <dockerfile.registry>dr2.rbkmoney.com</dockerfile.registry>
-        <shared.resources.version>0.3.6</shared.resources.version>
+        <shared.resources.version>0.3.8</shared.resources.version>
         <logstash-logback-encoder.version>5.2</logstash-logback-encoder.version>
-        <geck.version>0.6.9</geck.version>
+        <geck.version>0.6.11</geck.version>
         <lombok.version>1.18.4</lombok.version>
         <testcontainers.version>1.10.2</testcontainers.version>
-        <damsel.version>1.430-a1072d0</damsel.version>
+        <damsel.version>1.439-b18f037</damsel.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <machinarium.version>0.2.6</machinarium.version>
-        <cashreg-proto.version>1.14-25a9f63</cashreg-proto.version>
+        <machinarium.version>0.3.1</machinarium.version>
+        <cashreg-proto.version>1.15-f4f228b</cashreg-proto.version>
     </properties>
 
     <dependencies>
@@ -77,7 +77,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>spring-boot-starter-metrics-statsd</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -88,7 +88,7 @@
         <dependency>
             <groupId>com.rbkmoney</groupId>
             <artifactId>sink-common-lib</artifactId>
-            <version>0.0.3</version>
+            <version>0.0.5</version>
         </dependency>
         <dependency>
             <groupId>com.rbkmoney.geck</groupId>

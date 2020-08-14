@@ -1,6 +1,5 @@
 package com.rbkmoney.cashreg.handler.cashreg;
 
-
 import com.rbkmoney.damsel.cashreg.processing.Change;
 import com.rbkmoney.damsel.cashreg.repairer.RepairScenario;
 import com.rbkmoney.damsel.cashreg.repairer.RepairerSrv;

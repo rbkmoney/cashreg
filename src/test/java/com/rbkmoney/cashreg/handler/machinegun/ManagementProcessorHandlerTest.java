@@ -74,9 +74,12 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
     public void processSignalInit() throws TException {
         Change change = Change.status_changed(new StatusChange().setStatus(Status.pending(new Pending())));
 
+        Value value = new Value();
+        byte[] bytes = new byte[0];
+        value.setBin(bytes);
         SignalArgs signalArgs = new SignalArgs();
         signalArgs.setSignal(Signal.init(new InitSignal(Value.bin(Geck.toMsgPack(ProtoUtils.toValue(Collections.singletonList(change)))))));
-        prepareMachineEvents(signalArgs, new ArrayList<>());
+        prepareMachineEvents(signalArgs, new ArrayList<>(), value);
 
         SignalResult result = client.processSignal(signalArgs);
         assertTrue(result.getAction().getTimer().isSetSetTimer());
@@ -104,7 +107,11 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
 
         SignalArgs signalArgs = new SignalArgs();
         signalArgs.setSignal(Signal.init(new InitSignal(Value.bin(Geck.toMsgPack(ProtoUtils.toValue(changeList))))));
-        prepareMachineEvents(signalArgs, new ArrayList<>());
+
+        Value value = new Value();
+        byte[] bytes = new byte[0];
+        value.setBin(bytes);
+        prepareMachineEvents(signalArgs, new ArrayList<>(), value);
 
         SignalResult result = client.processSignal(signalArgs);
         assertTrue(result.getAction().getTimer().isSetSetTimer());
@@ -114,21 +121,24 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
 
         signalArgs.setSignal(Signal.timeout(new TimeoutSignal()));
         List<Event> events = prepareEvents(changes);
-        prepareMachineEvents(signalArgs, events);
+        value = result.getChange().getAuxState().getData();
+        prepareMachineEvents(signalArgs, events, value);
 
         result = client.processSignal(signalArgs);
         changes = convert(result);
         assertTrue(changes.size() == 3);
 
         events = prepareEvents(changes);
-        prepareMachineEvents(signalArgs, events);
+        value = result.getChange().getAuxState().getData();
+        prepareMachineEvents(signalArgs, events, value);
 
         result = client.processSignal(signalArgs);
         changes = convert(result);
         assertTrue(changes.size() == 4);
 
         events = prepareEvents(changes);
-        prepareMachineEvents(signalArgs, events);
+        value = result.getChange().getAuxState().getData();
+        prepareMachineEvents(signalArgs, events, value);
 
         result = client.processSignal(signalArgs);
         // Delivered
@@ -137,10 +147,13 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
         assertTrue(changes.get(changes.size() - 1).getStatusChanged().getStatus().isSetDelivered());
     }
 
-    private void prepareMachineEvents(SignalArgs signalArgs, List<Event> events) {
+    private void prepareMachineEvents(SignalArgs signalArgs, List<Event> events, Value value) {
+        Content content = new Content();
+        content.setData(value);
         signalArgs.setMachine(new Machine()
                 .setId(TestData.RECEIPT_ID)
                 .setNs(TestData.CASHREG_NAMESPACE)
+                .setAuxState(content)
                 .setHistory(events)
                 .setHistoryRange(new HistoryRange()));
     }
@@ -155,9 +168,9 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
     }
 
     private List<Change> convert(SignalResult result) {
-        return result.getChange().getEventsLegacy()
+        return result.getChange().getEvents()
                 .stream()
-                .map(event -> Geck.msgPackToTBase(event.getBin(), Change.class))
+                .map(event -> Geck.msgPackToTBase(event.getData().getBin(), Change.class))
                 .collect(Collectors.toList());
     }
 
