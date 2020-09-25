@@ -74,7 +74,7 @@ public class DominantServiceImpl implements DominantService {
     }
 
     private VersionedObject checkoutObject(Reference revisionReference, com.rbkmoney.damsel.domain.Reference reference) throws TException {
-        log.info("checkoutObject {} has been found, revisionReference={}, reference={}", revisionReference, reference);
+        log.info("checkoutObject revisionReference={}, reference={}", revisionReference, reference);
         return dominantClient.checkoutObject(revisionReference, reference);
     }
 }
