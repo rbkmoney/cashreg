@@ -7,10 +7,7 @@ import com.rbkmoney.cashreg.service.pm.PartyManagementService;
 import com.rbkmoney.cashreg.utils.cashreg.creators.CashRegProviderCreators;
 import com.rbkmoney.damsel.cashreg.domain.AccountInfo;
 import com.rbkmoney.damsel.cashreg.processing.CashRegisterProvider;
-import com.rbkmoney.damsel.cashreg.processing.Change;
-import com.rbkmoney.damsel.cashreg.processing.CreatedChange;
-import com.rbkmoney.damsel.cashreg.processing.Receipt;
-import com.rbkmoney.damsel.cashreg.processing.ReceiptParams;
+import com.rbkmoney.damsel.cashreg.processing.*;
 import com.rbkmoney.damsel.cashreg.receipt.status.Pending;
 import com.rbkmoney.damsel.cashreg.receipt.status.Status;
 import com.rbkmoney.damsel.domain.*;
@@ -32,6 +29,7 @@ public class ManagementAggregator {
 
     public Change toCashRegCreatedChange(ReceiptParams params) {
         CreatedChange created = new CreatedChange();
+        log.info("toCashRegCreatedChange params {}", params);
 
         Long domainRevision = null;
         Long partyRevision = partyManagementService.getPartyRevision(params.getPartyId());
@@ -39,6 +37,8 @@ public class ManagementAggregator {
 
         // TODO: select provider, but now get first in list
         CashRegisterProvider cashRegisterProvider = params.getProviders().get(0);
+        log.info("toCashRegCreatedChange partyRevision {}, shop {}, cashRegisterProvider {}", partyRevision, shop, cashRegisterProvider);
+
         ResponseDominantWrapper<CashRegisterProviderObject> providerObject = dominantService.getCashRegisterProviderObject(
                 CashRegProviderCreators.createCashregProviderRef(cashRegisterProvider.getProviderId()),
                 domainRevision

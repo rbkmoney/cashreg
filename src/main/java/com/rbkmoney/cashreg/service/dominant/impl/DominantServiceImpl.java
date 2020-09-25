@@ -12,7 +12,6 @@ import com.rbkmoney.damsel.domain_config.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 
 import static com.rbkmoney.damsel.domain.Reference.cash_register_provider;
@@ -24,8 +23,7 @@ import static com.rbkmoney.damsel.domain.Reference.proxy;
 public class DominantServiceImpl implements DominantService {
 
     private final RepositoryClientSrv.Iface dominantClient;
-    private final RetryTemplate retryTemplate;
-    
+
     @Override
     public ResponseDominantWrapper<ProxyObject> getProxyObject(ProxyRef proxyRef, Long revisionVersion) {
         log.info("Trying to get ProxyObject, proxyRef={}", proxyRef);
@@ -53,7 +51,7 @@ public class DominantServiceImpl implements DominantService {
     }
 
     private ResponseDominantWrapper<VersionedObject> getVersionedObjectFromReference(com.rbkmoney.damsel.domain.Reference reference, Long revisionVersion) {
-        log.info("Trying to get VersionedObject, reference={}", reference);
+        log.info("Trying to get VersionedObject, reference={}, revisionVersion={}", reference, revisionVersion);
         try {
             Reference referenceRevision;
             if (revisionVersion == null) {
@@ -62,7 +60,7 @@ public class DominantServiceImpl implements DominantService {
                 referenceRevision = Reference.version(revisionVersion);
             }
             VersionedObject versionedObject = checkoutObject(referenceRevision, reference);
-            log.info("VersionedObject {} has been found, reference={}", versionedObject, reference);
+            log.info("VersionedObject {} has been found, reference={} revisionVersion={}", versionedObject, reference, revisionVersion);
             ResponseDominantWrapper<VersionedObject> response = new ResponseDominantWrapper<>();
             response.setResponse(versionedObject);
             response.setRevisionVersion(versionedObject.getVersion());
@@ -76,8 +74,7 @@ public class DominantServiceImpl implements DominantService {
     }
 
     private VersionedObject checkoutObject(Reference revisionReference, com.rbkmoney.damsel.domain.Reference reference) throws TException {
-        return retryTemplate.execute(
-                context -> dominantClient.checkoutObject(revisionReference, reference)
-        );
+        log.info("checkoutObject {} has been found, revisionReference={}, reference={}", revisionReference, reference);
+        return dominantClient.checkoutObject(revisionReference, reference);
     }
 }
