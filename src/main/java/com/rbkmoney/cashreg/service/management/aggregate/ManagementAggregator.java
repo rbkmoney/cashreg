@@ -45,11 +45,11 @@ public class ManagementAggregator {
         );
 
         domainRevision = providerObject.getRevisionVersion();
-        Map<String, String> aggregateOptions = aggregateOptions(providerObject);
+        Map<String, String> aggregateOptions = aggregateOptions(providerObject, cashRegisterProvider);
         Contract contract = partyManagementService.getContract(params.getPartyId(), shop.getContractId(), partyRevision);
 
-        AccountInfo accountInfo = new AccountInfo();
-        accountInfo.setLegalEntity(prepareLegalEntity(contract, aggregateOptions));
+        AccountInfo accountInfo = new AccountInfo()
+                .setLegalEntity(prepareLegalEntity(contract, aggregateOptions));
 
         Receipt receipt = new Receipt()
                 .setCashregProvider(cashRegisterProvider)
@@ -67,17 +67,20 @@ public class ManagementAggregator {
         return Change.created(created);
     }
 
-    private Map<String, String> aggregateOptions(ResponseDominantWrapper<CashRegisterProviderObject> wrapperProviderObject) {
+    private Map<String, String> aggregateOptions(ResponseDominantWrapper<CashRegisterProviderObject> wrapperProviderObject, CashRegisterProvider cashRegisterProvider) {
         Proxy proxy = wrapperProviderObject.getResponse().getData().getProxy();
         ResponseDominantWrapper<ProxyObject> wrapperProxyObject = dominantService.getProxyObject(proxy.getRef(), wrapperProviderObject.getRevisionVersion());
         Map<String, String> proxyOptions = wrapperProxyObject.getResponse().getData().getOptions();
         proxyOptions.putAll(proxy.getAdditional());
+        if(cashRegisterProvider != null) {
+            proxyOptions.putAll(cashRegisterProvider.getProviderParams());
+        }
         return proxyOptions;
     }
 
     public Map<String, String> aggregateOptions(com.rbkmoney.damsel.domain.CashRegisterProviderRef providerRef, Long domainRevision) {
         ResponseDominantWrapper<CashRegisterProviderObject> wrapperProviderObject = dominantService.getCashRegisterProviderObject(providerRef, domainRevision);
-        return aggregateOptions(wrapperProviderObject);
+        return aggregateOptions(wrapperProviderObject, null);
     }
 
     private com.rbkmoney.damsel.cashreg.domain.LegalEntity prepareLegalEntity(Contract contract, Map<String, String> proxyOptions) {
