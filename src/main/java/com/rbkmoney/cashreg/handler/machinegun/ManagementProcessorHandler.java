@@ -1,6 +1,7 @@
 package com.rbkmoney.cashreg.handler.machinegun;
 
 import com.rbkmoney.cashreg.domain.SourceData;
+import com.rbkmoney.cashreg.service.exception.NotFoundException;
 import com.rbkmoney.cashreg.service.exception.UnsupportedMethodException;
 import com.rbkmoney.cashreg.service.management.ManagementService;
 import com.rbkmoney.cashreg.utils.ProtoUtils;
@@ -48,8 +49,10 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
 
     @Override
     protected SignalResultData<Change> processSignalTimeout(TMachine<Change> tMachine, List<TMachineEvent<Change>> list) {
-        log.info("Request processSignalTimeout() machineId: {} list: {}", tMachine.getMachineId(), tMachine.getMachineEvent());
-        List<Change> changes = tMachine.getMachineEvent().stream().map(TMachineEvent::getData).collect(Collectors.toList());
+        log.info("Request processSignalTimeout() machineId: {}, event: {}, list {}", tMachine.getMachineId(), tMachine.getMachineEvent(), list);
+        List<Change> changes = list.stream().map(TMachineEvent::getData).collect(Collectors.toList());
+        Change change = tMachine.getMachineEvent().stream().map(TMachineEvent::getData).findFirst().orElseThrow(() -> new NotFoundException("Change not found"));
+        changes.add(change);
         SourceData sourceData = managementService.signalTimeout(changes);
         changes.add(sourceData.getChange());
         SignalResultData<Change> resultData = new SignalResultData<>(
@@ -63,7 +66,7 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
 
     @Override
     protected CallResultData<Change> processCall(String namespace, String machineId, Value args, List<TMachineEvent<Change>> tMachineEvents) {
-        throw new UnsupportedMethodException("UnsupportedMethod");
+        throw new UnsupportedMethodException("ProcessCall. UnsupportedMethod");
     }
 
 }
