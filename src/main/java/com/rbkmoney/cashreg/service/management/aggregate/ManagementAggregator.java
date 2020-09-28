@@ -47,6 +47,7 @@ public class ManagementAggregator {
         domainRevision = providerObject.getRevisionVersion();
         Map<String, String> aggregateOptions = aggregateOptions(providerObject, cashRegisterProvider);
         Contract contract = partyManagementService.getContract(params.getPartyId(), shop.getContractId(), partyRevision);
+        log.info("toCashRegCreatedChange contract {}", contract);
 
         AccountInfo accountInfo = new AccountInfo()
                 .setLegalEntity(prepareLegalEntity(contract, aggregateOptions));
@@ -72,7 +73,7 @@ public class ManagementAggregator {
         ResponseDominantWrapper<ProxyObject> wrapperProxyObject = dominantService.getProxyObject(proxy.getRef(), wrapperProviderObject.getRevisionVersion());
         Map<String, String> proxyOptions = wrapperProxyObject.getResponse().getData().getOptions();
         proxyOptions.putAll(proxy.getAdditional());
-        if(cashRegisterProvider != null) {
+        if (cashRegisterProvider != null) {
             proxyOptions.putAll(cashRegisterProvider.getProviderParams());
         }
         return proxyOptions;
