@@ -43,27 +43,36 @@ public class CashRegProviderService implements CashRegProvider {
 
     @Override
     public CashregResult register(Receipt receipt) {
+        log.info("register. receipt {}", receipt);
         String url = extractUrl(receipt);
+        log.info("register. receipt {}, url {}", receipt, url);
         Map<String, String> options = managementAggregate.aggregateOptions(
                 CashRegProviderCreators.createCashregProviderRef(receipt.getCashregProvider().getProviderId()),
                 receipt.getDomainRevision()
         );
         CashregContext context = prepareCashRegContext(receipt, options);
+        log.info("register. receipt {}, url {}, context {}", receipt, url, context);
         return call(url, NETWORK_TIMEOUT_SEC, context);
     }
 
     private CashregResult call(String url, Integer networkTimeout, CashregContext context) {
+        log.info("call start. url {}, context {}", url, context);
         CashregAdapterSrv.Iface provider = providerCache.get(url, key -> cashRegProviderSrv(url, networkTimeout));
         try {
-            return provider.register(context);
-        } catch (TException e) {
+            CashregResult cashregResult = provider.register(context);
+            log.info("call start. url {}, context {}, result {}", url, context, cashregResult);
+            return cashregResult;
+        } catch (TException ex) {
             // Add more exception
-            throw new RuntimeException(e);
+            log.error("Call exception", ex);
+            throw new RuntimeException(ex);
         }
     }
 
     private String extractUrl(Receipt receipt) {
+        log.info("extractUrl start. receipt {}", receipt);
         ProxyObject proxyObject = managementAggregate.extractProxyObject(receipt);
+        log.info("extractUrl. receipt {}, proxyObject {}", receipt, proxyObject);
         return proxyObject.getData().getUrl();
     }
 
