@@ -88,7 +88,7 @@ public class ManagementAggregator {
         com.rbkmoney.damsel.domain.RussianLegalEntity russianLegalEntityDomain = contract.getContractor().getLegalEntity().getRussianLegalEntity();
 
         com.rbkmoney.damsel.cashreg.domain.RussianLegalEntity russianLegalEntity = new com.rbkmoney.damsel.cashreg.domain.RussianLegalEntity()
-                .setEmail(proxyOptions.get(ExtraField.RUSSIAN_LEGAL_ENTITY_EMAIL.getField()))
+                .setEmail(proxyOptions.get(ExtraField.COMPANY_EMAIL.getField()))
                 .setActualAddress(russianLegalEntityDomain.getActualAddress())
                 .setInn(russianLegalEntityDomain.getInn())
                 .setRegisteredNumber(russianLegalEntityDomain.getRegisteredNumber())

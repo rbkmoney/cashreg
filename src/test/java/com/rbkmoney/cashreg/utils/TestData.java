@@ -31,7 +31,7 @@ public class TestData {
     public static Map<String, String> prepareOptions() {
         Map<String, String> options = new HashMap<>();
         options.put(ExtraField.TAX_MODE.getField(), "osn");
-        options.put(ExtraField.RUSSIAN_LEGAL_ENTITY_EMAIL.getField(), TestData.TEST_EMAIL);
+        options.put(ExtraField.COMPANY_EMAIL.getField(), TestData.TEST_EMAIL);
         return options;
     }
 
