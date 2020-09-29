@@ -22,7 +22,7 @@ public class CreatedManagementHandler implements ManagementHandler {
 
     @Override
     public SourceData handle(Change change, Receipt receipt) {
-        log.debug("Start {}", HANDLER_NAME);
+        log.info("Start {}, change {}, receipt {}", HANDLER_NAME, change, receipt);
         SourceData sourceData = SourceData.builder()
                 .change(ChangeFactory.createStatusChangePending())
                 .complexAction(

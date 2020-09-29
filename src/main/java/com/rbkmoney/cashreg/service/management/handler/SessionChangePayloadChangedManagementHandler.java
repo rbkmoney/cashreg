@@ -23,9 +23,9 @@ public class SessionChangePayloadChangedManagementHandler implements ManagementH
 
     @Override
     public SourceData handle(Change change, Receipt receipt) {
-        log.debug("Start {}", HANDLER_NAME);
+        log.info("Start {} change {}, receipt {}", HANDLER_NAME, change, receipt);
         CashregResult result = providerService.register(receipt);
-        log.debug("Finish {}, result {}", HANDLER_NAME, result);
+        log.info("Finish {} change {}, receipt {}, result {}", HANDLER_NAME, change, receipt, result);
         return managementConverter.convert(result);
     }
 

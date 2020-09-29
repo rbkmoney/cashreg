@@ -18,12 +18,12 @@ public class SessionChangePayloadFinishedFailedManagementHandler implements Mana
 
     @Override
     public SourceData handle(Change change, Receipt receipt) {
-        log.debug("Start {}", HANDLER_NAME);
+        log.info("Start {} change {}, receipt {}", HANDLER_NAME, change, receipt);
         SourceData sourceData = SourceData.builder()
                 .change(ChangeFactory.createStatusChangeFailed())
                 .complexAction(new ComplexAction())
                 .build();
-        log.debug("Finish {}, sourceData {}", HANDLER_NAME, sourceData);
+        log.info("Finish {} change {}, receipt {}, sourceData {}", HANDLER_NAME, change, receipt, sourceData);
         return sourceData;
     }
 

@@ -22,7 +22,7 @@ public class StatusChangesPendingManagementHandler implements ManagementHandler 
 
     @Override
     public SourceData handle(Change change, Receipt receipt) {
-        log.debug("Start {}", HANDLER_NAME);
+        log.info("Start {}, change {}, receipt {}", HANDLER_NAME, change, receipt);
         SourceData sourceData = SourceData.builder()
                 .change(ChangeFactory.createSessionChangeStarted())
                 .complexAction(
@@ -31,7 +31,7 @@ public class StatusChangesPendingManagementHandler implements ManagementHandler 
                                 buildLastEventHistoryRange())
                 )
                 .build();
-        log.debug("Finish {}, sourceData {}", HANDLER_NAME, sourceData);
+        log.info("Finish {} change {}, receipt {}, sourceData {}", HANDLER_NAME, change, receipt, sourceData);
         return sourceData;
     }
 

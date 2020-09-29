@@ -28,7 +28,9 @@ public class MgChangeManagerMapper {
 
     public Receipt process(List<Change> changes) {
         log.info("MgChangeManagerMapper - process. List Changes {}", changes);
-        return changes.stream().map(this::handle).reduce(new Receipt(), ProtoUtils::mergeReceipts);
+        Receipt receipt = changes.stream().map(this::handle).reduce(new Receipt(), ProtoUtils::mergeReceipts);
+        log.info("MgChangeManagerMapper - process. List Changes {}, receipt {}", changes, receipt);
+        return receipt;
     }
 
 }
