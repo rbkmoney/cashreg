@@ -3,6 +3,7 @@ package com.rbkmoney.cashreg.service.management.handler;
 import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.management.handler.iface.ManagementHandler;
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.ChangeType;
+import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory;
 import com.rbkmoney.damsel.cashreg.processing.Change;
 import com.rbkmoney.damsel.cashreg.processing.Receipt;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import static com.rbkmoney.cashreg.service.management.impl.ManagementServiceImpl.DEFAULT_TIMER_SEC;
 import static com.rbkmoney.cashreg.utils.ProtoUtils.buildComplexActionWithTimer;
-import static com.rbkmoney.cashreg.utils.ProtoUtils.buildLastEventHistoryRange;
 
 @Slf4j
 @Component
@@ -28,7 +28,8 @@ public class CreatedManagementHandler implements ManagementHandler {
                 .complexAction(
                         buildComplexActionWithTimer(
                                 Timer.timeout(DEFAULT_TIMER_SEC),
-                                buildLastEventHistoryRange())
+                                ProtoUtils.buildDirectionBackwardEventHistoryRange()
+                        )
                 )
                 .build();
         log.debug("Finish {}, sourceData {}", HANDLER_NAME, sourceData);

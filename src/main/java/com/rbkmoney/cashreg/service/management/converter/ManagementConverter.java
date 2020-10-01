@@ -1,6 +1,7 @@
 package com.rbkmoney.cashreg.service.management.converter;
 
 import com.rbkmoney.cashreg.domain.SourceData;
+import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.damsel.cashreg.adapter.CashregResult;
 import com.rbkmoney.damsel.cashreg.adapter.FinishIntent;
 import com.rbkmoney.damsel.cashreg.processing.*;
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-import static com.rbkmoney.cashreg.utils.ProtoUtils.*;
+import static com.rbkmoney.cashreg.utils.ProtoUtils.buildComplexActionWithTimer;
+import static com.rbkmoney.cashreg.utils.ProtoUtils.prepareTimer;
 import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory.createSessionChange;
 
 @Service
@@ -35,7 +37,7 @@ public class ManagementConverter implements Converter<CashregResult, SourceData>
             sessionChangePayload.setSessionAdapterStateChanged(sessionAdapterStateChanged);
             complexAction = buildComplexActionWithTimer(
                     prepareTimer(result.getIntent().getSleep().getTimer()),
-                    buildLastEventHistoryRange()
+                    ProtoUtils.buildDirectionBackwardEventHistoryRange()
             );
         }
 

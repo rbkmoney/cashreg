@@ -21,16 +21,26 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProtoUtils {
 
+    public static final int HISTORY_RANGE_DEFAULT_LIMIT = 10;
+
     public static ComplexAction buildComplexActionWithTimer(Timer timer, HistoryRange historyRange) {
         SetTimerAction setTimerAction = new SetTimerAction().setTimer(timer).setRange(historyRange);
         return new ComplexAction().setTimer(TimerAction.set_timer(setTimerAction));
     }
 
     public static HistoryRange buildLastEventHistoryRange() {
+        return buildDirectionBackwardEventHistoryRange(1);
+    }
+
+    public static HistoryRange buildDirectionBackwardEventHistoryRange(int limit) {
         HistoryRange historyRange = new HistoryRange();
         historyRange.setDirection(Direction.backward);
-        historyRange.setLimit(1);
+        historyRange.setLimit(limit);
         return historyRange;
+    }
+
+    public static HistoryRange buildDirectionBackwardEventHistoryRange() {
+        return buildDirectionBackwardEventHistoryRange(HISTORY_RANGE_DEFAULT_LIMIT);
     }
 
     private static SourceCreation prepareSourceCreation(Receipt receipt) {

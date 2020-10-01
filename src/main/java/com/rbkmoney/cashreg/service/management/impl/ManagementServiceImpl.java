@@ -4,6 +4,7 @@ import com.rbkmoney.cashreg.domain.SourceData;
 import com.rbkmoney.cashreg.service.management.ManagementService;
 import com.rbkmoney.cashreg.service.management.handler.iface.ManagementHandler;
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.MgChangeManagerMapper;
+import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory;
 import com.rbkmoney.damsel.cashreg.processing.Change;
 import com.rbkmoney.damsel.cashreg.processing.Receipt;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 import static com.rbkmoney.cashreg.utils.ProtoUtils.buildComplexActionWithTimer;
-import static com.rbkmoney.cashreg.utils.ProtoUtils.buildLastEventHistoryRange;
 
 @Slf4j
 @Component
@@ -35,7 +35,7 @@ public class ManagementServiceImpl implements ManagementService {
                 .complexAction(
                         buildComplexActionWithTimer(
                                 Timer.timeout(DEFAULT_TIMER_SEC),
-                                buildLastEventHistoryRange()
+                                ProtoUtils.buildDirectionBackwardEventHistoryRange()
                         )
                 ).build();
     }
