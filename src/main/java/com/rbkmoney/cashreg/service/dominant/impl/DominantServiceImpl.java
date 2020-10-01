@@ -54,7 +54,7 @@ public class DominantServiceImpl implements DominantService {
         log.info("Trying to get VersionedObject, reference={}, revisionVersion={}", reference, revisionVersion);
         try {
             Reference referenceRevision;
-            if (revisionVersion == null) {
+            if (revisionVersion == null || revisionVersion == 0) {
                 referenceRevision = Reference.head(new Head());
             } else {
                 referenceRevision = Reference.version(revisionVersion);
