@@ -50,6 +50,7 @@ public class CashRegProviderService implements CashRegProvider {
                 CashRegProviderCreators.createCashregProviderRef(receipt.getCashregProvider().getProviderId()),
                 receipt.getDomainRevision()
         );
+        options.putAll(receipt.getCashregProvider().getProviderParams());
         CashregContext context = prepareCashRegContext(receipt, options);
         log.info("register. receipt {}, url {}, context {}", receipt, url, context);
         return call(url, NETWORK_TIMEOUT_SEC, context);
