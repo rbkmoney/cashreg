@@ -49,12 +49,14 @@ public class ProtoUtils {
         return sourceCreation;
     }
 
-    public static CashregContext prepareCashRegContext(Receipt receipt, Map<String, String> proxyOptions) {
+    public static CashregContext prepareCashRegContext(Receipt receipt, Map<String, String> proxyOptions, Change change) {
         return new CashregContext()
                 .setCashregId(receipt.getReceiptId())
                 .setAccountInfo(receipt.getAccountInfo())
                 .setOptions(proxyOptions)
-                .setSession(new Session().setType(receipt.getType()))
+                .setSession(new Session().setState(
+                        change.getSession().getPayload().getSessionAdapterStateChanged().getState().getBin())
+                        .setType(receipt.getType()))
                 .setSourceCreation(prepareSourceCreation(receipt));
     }
 

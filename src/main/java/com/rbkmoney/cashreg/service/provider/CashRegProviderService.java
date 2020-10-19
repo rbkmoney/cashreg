@@ -7,6 +7,7 @@ import com.rbkmoney.cashreg.utils.cashreg.creators.CashRegProviderCreators;
 import com.rbkmoney.damsel.cashreg.adapter.CashregAdapterSrv;
 import com.rbkmoney.damsel.cashreg.adapter.CashregContext;
 import com.rbkmoney.damsel.cashreg.adapter.CashregResult;
+import com.rbkmoney.damsel.cashreg.processing.Change;
 import com.rbkmoney.damsel.cashreg.processing.Receipt;
 import com.rbkmoney.damsel.domain.ProxyObject;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
@@ -42,7 +43,7 @@ public class CashRegProviderService implements CashRegProvider {
     }
 
     @Override
-    public CashregResult register(Receipt receipt) {
+    public CashregResult register(Receipt receipt, Change change) {
         log.info("register. receipt {}", receipt);
         String url = extractUrl(receipt);
         log.info("register. receipt {}, url {}", receipt, url);
@@ -51,7 +52,7 @@ public class CashRegProviderService implements CashRegProvider {
                 receipt.getDomainRevision()
         );
         options.putAll(receipt.getCashregProvider().getProviderParams());
-        CashregContext context = prepareCashRegContext(receipt, options);
+        CashregContext context = prepareCashRegContext(receipt, options, change);
         log.info("register. receipt {}, url {}, context {}", receipt, url, context);
         return call(url, NETWORK_TIMEOUT_SEC, context);
     }

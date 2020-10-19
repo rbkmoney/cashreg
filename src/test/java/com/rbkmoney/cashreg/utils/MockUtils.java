@@ -36,7 +36,7 @@ public class MockUtils {
 
             regResult.setIntent(Intent.finish(new FinishIntent().setStatus(FinishStatus.success(new Success()))));
             return regResult;
-        }).when(provider).register(any());
+        }).when(provider).register(any(), any());
     }
 
     public static void mockDominant(DominantService service) {
