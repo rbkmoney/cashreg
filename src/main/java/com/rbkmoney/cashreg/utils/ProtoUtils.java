@@ -49,13 +49,15 @@ public class ProtoUtils {
         return sourceCreation;
     }
 
-    public static CashregContext prepareCashRegContext(Receipt receipt, Map<String, String> proxyOptions, Change change) {
+    public static CashregContext prepareCashRegContext(Receipt receipt,
+                                                       Map<String, String> proxyOptions,
+                                                       com.rbkmoney.damsel.msgpack.Value value) {
         return new CashregContext()
                 .setCashregId(receipt.getReceiptId())
                 .setAccountInfo(receipt.getAccountInfo())
                 .setOptions(proxyOptions)
                 .setSession(new Session().setState(
-                        change.getSession().getPayload().getSessionAdapterStateChanged().getState().getBin())
+                        value != null ? value.getBin() : null)
                         .setType(receipt.getType()))
                 .setSourceCreation(prepareSourceCreation(receipt));
     }

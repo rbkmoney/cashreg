@@ -8,6 +8,7 @@ import com.rbkmoney.cashreg.service.provider.CashRegProviderService;
 import com.rbkmoney.damsel.cashreg.adapter.CashregResult;
 import com.rbkmoney.damsel.cashreg.processing.Change;
 import com.rbkmoney.damsel.cashreg.processing.Receipt;
+import com.rbkmoney.damsel.msgpack.Value;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,8 @@ public class SessionChangePayloadChangedManagementHandler implements ManagementH
     @Override
     public SourceData handle(Change change, Receipt receipt) {
         log.info("Start {} change {}, receipt {}", HANDLER_NAME, change, receipt);
-        CashregResult result = providerService.register(receipt, change);
+        Value value = change.getSession().getPayload().getSessionAdapterStateChanged().getState();
+        CashregResult result = providerService.register(receipt, value);
         log.info("Finish {} change {}, receipt {}, result {}", HANDLER_NAME, change, receipt, result);
         return managementConverter.convert(result);
     }

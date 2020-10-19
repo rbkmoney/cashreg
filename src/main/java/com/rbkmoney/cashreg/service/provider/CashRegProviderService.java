@@ -43,7 +43,7 @@ public class CashRegProviderService implements CashRegProvider {
     }
 
     @Override
-    public CashregResult register(Receipt receipt, Change change) {
+    public CashregResult register(Receipt receipt, com.rbkmoney.damsel.msgpack.Value value) {
         log.info("register. receipt {}", receipt);
         String url = extractUrl(receipt);
         log.info("register. receipt {}, url {}", receipt, url);
@@ -52,7 +52,7 @@ public class CashRegProviderService implements CashRegProvider {
                 receipt.getDomainRevision()
         );
         options.putAll(receipt.getCashregProvider().getProviderParams());
-        CashregContext context = prepareCashRegContext(receipt, options, change);
+        CashregContext context = prepareCashRegContext(receipt, options, value);
         log.info("register. receipt {}, url {}, context {}", receipt, url, context);
         return call(url, NETWORK_TIMEOUT_SEC, context);
     }
