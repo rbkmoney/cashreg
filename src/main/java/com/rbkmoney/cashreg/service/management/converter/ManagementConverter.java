@@ -5,6 +5,7 @@ import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.damsel.cashreg.adapter.CashregResult;
 import com.rbkmoney.damsel.cashreg.adapter.FinishIntent;
 import com.rbkmoney.damsel.cashreg.processing.*;
+import com.rbkmoney.machinegun.base.Timer;
 import com.rbkmoney.machinegun.stateproc.ComplexAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+import static com.rbkmoney.cashreg.service.management.impl.ManagementServiceImpl.DEFAULT_TIMER_SEC;
 import static com.rbkmoney.cashreg.utils.ProtoUtils.buildComplexActionWithTimer;
 import static com.rbkmoney.cashreg.utils.ProtoUtils.prepareTimer;
 import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory.createSessionChange;
@@ -43,6 +45,10 @@ public class ManagementConverter implements Converter<CashregResult, SourceData>
 
         if (result.getIntent().isSetFinish()) {
             sessionChangePayload.setFinished(prepareSessionFinished(result));
+            complexAction = buildComplexActionWithTimer(
+                    Timer.timeout(DEFAULT_TIMER_SEC),
+                    ProtoUtils.buildDirectionBackwardEventHistoryRange()
+            );
         }
 
         String sessionId = UUID.randomUUID().toString();

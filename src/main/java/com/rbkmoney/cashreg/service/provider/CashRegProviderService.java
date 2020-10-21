@@ -7,7 +7,6 @@ import com.rbkmoney.cashreg.utils.cashreg.creators.CashRegProviderCreators;
 import com.rbkmoney.damsel.cashreg.adapter.CashregAdapterSrv;
 import com.rbkmoney.damsel.cashreg.adapter.CashregContext;
 import com.rbkmoney.damsel.cashreg.adapter.CashregResult;
-import com.rbkmoney.damsel.cashreg.processing.Change;
 import com.rbkmoney.damsel.cashreg.processing.Receipt;
 import com.rbkmoney.damsel.domain.ProxyObject;
 import com.rbkmoney.woody.thrift.impl.http.THSpawnClientBuilder;
@@ -62,7 +61,7 @@ public class CashRegProviderService implements CashRegProvider {
         CashregAdapterSrv.Iface provider = providerCache.get(url, key -> cashRegProviderSrv(url, networkTimeout));
         try {
             CashregResult cashregResult = provider.register(context);
-            log.info("call start. url {}, context {}, result {}", url, context, cashregResult);
+            log.info("call finish. url {}, context {}, result {}", url, context, cashregResult);
             return cashregResult;
         } catch (TException ex) {
             // Add more exception
