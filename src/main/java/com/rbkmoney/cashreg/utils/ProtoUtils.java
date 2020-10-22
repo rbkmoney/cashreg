@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProtoUtils {
 
-    public static final int HISTORY_RANGE_DEFAULT_LIMIT = 10;
+    public static final int HISTORY_RANGE_DEFAULT_LIMIT = 200;
 
     public static ComplexAction buildComplexActionWithTimer(Timer timer, HistoryRange historyRange) {
         SetTimerAction setTimerAction = new SetTimerAction().setTimer(timer).setRange(historyRange);
