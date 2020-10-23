@@ -51,7 +51,8 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
         log.info("Request processSignalTimeout() machineId: {}, event: {}, tMachineEvents {}", tMachine.getMachineId(), tMachine.getMachineEvent(), tMachineEvents);
         List<Change> changes = tMachineEvents.stream().map(TMachineEvent::getData).collect(Collectors.toList());
         SourceData sourceData = managementService.signalTimeout(changes);
-        if (sourceData.getChange().isSet()) {
+        log.info("ProcessSignalTimeout sourceData {}", sourceData);
+        if (sourceData.getChange() != null) {
             changes.add(sourceData.getChange());
         }
         SignalResultData<Change> resultData = new SignalResultData<>(
