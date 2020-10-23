@@ -44,7 +44,7 @@ public class ManagementConverter implements Converter<StateResultWrapper, Source
                     ProtoUtils.buildDirectionBackwardEventHistoryRange()
             );
 
-            if(wrapper.getValue() != null && wrapper.getValue().equals(createBinaryState(result))) {
+            if(wrapper.getValue() != null && result.getState() != null && wrapper.getValue().equals(createBinaryState(result))) {
                 return SourceData.builder()
                         .complexAction(complexAction)
                         .build();
