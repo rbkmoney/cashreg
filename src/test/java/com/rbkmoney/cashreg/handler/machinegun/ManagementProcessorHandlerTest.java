@@ -111,40 +111,40 @@ public class ManagementProcessorHandlerTest extends AbstractIntegrationTest {
         Value value = new Value();
         byte[] bytes = new byte[0];
         value.setBin(bytes);
-        prepareMachineEvents(signalArgs, new ArrayList<>(), value);
+        prepareMachineEvents(signalArgs, prepareEvents(changeList), value);
 
         SignalResult result = client.processSignal(signalArgs);
         assertTrue(result.getAction().getTimer().isSetSetTimer());
         // Pending
-        List<Change> changes = convert(result);
-        assertTrue(changes.size() == 2);
+        changeList.addAll(convert(result));
+        assertTrue(changeList.size() == 2);
 
         signalArgs.setSignal(Signal.timeout(new TimeoutSignal()));
-        List<Event> events = prepareEvents(changes);
+        List<Event> events = prepareEvents(changeList);
         value = result.getChange().getAuxState().getData();
         prepareMachineEvents(signalArgs, events, value);
 
         result = client.processSignal(signalArgs);
-        changes = convert(result);
-        assertTrue(changes.size() == 3);
+        changeList.addAll(convert(result));
+        assertTrue(changeList.size() == 3);
 
-        events = prepareEvents(changes);
+        events = prepareEvents(changeList);
         value = result.getChange().getAuxState().getData();
         prepareMachineEvents(signalArgs, events, value);
 
         result = client.processSignal(signalArgs);
-        changes = convert(result);
-        assertTrue(changes.size() == 4);
+        changeList.addAll(convert(result));
+        assertTrue(changeList.size() == 4);
 
-        events = prepareEvents(changes);
+        events = prepareEvents(changeList);
         value = result.getChange().getAuxState().getData();
         prepareMachineEvents(signalArgs, events, value);
 
         result = client.processSignal(signalArgs);
         // Delivered
-        changes = convert(result);
-        assertTrue(changes.size() == 5);
-        assertTrue(changes.get(changes.size() - 1).getStatusChanged().getStatus().isSetDelivered());
+        changeList.addAll(convert(result));
+        assertTrue(changeList.size() == 5);
+        assertTrue(changeList.get(changeList.size() - 1).getStatusChanged().getStatus().isSetDelivered());
     }
 
     private void prepareMachineEvents(SignalArgs signalArgs, List<Event> events, Value value) {
