@@ -81,7 +81,10 @@ public class ProtoUtils {
     }
 
     public static List<Change> toChangeList(Value value) {
-        return value.getArr().stream().map(v -> Geck.msgPackToTBase(v.getBin(), Change.class)).collect(Collectors.toList());
+        return value.getArr().stream()
+                .filter(Value::isSetBin)
+                .map(v -> Geck.msgPackToTBase(v.getBin(), Change.class))
+                .collect(Collectors.toList());
     }
 
     public static Receipt mergeReceipts(Receipt receipt1, Receipt receipt2) {
