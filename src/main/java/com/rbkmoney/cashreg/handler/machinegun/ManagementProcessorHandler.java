@@ -36,10 +36,14 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
     @Override
     protected SignalResultData<Change> processSignalInit(TMachine<Change> tMachine, Value value) {
         log.info("Request processSignalInit() machineId: {} value: {}", tMachine.getMachineId(), value);
+        List<Change> changes = ProtoUtils.toChangeList(value);
+        log.info("Request processSignalInit() machineId: {} changes 1: {}", tMachine.getMachineId(), changes);
         SourceData sourceData = managementService.signalInit();
+        changes.add(sourceData.getChange());
+        log.info("Request processSignalInit() machineId: {} changes 2: {}", tMachine.getMachineId(), changes);
         SignalResultData<Change> resultData = new SignalResultData<>(
                 value,
-                ProtoUtils.toChangeList(toValue(Collections.singletonList(sourceData.getChange()))),
+                ProtoUtils.toChangeList(toValue(changes)),
                 sourceData.getComplexAction()
         );
         log.info("Response of processSignalInit: {}", resultData);
