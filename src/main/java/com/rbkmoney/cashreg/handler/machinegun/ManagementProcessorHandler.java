@@ -14,6 +14,8 @@ import com.rbkmoney.machinegun.msgpack.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,12 +36,10 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
     @Override
     protected SignalResultData<Change> processSignalInit(TMachine<Change> tMachine, Value value) {
         log.info("Request processSignalInit() machineId: {} value: {}", tMachine.getMachineId(), value);
-        List<Change> changes = ProtoUtils.toChangeList(value);
         SourceData sourceData = managementService.signalInit();
-        changes.add(sourceData.getChange());
         SignalResultData<Change> resultData = new SignalResultData<>(
                 value,
-                ProtoUtils.toChangeList(toValue(changes)),
+                ProtoUtils.toChangeList(toValue(Collections.singletonList(sourceData.getChange()))),
                 sourceData.getComplexAction()
         );
         log.info("Response of processSignalInit: {}", resultData);
@@ -52,12 +52,13 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
         List<Change> changes = tMachineEvents.stream().map(TMachineEvent::getData).collect(Collectors.toList());
         SourceData sourceData = managementService.signalTimeout(changes);
         log.info("ProcessSignalTimeout sourceData {}", sourceData);
+        List<Change> newChanges = new ArrayList<>();
         if (sourceData.getChange() != null) {
-            changes.add(sourceData.getChange());
+            newChanges = Collections.singletonList(sourceData.getChange());
         }
         SignalResultData<Change> resultData = new SignalResultData<>(
                 tMachine.getMachineState().getData(),
-                toChangeList(toValue(changes)),
+                toChangeList(toValue(newChanges)),
                 sourceData.getComplexAction()
         );
         log.info("Response of processSignalTimeout: {}", resultData);
