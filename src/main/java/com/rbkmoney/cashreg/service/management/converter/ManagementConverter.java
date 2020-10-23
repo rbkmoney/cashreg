@@ -5,6 +5,7 @@ import com.rbkmoney.cashreg.utils.ProtoUtils;
 import com.rbkmoney.damsel.cashreg.adapter.CashregResult;
 import com.rbkmoney.damsel.cashreg.adapter.FinishIntent;
 import com.rbkmoney.damsel.cashreg.processing.*;
+import com.rbkmoney.damsel.msgpack.Value;
 import com.rbkmoney.machinegun.base.Timer;
 import com.rbkmoney.machinegun.stateproc.ComplexAction;
 import lombok.RequiredArgsConstructor;
@@ -22,16 +23,17 @@ import static com.rbkmoney.cashreg.utils.cashreg.creators.ChangeFactory.createSe
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ManagementConverter implements Converter<CashregResult, SourceData> {
+public class ManagementConverter implements Converter<StateResultWrapper, SourceData> {
 
     @Override
-    public SourceData convert(CashregResult result) {
+    public SourceData convert(StateResultWrapper wrapper) {
+        CashregResult result = wrapper.getResult();
         SessionChangePayload sessionChangePayload = new SessionChangePayload();
         SessionAdapterStateChanged sessionAdapterStateChanged = new SessionAdapterStateChanged();
         sessionChangePayload.setSessionAdapterStateChanged(sessionAdapterStateChanged);
 
         if (result.getState() != null) {
-            sessionAdapterStateChanged.setState(com.rbkmoney.damsel.msgpack.Value.bin(result.getState()));
+            sessionAdapterStateChanged.setState(createBinaryState(result));
         }
 
         ComplexAction complexAction = new ComplexAction();
@@ -41,6 +43,12 @@ public class ManagementConverter implements Converter<CashregResult, SourceData>
                     prepareTimer(result.getIntent().getSleep().getTimer()),
                     ProtoUtils.buildDirectionBackwardEventHistoryRange()
             );
+
+            if(wrapper.getValue() != null && wrapper.getValue().equals(createBinaryState(result))) {
+                return SourceData.builder()
+                        .complexAction(complexAction)
+                        .build();
+            }
         }
 
         if (result.getIntent().isSetFinish()) {
@@ -88,6 +96,10 @@ public class ManagementConverter implements Converter<CashregResult, SourceData>
                         .setInfo(result.getInfo())
         );
         sessionFinished.setResult(sessionResult);
+    }
+
+    private Value createBinaryState(CashregResult result) {
+        return Value.bin(result.getState());
     }
 }
 

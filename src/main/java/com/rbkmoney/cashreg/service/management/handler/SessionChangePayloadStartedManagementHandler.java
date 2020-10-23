@@ -1,6 +1,7 @@
 package com.rbkmoney.cashreg.service.management.handler;
 
 import com.rbkmoney.cashreg.domain.SourceData;
+import com.rbkmoney.cashreg.service.management.converter.StateResultWrapper;
 import com.rbkmoney.cashreg.service.management.converter.ManagementConverter;
 import com.rbkmoney.cashreg.service.management.handler.iface.ManagementHandler;
 import com.rbkmoney.cashreg.service.mg.aggregate.mapper.ChangeType;
@@ -26,7 +27,8 @@ public class SessionChangePayloadStartedManagementHandler implements ManagementH
         log.info("Start {}, change {}, receipt {}", HANDLER_NAME, change, receipt);
         CashregResult result = providerService.register(receipt, null);
         log.info("Finish {}, change {}, receipt {}, result {}", HANDLER_NAME, change, receipt, result);
-        return managementConverter.convert(result);
+        StateResultWrapper wrapper = StateResultWrapper.builder().result(result).build();
+        return managementConverter.convert(wrapper);
     }
 
     @Override
