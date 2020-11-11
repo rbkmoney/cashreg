@@ -8,6 +8,7 @@ import com.rbkmoney.damsel.cashreg.processing.*;
 import com.rbkmoney.damsel.cashreg.receipt.ReceiptNotFound;
 import com.rbkmoney.machinarium.client.AutomatonClient;
 import com.rbkmoney.machinarium.domain.TMachineEvent;
+import com.rbkmoney.machinarium.exception.MachineAlreadyExistsException;
 import com.rbkmoney.machinegun.msgpack.Value;
 import com.rbkmoney.machinegun.stateproc.HistoryRange;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,11 @@ public class CashRegServerManagementHandler implements ManagementSrv.Iface {
     @Override
     public void create(ReceiptParams receiptParams) throws ReceiptNotFound, TException {
         Change change = managementAggregate.toCashRegCreatedChange(receiptParams);
-        automatonClient.start(receiptParams.getReceiptId(), ProtoUtils.toValue(Collections.singletonList(change)));
+        try {
+            automatonClient.start(receiptParams.getReceiptId(), ProtoUtils.toValue(Collections.singletonList(change)));
+        } catch (MachineAlreadyExistsException ex) {
+            log.error("Machine {} already exists", receiptParams.getReceiptId(), ex);
+        }
     }
 
     @Override
