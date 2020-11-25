@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.rbkmoney.cashreg.service.management.aggregate.ManagementAggregator;
 import com.rbkmoney.cashreg.utils.cashreg.creators.CashRegProviderCreators;
+import com.rbkmoney.cashreg.utils.cashreg.extractors.ReceiptExtractor;
 import com.rbkmoney.damsel.cashreg.adapter.CashregAdapterSrv;
 import com.rbkmoney.damsel.cashreg.adapter.CashregContext;
 import com.rbkmoney.damsel.cashreg.adapter.CashregResult;
@@ -43,25 +44,25 @@ public class CashRegProviderService implements CashRegProvider {
 
     @Override
     public CashregResult register(Receipt receipt, com.rbkmoney.damsel.msgpack.Value value) {
-        log.info("register. receipt {}", receipt);
+        String receiptId = ReceiptExtractor.extractReceiptId(receipt);
         String url = extractUrl(receipt);
-        log.info("register. receipt {}, url {}", receipt, url);
+        log.info("Start register. receiptId {}, url {}", receiptId, url);
         Map<String, String> options = managementAggregate.aggregateOptions(
                 CashRegProviderCreators.createCashregProviderRef(receipt.getCashregProvider().getProviderId()),
                 receipt.getDomainRevision()
         );
         options.putAll(receipt.getCashregProvider().getProviderParams());
         CashregContext context = prepareCashRegContext(receipt, options, value);
-        log.info("register. receipt {}, url {}, context {}", receipt, url, context);
+        log.info("Finish register. receiptId {}, url {}", receiptId, url);
         return call(url, NETWORK_TIMEOUT_SEC, context);
     }
 
     private CashregResult call(String url, Integer networkTimeout, CashregContext context) {
-        log.info("call start. url {}, context {}", url, context);
+        log.debug("Start call. url {}", url);
         CashregAdapterSrv.Iface provider = providerCache.get(url, key -> cashRegProviderSrv(url, networkTimeout));
         try {
             CashregResult cashregResult = provider.register(context);
-            log.info("call finish. url {}, context {}, result {}", url, context, cashregResult);
+            log.debug("Finish call. url {}, result {}", url, cashregResult);
             return cashregResult;
         } catch (TException ex) {
             // Add more exception
@@ -71,9 +72,10 @@ public class CashRegProviderService implements CashRegProvider {
     }
 
     private String extractUrl(Receipt receipt) {
-        log.info("extractUrl start. receipt {}", receipt);
+        String receiptId = ReceiptExtractor.extractReceiptId(receipt);
+        log.debug("Start extractUrl. receiptId {}", receiptId);
         ProxyObject proxyObject = managementAggregate.extractProxyObject(receipt);
-        log.info("extractUrl. receipt {}, proxyObject {}", receipt, proxyObject);
+        log.debug("Finish extractUrl. receiptId {}, proxyObject {}", receiptId, proxyObject);
         return proxyObject.getData().getUrl();
     }
 

@@ -26,27 +26,27 @@ public class DominantServiceImpl implements DominantService {
 
     @Override
     public ResponseDominantWrapper<ProxyObject> getProxyObject(ProxyRef proxyRef, Long revisionVersion) {
-        log.info("Trying to get ProxyObject, proxyRef={}", proxyRef);
+        log.debug("Trying to get ProxyObject, proxyRef={}", proxyRef);
         ResponseDominantWrapper<VersionedObject> versionedObjectWrapper = getVersionedObjectFromReference(proxy(proxyRef), revisionVersion);
         ProxyObject proxyObject = versionedObjectWrapper.getResponse().getObject().getProxy();
-        log.info("ProxyObject has been found, versionedObjectWrapper={}", proxyObject, versionedObjectWrapper);
+        log.debug("ProxyObject has been found, versionedObjectWrapper={}", proxyObject, versionedObjectWrapper);
         ResponseDominantWrapper<ProxyObject> response = new ResponseDominantWrapper<>();
         response.setResponse(proxyObject);
         response.setRevisionVersion(versionedObjectWrapper.getRevisionVersion());
-        log.info("ProxyObject {} has been found, reference={}, response {}", versionedObjectWrapper, revisionVersion, response);
+        log.debug("ProxyObject {} has been found, reference={}, response {}", versionedObjectWrapper, revisionVersion, response);
         return response;
     }
 
     @Override
     public ResponseDominantWrapper<CashRegisterProviderObject> getCashRegisterProviderObject(CashRegisterProviderRef providerRef, Long revisionVersion) {
-        log.info("Trying to get CashRegProviderObject, providerRef={}", providerRef);
+        log.debug("Trying to get CashRegProviderObject, providerRef={}", providerRef);
         ResponseDominantWrapper<VersionedObject> versionedObjectWrapper = getVersionedObjectFromReference(cash_register_provider(providerRef), revisionVersion);
         CashRegisterProviderObject providerObject = versionedObjectWrapper.getResponse().getObject().getCashRegisterProvider();
-        log.info("CashRegProviderObject {} has been found, versionedObjectWrapper={}", providerObject, versionedObjectWrapper);
+        log.debug("CashRegProviderObject {} has been found, versionedObjectWrapper={}", providerObject, versionedObjectWrapper);
         ResponseDominantWrapper<CashRegisterProviderObject> response = new ResponseDominantWrapper<>();
         response.setResponse(providerObject);
         response.setRevisionVersion(versionedObjectWrapper.getRevisionVersion());
-        log.info("CashRegProviderObject {} has been found, revisionVersion={}, response {}", versionedObjectWrapper, revisionVersion, response);
+        log.debug("CashRegProviderObject {} has been found, revisionVersion={}, response {}", versionedObjectWrapper, revisionVersion, response);
         return response;
     }
 
@@ -60,11 +60,11 @@ public class DominantServiceImpl implements DominantService {
                 referenceRevision = Reference.version(revisionVersion);
             }
             VersionedObject versionedObject = checkoutObject(referenceRevision, reference);
-            log.info("VersionedObject {} has been found, reference={} revisionVersion={}", versionedObject, reference, revisionVersion);
+            log.debug("VersionedObject {} has been found, reference={} revisionVersion={}", versionedObject, reference, revisionVersion);
             ResponseDominantWrapper<VersionedObject> response = new ResponseDominantWrapper<>();
             response.setResponse(versionedObject);
             response.setRevisionVersion(versionedObject.getVersion());
-            log.info("VersionedObject {} has been found, reference={}, response {}", versionedObject, reference, response);
+            log.debug("VersionedObject {} has been found, reference={}, response {}", versionedObject, reference, response);
             return response;
         } catch (VersionNotFound | ObjectNotFound ex) {
             throw new NotFoundException(String.format("Version not found, reference=%s", reference), ex);
@@ -74,7 +74,7 @@ public class DominantServiceImpl implements DominantService {
     }
 
     private VersionedObject checkoutObject(Reference revisionReference, com.rbkmoney.damsel.domain.Reference reference) throws TException {
-        log.info("checkoutObject revisionReference={}, reference={}", revisionReference, reference);
+        log.debug("checkoutObject revisionReference={}, reference={}", revisionReference, reference);
         return dominantClient.checkoutObject(revisionReference, reference);
     }
 }

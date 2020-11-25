@@ -18,7 +18,7 @@ public class MgChangeManagerMapper {
     private final List<Mapper> changeMappers;
 
     public Receipt handle(Change change) {
-        log.info("MgChangeManagerMapper - process. Change {}", change);
+        log.debug("MgChangeManagerMapper - process. Change {}", change);
         return changeMappers.stream()
                 .filter(mapper -> mapper.filter(change))
                 .findFirst()
@@ -27,9 +27,9 @@ public class MgChangeManagerMapper {
     }
 
     public Receipt process(List<Change> changes) {
-        log.info("MgChangeManagerMapper - process. List Changes {}", changes);
+        log.debug("MgChangeManagerMapper - process. List Changes {}", changes);
         Receipt receipt = changes.stream().map(this::handle).reduce(new Receipt(), ProtoUtils::mergeReceipts);
-        log.info("MgChangeManagerMapper - process. List Changes {}, receipt {}", changes, receipt);
+        log.debug("MgChangeManagerMapper - process. List Changes {}, receipt {}", changes, receipt);
         return receipt;
     }
 

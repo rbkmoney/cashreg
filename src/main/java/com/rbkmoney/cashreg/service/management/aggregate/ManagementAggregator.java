@@ -29,7 +29,7 @@ public class ManagementAggregator {
 
     public Change toCashRegCreatedChange(ReceiptParams params) {
         CreatedChange created = new CreatedChange();
-        log.info("toCashRegCreatedChange params {}", params);
+        log.debug("toCashRegCreatedChange params {}", params);
 
         Long domainRevision = null;
         Long partyRevision = partyManagementService.getPartyRevision(params.getPartyId());
@@ -37,7 +37,7 @@ public class ManagementAggregator {
 
         // TODO: select provider, but now get first in list
         CashRegisterProvider cashRegisterProvider = params.getProviders().get(0);
-        log.info("toCashRegCreatedChange partyRevision {}, shop {}, cashRegisterProvider {}", partyRevision, shop, cashRegisterProvider);
+        log.debug("toCashRegCreatedChange partyRevision {}, shop {}, cashRegisterProvider {}", partyRevision, shop, cashRegisterProvider);
 
         ResponseDominantWrapper<CashRegisterProviderObject> providerObject = dominantService.getCashRegisterProviderObject(
                 CashRegProviderCreators.createCashregProviderRef(cashRegisterProvider.getProviderId()),
@@ -47,7 +47,7 @@ public class ManagementAggregator {
         domainRevision = providerObject.getRevisionVersion();
         Map<String, String> aggregateOptions = aggregateOptions(providerObject, cashRegisterProvider);
         Contract contract = partyManagementService.getContract(params.getPartyId(), shop.getContractId(), partyRevision);
-        log.info("toCashRegCreatedChange contract {}", contract);
+        log.debug("toCashRegCreatedChange contract {}", contract);
 
         AccountInfo accountInfo = new AccountInfo()
                 .setLegalEntity(prepareLegalEntity(contract, aggregateOptions));

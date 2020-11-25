@@ -35,27 +35,25 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
 
     @Override
     protected SignalResultData<Change> processSignalInit(TMachine<Change> tMachine, Value value) {
-        log.info("Request processSignalInit() machineId: {} value: {}", tMachine.getMachineId(), value);
+        log.debug("Request processSignalInit() machineId: {} value: {}", tMachine.getMachineId(), value);
         List<Change> changes = ProtoUtils.toChangeList(value);
-        log.info("Request processSignalInit() machineId: {} changes 1: {}", tMachine.getMachineId(), changes);
         SourceData sourceData = managementService.signalInit();
         changes.add(sourceData.getChange());
-        log.info("Request processSignalInit() machineId: {} changes 2: {}", tMachine.getMachineId(), changes);
         SignalResultData<Change> resultData = new SignalResultData<>(
                 value,
                 ProtoUtils.toChangeList(toValue(changes)),
                 sourceData.getComplexAction()
         );
-        log.info("Response of processSignalInit: {}", resultData);
+        log.debug("Response of processSignalInit: {}", resultData);
         return resultData;
     }
 
     @Override
     protected SignalResultData<Change> processSignalTimeout(TMachine<Change> tMachine, List<TMachineEvent<Change>> tMachineEvents) {
-        log.info("Request processSignalTimeout() machineId: {}, event: {}, tMachineEvents {}", tMachine.getMachineId(), tMachine.getMachineEvent(), tMachineEvents);
+        log.debug("Request processSignalTimeout() machineId: {}, event: {}, tMachineEvents {}", tMachine.getMachineId(), tMachine.getMachineEvent(), tMachineEvents);
         List<Change> changes = tMachineEvents.stream().map(TMachineEvent::getData).collect(Collectors.toList());
         SourceData sourceData = managementService.signalTimeout(changes);
-        log.info("ProcessSignalTimeout sourceData {}", sourceData);
+        log.debug("ProcessSignalTimeout sourceData {}", sourceData);
         List<Change> newChanges = new ArrayList<>();
         if (sourceData.getChange() != null) {
             newChanges = Collections.singletonList(sourceData.getChange());
@@ -65,7 +63,7 @@ public class ManagementProcessorHandler extends AbstractProcessorHandler<Value, 
                 toChangeList(toValue(newChanges)),
                 sourceData.getComplexAction()
         );
-        log.info("Response of processSignalTimeout: {}", resultData);
+        log.debug("Response of processSignalTimeout: {}", resultData);
         return resultData;
     }
 

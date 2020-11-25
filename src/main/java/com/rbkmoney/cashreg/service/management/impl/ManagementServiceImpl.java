@@ -42,11 +42,11 @@ public class ManagementServiceImpl implements ManagementService {
 
     @Override
     public SourceData signalTimeout(List<Change> changes) {
-        log.info("signalTimeout start changes {}", changes);
+        log.debug("signalTimeout start changes {}", changes);
         Change lastChange = getLastChange(changes);
-        log.info("signalTimeout changes {}, lastChanges {}", changes, lastChange);
+        log.debug("signalTimeout changes {}, lastChanges {}", changes, lastChange);
         Receipt receipt = mgChangeManagerMapper.process(changes);
-        log.info("signalTimeout changes {}, lastChanges {}, receipt {}", changes, lastChange, receipt);
+        log.debug("signalTimeout changes {}, lastChanges {}, receipt {}", changes, lastChange, receipt);
         return managementHandlers.stream()
                 .filter(handler -> handler.filter(lastChange, receipt))
                 .findFirst()

@@ -42,9 +42,9 @@ public class CashRegServerManagementHandler implements ManagementSrv.Iface {
     @Override
     public Receipt get(String receiptID) throws ReceiptNotFound, TException {
         List<Change> changes = automatonClient.getEvents(receiptID).stream().map(TMachineEvent::getData).collect(Collectors.toList());
-        log.info("Get receiptID {}, changes {}", receiptID, changes);
+        log.debug("Get receiptID {}, changes {}", receiptID, changes);
         Receipt receipt = mgChangeManagerMapper.process(changes);
-        log.info("Get receiptID {}, changes {}, receipt {}", receiptID, changes, receipt);
+        log.debug("Get receiptID {}, changes {}, receipt {}", receiptID, changes, receipt);
         return receipt;
     }
 
