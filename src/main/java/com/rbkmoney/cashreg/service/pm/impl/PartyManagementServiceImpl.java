@@ -96,6 +96,7 @@ public class PartyManagementServiceImpl implements PartyManagementService {
         if (partyContractor == null) {
             throw new NotFoundException(String.format("Contractor not found, partyId='%s', contractId='%s'", party.getId(), contract.getId()));
         }
+        log.debug("Contractor has been found, partyId='{}', contractId='{}'", partyId, contract.getId());
         return partyContractor.getContractor();
     }
 
