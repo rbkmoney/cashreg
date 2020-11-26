@@ -86,7 +86,7 @@ public class ManagementAggregator {
     }
 
     private com.rbkmoney.damsel.cashreg.domain.LegalEntity prepareLegalEntity(Contract contract, Contractor contractor, Map<String, String> proxyOptions) {
-        if(contract.getContractor() != null ) {
+        if(contract.isSetContractor()) {
             return prepareLegalEntity(contract.getContractor(), proxyOptions);
         }
         return prepareLegalEntity(contractor, proxyOptions);
