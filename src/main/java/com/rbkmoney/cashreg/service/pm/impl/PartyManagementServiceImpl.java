@@ -88,15 +88,15 @@ public class PartyManagementServiceImpl implements PartyManagementService {
     }
 
     @Override
-    public Contractor getContractor(String partyId, Contract contract, Long revision) {
-        log.debug("Trying to get Contractor, partyId='{}', contractId='{}', revision='{}", partyId, contract.getId(), revision);
+    public Contractor getContractor(String partyId, String contractorId, Long revision) {
+        log.debug("Trying to get Contractor, partyId='{}', contractId='{}', revision='{}", partyId, contractorId, revision);
         PartyRevisionParam partyRevisionParam = revision(revision);
         Party party = getParty(partyId, partyRevisionParam);
-        PartyContractor partyContractor = party.getContractors().get(contract.getContractorId());
+        PartyContractor partyContractor = party.getContractors().get(contractorId);
         if (partyContractor == null) {
-            throw new NotFoundException(String.format("Contractor not found, partyId='%s', contractId='%s'", party.getId(), contract.getId()));
+            throw new NotFoundException(String.format("Contractor not found, partyId='%s', contractorId='%s'", party.getId(), contractorId));
         }
-        log.debug("Contractor has been found, partyId='{}', contractId='{}'", partyId, contract.getId());
+        log.debug("Contractor has been found, partyId='{}', contractorId='{}'", partyId, contractorId);
         return partyContractor.getContractor();
     }
 

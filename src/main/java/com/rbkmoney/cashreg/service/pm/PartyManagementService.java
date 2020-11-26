@@ -12,5 +12,5 @@ public interface PartyManagementService {
 
     long getPartyRevision(String partyId);
 
-    Contractor getContractor(String partyId, Contract contract, Long revision);
+    Contractor getContractor(String partyId, String contractorId, Long revision);
 }

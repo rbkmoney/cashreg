@@ -47,11 +47,16 @@ public class ManagementAggregator {
         domainRevision = providerObject.getRevisionVersion();
         Map<String, String> aggregateOptions = aggregateOptions(providerObject, cashRegisterProvider);
         Contract contract = partyManagementService.getContract(params.getPartyId(), shop.getContractId(), partyRevision);
-        Contractor contractor = partyManagementService.getContractor(params.getPartyId(), contract, partyRevision);
+        Contractor contractor;
+        if(contract.isSetContractor()) {
+            contractor = contract.getContractor();
+        } else {
+            contractor = partyManagementService.getContractor(params.getPartyId(), contract.getContractorId(), partyRevision);
+        }
         log.debug("toCashRegCreatedChange contract {}", contract);
 
         AccountInfo accountInfo = new AccountInfo()
-                .setLegalEntity(prepareLegalEntity(contract, contractor, aggregateOptions));
+                .setLegalEntity(prepareLegalEntity(contractor, aggregateOptions));
 
         Receipt receipt = new Receipt()
                 .setCashregProvider(cashRegisterProvider)
@@ -83,13 +88,6 @@ public class ManagementAggregator {
     public Map<String, String> aggregateOptions(com.rbkmoney.damsel.domain.CashRegisterProviderRef providerRef, Long domainRevision) {
         ResponseDominantWrapper<CashRegisterProviderObject> wrapperProviderObject = dominantService.getCashRegisterProviderObject(providerRef, domainRevision);
         return aggregateOptions(wrapperProviderObject, null);
-    }
-
-    private com.rbkmoney.damsel.cashreg.domain.LegalEntity prepareLegalEntity(Contract contract, Contractor contractor, Map<String, String> proxyOptions) {
-        if(contract.isSetContractor()) {
-            return prepareLegalEntity(contract.getContractor(), proxyOptions);
-        }
-        return prepareLegalEntity(contractor, proxyOptions);
     }
 
     private com.rbkmoney.damsel.cashreg.domain.LegalEntity prepareLegalEntity(Contractor contractor, Map<String, String> proxyOptions) {
