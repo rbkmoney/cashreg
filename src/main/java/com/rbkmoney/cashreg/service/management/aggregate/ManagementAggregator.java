@@ -47,10 +47,11 @@ public class ManagementAggregator {
         domainRevision = providerObject.getRevisionVersion();
         Map<String, String> aggregateOptions = aggregateOptions(providerObject, cashRegisterProvider);
         Contract contract = partyManagementService.getContract(params.getPartyId(), shop.getContractId(), partyRevision);
+        Contractor contractor = partyManagementService.getContractor(params.getPartyId(), contract, partyRevision);
         log.debug("toCashRegCreatedChange contract {}", contract);
 
         AccountInfo accountInfo = new AccountInfo()
-                .setLegalEntity(prepareLegalEntity(contract, aggregateOptions));
+                .setLegalEntity(prepareLegalEntity(contract, contractor, aggregateOptions));
 
         Receipt receipt = new Receipt()
                 .setCashregProvider(cashRegisterProvider)
@@ -84,8 +85,15 @@ public class ManagementAggregator {
         return aggregateOptions(wrapperProviderObject, null);
     }
 
-    private com.rbkmoney.damsel.cashreg.domain.LegalEntity prepareLegalEntity(Contract contract, Map<String, String> proxyOptions) {
-        com.rbkmoney.damsel.domain.RussianLegalEntity russianLegalEntityDomain = contract.getContractor().getLegalEntity().getRussianLegalEntity();
+    private com.rbkmoney.damsel.cashreg.domain.LegalEntity prepareLegalEntity(Contract contract, Contractor contractor, Map<String, String> proxyOptions) {
+        if(contract.getContractor() != null ) {
+            return prepareLegalEntity(contract.getContractor(), proxyOptions);
+        }
+        return prepareLegalEntity(contractor, proxyOptions);
+    }
+
+    private com.rbkmoney.damsel.cashreg.domain.LegalEntity prepareLegalEntity(Contractor contractor, Map<String, String> proxyOptions) {
+        com.rbkmoney.damsel.domain.RussianLegalEntity russianLegalEntityDomain = contractor.getLegalEntity().getRussianLegalEntity();
 
         com.rbkmoney.damsel.cashreg.domain.RussianLegalEntity russianLegalEntity = new com.rbkmoney.damsel.cashreg.domain.RussianLegalEntity()
                 .setEmail(proxyOptions.get(ExtraField.COMPANY_EMAIL.getField()))

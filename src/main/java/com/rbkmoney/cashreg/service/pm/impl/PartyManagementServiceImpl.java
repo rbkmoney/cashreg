@@ -5,9 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.rbkmoney.cashreg.service.exception.NotFoundException;
 import com.rbkmoney.cashreg.service.exception.PartyNotFoundException;
 import com.rbkmoney.cashreg.service.pm.PartyManagementService;
-import com.rbkmoney.damsel.domain.Contract;
-import com.rbkmoney.damsel.domain.Party;
-import com.rbkmoney.damsel.domain.Shop;
+import com.rbkmoney.damsel.domain.*;
 import com.rbkmoney.damsel.payment_processing.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.thrift.TException;
@@ -68,15 +66,7 @@ public class PartyManagementServiceImpl implements PartyManagementService {
         log.debug("Trying to get contract, partyId='{}', contractId='{}', revision='{}", partyId, contractId, revision);
         PartyRevisionParam partyRevisionParam = revision(revision);
         Party party = getParty(partyId, partyRevisionParam);
-
-        Optional<Contract> partyContract = party.getContracts()
-                .entrySet()
-                .stream()
-                .filter(contractEntry-> contractEntry.getValue().getId().equals(contractId))
-                .map(Map.Entry::getValue)
-                .findFirst();
-
-        Contract contract = partyContract.orElseGet(() -> party.getContracts().get(contractId));
+        Contract contract = party.getContracts().get(contractId);
         if (contract == null) {
             throw new NotFoundException(String.format("Contract not found, partyId='%s', contractId='%s', partyRevisionParam='%s'", partyId, contractId, partyRevisionParam));
         }
@@ -95,6 +85,26 @@ public class PartyManagementServiceImpl implements PartyManagementService {
             throw new PartyNotFoundException(String.format("Party not found, partyId='%s'", partyId), ex);
         } catch (TException ex) {
             throw new RuntimeException(String.format("Failed to get party revision, partyId='%s'", partyId), ex);
+        }
+    }
+
+    @Override
+    public Contractor getContractor(String partyId, Contract contract, Long revision) {
+        log.debug("Trying to get Contractor, partyId='{}', contractId='{}', revision='{}", partyId, contract.getId(), revision);
+        PartyRevisionParam partyRevisionParam = revision(revision);
+        Party party = getParty(partyId, partyRevisionParam);
+
+        Optional<PartyContractor> partyContractor = party.getContractors()
+                .entrySet()
+                .stream()
+                .filter(contractEntry-> contractEntry.getValue().getId().equals(contract.getContractorId()))
+                .map(Map.Entry::getValue)
+                .findFirst();
+
+        if(partyContractor.isPresent()) {
+            return partyContractor.get().getContractor();
+        } else {
+            throw new NotFoundException(String.format("Contractor not found, partyId='%s', contractId='%s'", party.getId(), contract.getId()));
         }
     }
 
