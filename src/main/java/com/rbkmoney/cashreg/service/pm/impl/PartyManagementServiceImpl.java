@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static com.rbkmoney.damsel.payment_processing.PartyRevisionParam.revision;
 
@@ -67,7 +68,15 @@ public class PartyManagementServiceImpl implements PartyManagementService {
         log.debug("Trying to get contract, partyId='{}', contractId='{}', revision='{}", partyId, contractId, revision);
         PartyRevisionParam partyRevisionParam = revision(revision);
         Party party = getParty(partyId, partyRevisionParam);
-        Contract contract = party.getContracts().get(contractId);
+
+        Optional<Contract> partyContract = party.getContracts()
+                .entrySet()
+                .stream()
+                .filter(contractEntry-> contractEntry.getValue().getId().equals(contractId))
+                .map(Map.Entry::getValue)
+                .findFirst();
+
+        Contract contract = partyContract.orElseGet(() -> party.getContracts().get(contractId));
         if (contract == null) {
             throw new NotFoundException(String.format("Contract not found, partyId='%s', contractId='%s', partyRevisionParam='%s'", partyId, contractId, partyRevisionParam));
         }
