@@ -93,11 +93,10 @@ public class PartyManagementServiceImpl implements PartyManagementService {
         PartyRevisionParam partyRevisionParam = revision(revision);
         Party party = getParty(partyId, partyRevisionParam);
         PartyContractor partyContractor = party.getContractors().get(contract.getContractorId());
-        if(partyContractor != null) {
-            return partyContractor.getContractor();
-        } else {
+        if (partyContractor == null) {
             throw new NotFoundException(String.format("Contractor not found, partyId='%s', contractId='%s'", party.getId(), contract.getId()));
         }
+        return partyContractor.getContractor();
     }
 
     private Party callCheckout(String partyId, PartyRevisionParam partyRevisionParam) {
